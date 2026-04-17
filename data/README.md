@@ -243,89 +243,111 @@ For the top 500 exporters per country that couldn't be matched automatically, I 
 
 ## 8. AI Review Files
 
-**Used by:** Script 01 (between the fuzzy matching steps)
+**Used by:** Script 01 (between the two fuzzy matching stages)
 
-Script 01 has two pause points where you need to run the Python name-matching scripts and then send the results to an AI model for validation. The AI checks each candidate pair (customs firm name vs. corporate database name) and says whether they're the same company.
+After each round of fuzzy name matching, the Python script produces a list of candidate pairs — each row says "this customs firm name might be the same company as this corporate database entry." Before accepting those matches, an AI model (GPT-4 or Gemini) checks each pair and confirms whether they really are the same company.
 
-### How the files flow
+Script 01 stops twice and waits for you to complete this review before continuing. Here is exactly what happens each time.
 
-```
-Script 01 (Stage 2a) generates:
-  data/intermediate/ia_review/Match_preIA_ARG.csv
-  data/intermediate/ia_review/Match_preIA_CHL.csv
-  ... (one per country)
+---
 
-You send these to AI → get back:
-  data/intermediate/ia_review/Match_preIA_ARG_scored.csv
-  data/intermediate/ia_review/Match_preIA_CHL_scored.csv
-  ... (same, with AI scores added)
+### Round 1 — Country-by-country review
 
-Script 01 (Stage 2c) then generates:
-  data/intermediate/ia_review/final_match_preIA.csv
-
-You send this to AI → get back:
-  data/intermediate/final_match_postIA.csv
-```
-
-### AI prompt to use (for all review steps)
-
-Paste this into GPT-4 or Gemini, then give it the rows from each CSV file:
+Script 01 (Stage 2a) creates one CSV per country in `data/intermediate/ia_review/`:
 
 ```
-You are a research assistant specialized in identifying companies.
-I will give you two company names: one is the original company name
-(firm_name), and the other is the result of a previous database
-match (company_name).
-
-Your task: Determine whether firm_name and company_name refer to
-the same company or companies belonging to the same parent company.
-
-Output format (always in this structure, no explanations):
-Q1: Yes/Non || Q2: <score from 1 to 10>
-
-Q1: "Yes" if same company or shared parent — "Non" otherwise
-Q2: 1 = very low certainty, 10 = very high certainty
-
-Additional rules:
-- Auto-mark identical names (post normalisation) as Yes/10
-- Use web search to verify ownership when uncertain
-- Count parent-subsidiary ties as Yes
-- Consider both English and Spanish names
-- Ignore generic terms (health, logistics, services) when comparing
+Match_preIA_ARG.csv
+Match_preIA_CHL.csv
+Match_preIA_COL.csv
+... (one file per country, 10 total)
 ```
 
-### For the duplicate ranking step (Stage 5 in script 01)
+Each file has two columns: `firm_name` (from customs) and `company_name` (from the corporate database). Your job is to send each file to the AI and get back a scored version. Save the scored files in the same folder with `_scored` added to the name:
 
-Same prompt as above, but add this output column:
 ```
-Q3: <rank from 1 to n>   (1 = most probable match among duplicates)
+Match_preIA_ARG_scored.csv
+Match_preIA_CHL_scored.csv
+... (same files, now with AI scores added)
 ```
-This is needed when one customs firm matched multiple corporate database entries.
 
-### Columns the scored CSV files must have
+Once all 10 scored files are in place, re-run `00_master.do` and script 01 will continue.
 
-| Column | Type | Meaning |
+---
+
+### Round 2 — Cross-country review
+
+Script 01 (Stage 2c) creates one combined file:
+
+```
+data/intermediate/ia_review/final_match_preIA.csv
+```
+
+Send this to the AI, save the result as:
+
+```
+data/intermediate/final_match_postIA.csv
+```
+
+Re-run `00_master.do` one final time and the pipeline will finish.
+
+---
+
+### AI prompt to use
+
+Use this prompt for both rounds. Paste it at the start of your conversation with GPT-4 or Gemini, then paste the rows from the CSV beneath it.
+
+> You are a research assistant specialized in identifying companies.
+> I will give you two company names: one is the original company name (firm_name), and the other is the result of a previous database match (company_name).
+>
+> Your task: Determine whether firm_name and company_name refer to the same company, or to companies that share the same parent company.
+>
+> Output format — always use this exact structure, no extra explanation:
+> Q1: Yes/Non || Q2: \<score from 1 to 10\>
+>
+> Q1: "Yes" if they are the same company or share a parent — "Non" otherwise
+> Q2: confidence score — 1 = very uncertain, 10 = completely certain
+>
+> Rules:
+> - If the names are identical after normalisation (removing accents, punctuation, legal suffixes), mark as Yes / 10
+> - Use web search to verify ownership when you are uncertain
+> - A parent-subsidiary relationship counts as Yes
+> - Consider both English and Spanish versions of company names
+> - Ignore generic words like "health", "logistics", "services" when comparing
+
+---
+
+### Extra column needed for the duplicate ranking step (Stage 5 in script 01)
+
+When one customs firm matched more than one corporate database entry, the AI also needs to rank the candidates. Use the same prompt above but add a third output column:
+
+> Q3: \<rank from 1 to n\> — 1 = most likely match, n = least likely
+
+---
+
+### What the scored files must contain
+
+| Column | Type | What it means |
 |---|---|---|
-| `Q1` | text | "Yes" or "Non" |
-| `Q2` | number | Confidence 1–10 |
-| `Q3` | number | Rank among duplicates (Stage 5 only) |
+| `Q1` | text | "Yes" (match confirmed) or "Non" (not a match) |
+| `Q2` | number | AI confidence, 1–10 |
+| `Q3` | number | Rank among duplicates — only needed for Stage 5 |
 
 ---
 
 ## 9. Supplementary Input Files for Scripts 06 and 07
 
-These smaller datasets are merged in during the data preparation section of scripts 06 and 07. Put them all in `data/raw/`.
+Scripts 06 and 07 merge several additional datasets into the main trade data before running regressions. These are all standard datasets from public or IDB sources. Put them all in `data/raw/`.
 
-| File | What it is | Source |
+| File | What it is | Where to get it |
 |---|---|---|
-| `RCA_WITS_orig_year.dta` | Revealed comparative advantage by country, product, year | WITS |
-| `lall2000_hs2007.dta` | Technology classification (Lall 2000) mapped to HS 2007 | Author |
-| `ALP_IPC_Patent_hs2007_6_to_ipc1.dta` | Patent intensity by product | Author |
-| `UNCTAD RHCI hs_2007_indices.dta` | UNCTAD human capital intensity index | UNCTAD |
-| `tariffsPairs_88_21_vbeta1-2024-12.dta` | Bilateral tariffs 1988–2021 | MAcMap/IDB |
-| `PTA_BIT_DTT_BID.dta` | Trade agreements, investment treaties, tax treaties | IDB |
-| `WB_Income_group.dta` | World Bank country income group | World Bank |
-| `Unknown_countries_...dta` | Parent country info for firms missing it (output of script 02) | Script 02 |
+| `RCA_WITS_orig_year.dta` | Revealed comparative advantage by country, product, and year. Used to control for whether a country already has a natural export advantage in a given product. | [WITS](https://wits.worldbank.org) |
+| `lall2000_hs2007.dta` | Classifies each HS product by technology intensity (primary, resource-based, low-tech, medium-tech, high-tech) following Lall (2000). Used to test whether MNE effects differ by product type. | Compiled by author — included in repo |
+| `ALP_IPC_Patent_hs2007_6_to_ipc1.dta` | Patent intensity by product code. Measures how much R&D activity is associated with each product, based on patent filings mapped to HS codes. | Compiled by author — included in repo |
+| `UNCTAD RHCI hs_2007_indices.dta` | Human capital intensity index from UNCTAD. Measures how skill-intensive each product is to manufacture. | [UNCTAD](https://unctadstat.unctad.org) |
+| `tariffsPairs_88_21_vbeta1-2024-12.dta` | Bilateral applied tariffs between country pairs, covering 1988–2021. Used as a trade cost control in the gravity regressions. | IDB MAcMap tariff database |
+| `PTA_BIT_DTT_BID.dta` | Indicators for whether a country pair has a Preferential Trade Agreement (PTA), Bilateral Investment Treaty (BIT), or Double Taxation Treaty (DTT). | IDB Trade and Integration Division |
+| `WB_Income_group.dta` | World Bank classification of countries by income group (low, lower-middle, upper-middle, high). Used to characterise destination markets. | [World Bank](https://datahelpdesk.worldbank.org/knowledgebase/articles/906519) |
+| `Unknown_countries_...dta` | Parent country information recovered by script 02 for firms that had a BvD ID but no parent country in the original match. Merged in to fill those gaps before regressions. | Generated by script 02 |
 
 ---
 
