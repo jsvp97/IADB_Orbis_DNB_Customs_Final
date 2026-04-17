@@ -257,4 +257,4 @@ Full details in `data/README.md`.
 
 ## License
 
-The code is available for academic and research use (MIT License). The underlying data — Orbis, DNB, and the customs microdata — are not included here. They have their own licence agreements.
+The code is available for academic and research use. The underlying data — Orbis, DNB, and the customs microdata — are not included here. They have their own licence agreements.
