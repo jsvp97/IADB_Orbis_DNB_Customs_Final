@@ -1,0 +1,74 @@
+# ============================================================
+# .gitignore — orbis-dnb-customs-trade
+# ============================================================
+# Data files are NOT tracked. Raw and intermediate data contain
+# proprietary (Orbis, DNB) and restricted (customs) information.
+# ============================================================
+
+# Stata data files
+*.dta
+*.ster
+
+# Stata log and output files
+*.log
+*.smcl
+
+# Excel and CSV output files
+*.xlsx
+*.xls
+*.csv
+
+# Stata graph files
+*.gph
+
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Python virtual environment
+.venv/
+env/
+venv/
+
+# Jupyter notebooks (contain output data)
+*.ipynb
+
+# NMSLIB index files
+*.bin
+
+# Pickle files (intermediate ML objects)
+*.pkl
+*.pickle
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Output folder (generated — do not commit)
+output/
+
+# Overleaf sync folder
+overleaf/
+
+# Agro output
+agro/Output/
+
+# ============================================================
+# EXCEPTIONS — files that SHOULD be tracked despite extensions
+# ============================================================
+
+# The data README describes data structure without containing data
+!data/README.md

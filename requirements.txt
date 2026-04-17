@@ -1,0 +1,31 @@
+# requirements.txt
+# Python dependencies for the fuzzy name-matching pipeline
+# (scripts 03_fuzzy_match_by_country.py and 04_fuzzy_match_post10cou.py)
+#
+# Installation:
+#   pip install -r requirements.txt
+#
+# Python version: 3.9 or later recommended
+# Note: nmslib requires a C++ compiler on Windows. Install Visual Studio
+#       Build Tools (https://visualstudio.microsoft.com/visual-cpp-build-tools/)
+#       before running pip install nmslib.
+#       Alternatively, use the pre-built wheel:
+#         pip install nmslib-metabrainz==2.1.3
+
+# Core data handling
+pandas>=1.5.0
+numpy>=1.23.0
+
+# TF-IDF vectorisation and sparse matrix operations
+scikit-learn>=1.1.0
+scipy>=1.9.0
+
+# Approximate nearest-neighbour search (inverted index for sparse vectors)
+# Use nmslib-metabrainz if the standard nmslib build fails on Windows
+nmslib>=2.1.1
+
+# Text encoding normalisation (fixes Unicode/encoding artefacts in firm names)
+ftfy>=6.1.1
+
+# Progress bars (optional but useful for large batches)
+tqdm>=4.64.0
