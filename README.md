@@ -55,7 +55,13 @@ orbis-dnb-customs-trade/
 │   ├── 05_descriptive_stats.do       ← summary tables
 │   ├── 06_trade_analysis.do          ← main econometric analysis
 │   ├── 07_agro_trade_analysis.do     ← same analysis, agriculture only
-│   └── 08_agro_policy_report.do      ← policy report charts and tables
+│   ├── 08_agro_policy_report.do      ← policy report charts and tables
+│   ├── 09_mne_export_destinations_build.do   ← where MNE exports go: build the cube
+│   ├── 10_mne_export_destinations_tables.do  ← where MNE exports go: the tables
+│   ├── 11_ultimate_parent_build.do           ← conduit reallocation: build the cube
+│   ├── 12_ultimate_parent_tables.do          ← conduit reallocation: the tables
+│   ├── 13_fact5_dpy_fe.do                    ← Fact 5: destination×product×year FE test
+│   └── 14_ownership_covariance.do            ← Cov(θ,S): the paper's headline object
 │
 ├── data/
 │   ├── README.md                     ← what data you need and where to put it
@@ -167,6 +173,26 @@ All results are produced for three different definitions so you can choose what 
 **`07_agro_trade_analysis.do`** — same as 06 but restricted to food and agriculture (HS chapters 1–24). Results go to the `agro/` folder so they don't mix with the main analysis.
 
 **`08_agro_policy_report.do`** — makes the charts and tables for the IDB agricultural policy report. Reads from the files built by script 07.
+
+**`09_mne_export_destinations_build.do`** — reads the full transaction file once, keeping only the columns needed to answer "where do multinational exports actually go", and collapses it to a small cube (`output/tables/mne_export_destination_cube.dta`). The MNE definitions are copied verbatim from script 05, so the numbers sit on the same classification as every other table in the project. The read is the expensive step; saving the cube means it only happens once.
+
+**`10_mne_export_destinations_tables.do`** — the tables, from the cube. Coverage; the share of foreign-MNE export value that goes to the parent's own country, overall and by origin and year; the destination mix of MNE against non-MNE exporters; the top parent countries and how much each ships home; and, for each destination, the share of its imports from these ten origins that is produced by affiliates of its own multinationals. Writes four CSVs and a log to `output/tables/`.
+
+Headline result: **only 9.2% of foreign-MNE export value goes to the parent's own country**, and foreign affiliates are *less* US-oriented than local exporters (13.9% of value against 25.0%). The split by origin is large — 0.40 for El Salvador, 0.30 for the Dominican Republic, 0.28 for Costa Rica, against roughly 0.06 for Argentina, Chile and Peru.
+
+**`11_ultimate_parent_build.do`** — the recorded parent of an exporter is often a holding company in a conduit jurisdiction rather than an economic owner. This script reads the full transaction file once and builds a cube carrying three ownership sources side by side: Orbis global ultimate owner at the 50% and 25% control thresholds, and Dun & Bradstreet's global ultimate. Orbis reports ISO2 codes and D&B a country name, so both are crosswalked to ISO3 first (the two crosswalk CSVs are written by a short Python step and live in `output/tables/`).
+
+**`12_ultimate_parent_tables.do`** — applies three owner concepts to that cube: the parent as recorded, a naive chain that takes the first available ultimate owner, and an improved chain that takes the first **non-conduit** country. The naive chain is not good enough — it moves value *into* Panama and Luxembourg — which is why the third concept exists.
+
+Result: the correction is worth making but small. The share of foreign-MNE exports going to the owner's own country is 0.092 under all three concepts. The share of US imports from these origins produced by US-owned affiliates moves 0.134 → 0.136. The biggest single correction is 52.5 bn reassigned from the United Kingdom to Australia — the dual-listed mining groups. About 136 bn of export value cannot be resolved past a conduit and is reported as a range rather than assumed away.
+
+**`13_fact5_dpy_fe.do`** — the decisive test of Fact 5 ("more MNE presence, more non-MNE exports"). The published Table 1's tightest column absorbs origin×dest×product and origin×dest×year but **not** destination×product×year, so a market-level demand shock raises MNE entry and local exports together. This script re-runs the Panel B regressions on `collapsed_odpy.dta` with that term added (plus a PPML column on the level). Reads the cube from the predecessor project's `Intermediate_v4`; writes `output/tables/fact5_dpy_fe.{log,csv,tex}`.
+
+Result (2026-08-26): **the fact survives at roughly half its published size.** Intensive margin 0.166 → 0.087 (s.e. 0.017), extensive 0.117 → 0.061 (s.e. 0.011), PPML on the level with the full FE set +0.229 (s.e. 0.051), all significant at 1%. About half of the published association was common demand; the surviving half is a real fact the model must explain.
+
+**`14_ownership_covariance.do`** — measures the theory paper's headline object: the ownership-weighted concentration decomposition Σθ·S² = θ̄·HHI + Cov(θ,S), per destination×product×year market, groups = ultimate parent firms (GUO BvD id; unmatched exporters as singleton groups), aggregated with value weights into naive + between-market + within-market terms. Reads the transaction file once; writes `output/tables/ownership_cov_bymarket.dta`, `ownership_cov_owners.csv`, and a log.
+
+Result (2026-08-27): for the **United States** (θ̄ = 0.135, independently matching script 10's 0.134), the country-level calculation **understates** the ownership-weighted concentration by **10.1%** (between +0.0032, within +0.0020, both positive: US parents are disproportionately the big players in concentrated markets). The correction is owner-specific and **sign-varying** — Colombia +24%, Chile +10%, UK −10%, Argentina −24%, Peru −30% — a pattern invisible to country-level ownership shares. Value-weighted mean market HHI 0.373 (within-LAC-sample shares), 35 groups per market.
 
 ---
 
