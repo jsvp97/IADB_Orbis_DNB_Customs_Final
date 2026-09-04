@@ -1,0 +1,1876 @@
+﻿\documentclass[article, 12pt, 3p]{elsarticle}
+
+\usepackage{natbib}
+\setcitestyle{authoryear,open={(},close={)}}
+
+\usepackage{etoolbox,comment,setspace,fancyhdr,hyperref,color,graphicx,subcaption,booktabs,rotating,multirow}
+
+\captionsetup[subfigure]{labelformat=simple,labelsep=space}
+\renewcommand\thesubfigure{(\roman{subfigure})}
+
+\newcounter{rowfig}
+\renewcommand{\therowfig}{\Alph{rowfig}}
+\usepackage{pifont}
+\usepackage{amsmath,amsthm,amssymb,amstext,bbold,amsfonts}
+\usepackage{float,caption}
+\usepackage{threeparttable}
+\usepackage{lscape}
+\usepackage{bbm}
+\usepackage{adjustbox}
+\usepackage[tracking=true]{microtype}
+
+\hypersetup{
+  colorlinks = true,
+  urlcolor   = blue,
+  linkcolor  = black,
+  citecolor  = blue
+}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{definition}{Definition}
+\newtheorem{assumption}{Assumption}
+\newtheorem{condition}{Condition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{conjecture}{Conjecture}
+\newtheorem{corollary}{Corollary}
+\numberwithin{corollary}{proposition}
+%\numberwithin{equation}{}  % removed: empty counter argument causes LaTeX error
+
+\pdfminorversion=6
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\makeatletter
+\def\ps@pprintTitle{%
+   \let\@oddhead\@empty
+   \let\@evenhead\@empty
+   \let\@oddfoot\@empty
+   \let\@evenfoot\@oddfoot
+}
+\makeatother
+
+\usepackage{ragged2e}
+\usepackage{setspace}
+\usepackage{caption}
+% pstricks/epsfig/pst-grad/pst-plot removed: dvips-only, incompatible with pdflatex
+% grffile + \patchcmd\Gread@eps removed: caused "Unknown graphics extension" errors
+%   on captions containing dots (e.g. "Figure 1.3.2b"); not needed in TeXLive 2019+
+\usepackage[utf8]{inputenc}
+\usepackage{stackrel}
+\usepackage{array}
+\usepackage{siunitx}
+\setlength{\extrarowheight}{4pt}
+\renewcommand\normalsize{\fontsize{11}{8}\selectfont}
+\newcommand\narrowstyle{\SetTracking{encoding=*}{-10}\lsstyle}
+\newcommand\vnarrowstyle{\SetTracking{encoding=*}{-40}\lsstyle}
+\newcommand\vvnarrowstyle{\SetTracking{encoding=*}{-75}\lsstyle}
+\newcommand\narrowtext[1]{\textls[-10]{#1}}
+\newcommand\vnarrowtext[1]{\textls[-40]{#1}}
+\newcommand\vvnarrowtext[1]{\textls[-75]{#1}}
+
+\makeatletter
+\renewcommand\footnotesize{%
+   \@setfontsize\footnotesize\@ixpt{9}%
+   \abovedisplayskip 8\p@ \@plus2\p@ \@minus4\p@
+   \abovedisplayshortskip \z@ \@plus\p@
+   \belowdisplayshortskip 4\p@ \@plus2\p@ \@minus2\p@
+   \def\@listi{\leftmargin\leftmarginin
+               \topsep 4\p@ \@plus2\p@ \@minus2\p@
+               \parsep 2\p@ \@plus\p@ \@minus\p@
+               \itemsep \parsep}%
+   \belowdisplayskip \abovedisplayskip
+}
+\makeatother
+
+\usepackage{setspace}
+\usepackage[hang,flushmargin,stable]{footmisc}
+\setlength{\footnotemargin}{3mm}
+\renewcommand{\footnotelayout}{\setstretch{1.2}}
+\usepackage[sc]{mathpazo}
+\linespread{1.5}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{verbose,tmargin=4cm,bmargin=4cm,lmargin=3cm,rmargin=3cm}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{pdfpages}
+\usepackage{dsfont}
+
+%--- Text shortcuts ---
+\newcommand{\bc}{\begin{center}}
+\newcommand{\ec}{\end{center}}
+\newcommand{\bt}{\begin{tabular}}
+\newcommand{\et}{\end{tabular}}
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\ben}{\begin{enumerate}}
+\newcommand{\een}{\end{enumerate}}
+\newcommand{\bd}{\begin{displaymath}}
+\newcommand{\ed}{\end{displaymath}}
+\newcommand{\beann}{\begin{eqnarray*}}
+\newcommand{\eeann}{\end{eqnarray*}}
+\newcommand{\bea}{\begin{eqnarray}}
+\newcommand{\eea}{\end{eqnarray}}
+\newcommand{\ba}{\begin{array}}
+\newcommand{\ea}{\end{array}}
+\newcommand{\bma}{\begin{pmatrix}}
+\newcommand{\ema}{\end{pmatrix}}
+
+%--- Math shortcuts ---
+\newcommand{\Ra}{\Rightarrow}
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bbN}{\mathbb{N}}
+\newcommand{\E}{\mathnormal{E}}
+\newcommand{\var}{\mathnormal{V\!AR}}
+\newcommand{\Cov}{\mathnormal{COV}}
+\newcommand{\Prob}{\mathnormal{Prob}}
+\newcommand{\nn}{\nonumber}
+\newcommand{\colorEmphText}{\color{blue}}
+
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage{dcolumn}
+    \newcolumntype{d}[1]{D{.}{.}{#1}}
+
+% Estout wrappers
+\let\estinput=\input
+\newcommand{\estwide}[3]{
+    \vspace{.75ex}{
+        \begin{tabular*}
+        {\textwidth}{@{\hskip\tabcolsep\extracolsep\fill}l*{#2}{#3}}
+        \toprule
+        \estinput{#1}
+        \addlinespace[.75ex]
+        \end{tabular*}
+    }
+}
+\newcommand{\estauto}[3]{
+    \vspace{.75ex}{
+        \begin{tabular}{l*{#2}{#3}}
+        \toprule
+        \estinput{#1}
+        \\ \bottomrule
+        \addlinespace[-.75ex]
+        \end{tabular}
+    }
+}
+
+\newcommand{\specialcell}[2][c]{%
+    \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}
+}
+\usepackage{float}
+\newcommand{\sym}[1]{\rlap{#1}}
+\usepackage{hhline}
+\captionsetup{font=normalsize}
+
+% Notes after tables/figures (kept for optional use)
+\newcommand{\figtext}[1]{
+    \vspace{-1.9ex}
+    \captionsetup{justification=justified,font=scriptsize}
+    \caption*{\hspace{6pt}\hangindent=1.5em #1}
+}
+\newcommand{\fignote}[1]{\figtext{\emph{Note:~}~#1}}
+\newcommand{\figsource}[1]{\figtext{\emph{Source:~}~#1}}
+\newcommand{\starnote}{\figtext{* p $<$ 0.1, ** p $<$ 0.05, *** p $<$ 0.01. Standard errors in parentheses.}}
+
+% subfig removed: conflicts with subcaption (loaded above); subfigure env provided by subcaption
+
+\usepackage{tikz}
+\newcommand{\tikzxmark}{%
+\tikz[scale=0.23] {
+    \draw[line width=0.7,line cap=round] (0,0) to [bend left=6] (1,1);
+    \draw[line width=0.7,line cap=round] (0.2,0.95) to [bend right=3] (0.8,0.05);
+}}
+\newcommand{\tikzcmark}{%
+\tikz[scale=0.23] {
+    \draw[line width=0.7,line cap=round] (0.25,0) to [bend left=10] (1,1);
+    \draw[line width=0.8,line cap=round] (0,0.35) to [bend right=1] (0.23,0);
+}}
+
+\makeatletter
+\newcommand*\mysize{\@setfontsize\mysize{7.5}{9.0}}
+\makeatother
+
+% ---------------------------------------------------------------
+% HELPER MACROS
+%
+%   \figone{path.png}{Short caption}
+%   \figtwo{a.png}{b.png}{Short caption}
+%   \figthree{a.png}{b.png}{c.png}{Short caption}
+%
+%   \regtable{path/stem}{ncols}{Short caption}
+%     Vertical, \footnotesize, scaled to fit page width with adjustbox.
+%     Inputs the outreg2 .tex fragment; short caption + starnote.
+%
+%   \regtableW{path/stem}{ncols}{Short caption}
+%     Same but rendered landscape (for very wide tables, e.g. 9+ cols).
+% ---------------------------------------------------------------
+
+\newcommand{\figone}[2]{%
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{#1}
+    \caption{#2}
+  \end{figure}%
+}
+
+\newcommand{\figtwo}[3]{%
+  \begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+      \includegraphics[width=\textwidth]{#1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+      \includegraphics[width=\textwidth]{#2}
+    \end{subfigure}
+    \caption{#3}
+  \end{figure}%
+}
+
+\newcommand{\figthree}[4]{%
+  \begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+      \includegraphics[width=\textwidth]{#1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+      \includegraphics[width=\textwidth]{#2}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.32\textwidth}
+      \includegraphics[width=\textwidth]{#3}
+    \end{subfigure}
+    \caption{#4}
+  \end{figure}%
+}
+
+% Portrait regression table: footnotesize + adjustbox so it never overflows
+\newcommand{\regtable}[3]{%
+  \begin{table}[H]
+    \centering
+    \caption{#3}
+    \footnotesize
+    \adjustbox{max width=\textwidth}{%
+      \estauto{#1}{#2}{c}%
+    }
+    \normalsize
+    \starnote
+  \end{table}%
+}
+
+% Landscape regression table: for very wide specs (9+ columns)
+\newcommand{\regtableW}[3]{%
+  \begin{landscape}
+  \begin{table}[H]
+    \centering
+    \caption{#3}
+    \footnotesize
+    \adjustbox{max width=\linewidth}{%
+      \estauto{#1}{#2}{c}%
+    }
+    \normalsize
+    \starnote
+  \end{table}
+  \end{landscape}%
+}
+
+
+%==================================================================
+\begin{document}
+%==================================================================
+
+\title{$\,$\\ $\,$\\  $\,$\\
+\vspace{-4.9em}
+\LARGE\textbf{Multinational Firms and Trade}\vspace{-0.7cm}}
+
+\author{
+\vspace{1.4em}
+ \[ \begin{array}{c}
+ \text{{Ignacio Marra de Arti\~nano}} \\  \text{{\textit{Universit\'e Libre de Bruxelles and ECARES}}}
+ \\ \\
+ \text{{Gabriel Scattolo}} \\ \text{{\textit{IDB}}}
+ \\ \\
+ \text{{Sebasti\'an Velasquez}} \\ \text{{\textit{IDB}}}
+ \\ \\
+ \text{{Christian Volpe Martincus}} \\ \text{{\textit{IDB and CESifo}}}
+ \\ \\
+ \end{array} \]
+ \vskip 0.6em
+This version: March 2026
+\vspace{-1.6em}
+}
+
+\thispagestyle{empty}
+\maketitle
+\setcounter{page}{0}
+\setcounter{footnote}{0}
+
+\renewcommand\normalsize{\fontsize{12}{20}\selectfont}
+\normalsize
+\vskip 2em
+
+We organize our exploration around two broad questions.
+
+First, we characterize the \textit{determinants} of multinational presence in trade, examining how the share of MNEs in exports and in the number of exporters varies across exporting countries, export destinations, and products. We relate these patterns to country characteristics (income, distance, trade agreements), product characteristics (upstreamness, complexity, quality, elasticity of substitution), and bilateral trade costs.
+
+Second, we study the \textit{effects} of multinational presence on trade patterns. Here, we ask whether trade routes and products with greater MNE participation exhibit larger trade flows, different responses to gravity, distinct concentration structures, and broader extensive margins. We further exploit the full corporate network structure available in ORBIS and DnB to test whether MNEs trade differently with destinations where their parent or affiliates are located. Throughout, we document these patterns both in aggregate and by exporting country, allowing the reader to assess which findings are common across the region and which are country-specific.
+
+% MNE definitions used:
+%   MNE_total - any firm matched in the corporate database  [MAIN RESULTS]
+%   MNE_ext   - foreign subsidiary (parent country != exporting country)
+
+\newpage
+
+%==================================================================
+\section{Determinants of Multinational Presence in Trade Patterns}
+\label{sec:determinants}
+%==================================================================
+
+%------------------------------------------------------------------
+\subsection{Across Exporting Countries}
+\label{subsec:countries}
+%------------------------------------------------------------------
+
+\begin{itemize}
+    \item[\ding{114}] Bar graph of the share of MNEs in total exports and number of exporters by country, descending order for total exports.
+    \item[\ding{114}] Scatter graph of the share of MNEs in total exports vs.\ GDP per capita of the exporting country.
+    \item[\ding{114}] Bar graph with share of the 10 most important home countries and rest in total exports accounted for by multinational firms.
+\end{itemize}
+
+
+\input{Tables/S1_Determinants/tab_mne_shares_by_country}
+
+
+% Combined panel (all definitions together)
+\figone{Graphs/1_1_ExportingCountries/fig_1_1_1_all_defs_nfirms.png}
+       {Figure 1.1.1 --- MNE shares in number of exporters: ext and total}
+
+%...............................................
+\subsubsection{MNE\_total (all matched firms) --- Main Results}
+%...............................................
+
+\figone{Graphs/1_1_ExportingCountries/fig_1_1_1_MNE_total_by_country.png}
+       {Figure 1.1.1a (MNE\_total) --- Export value and exporter shares by country}
+
+\figone{Graphs/1_1_ExportingCountries/fig_1_1_2_total_vs_GDPpc.png}
+       {Figure 1.1.2a (MNE\_total) --- Export share vs.\ log GDP per capita}
+
+%...............................................
+\subsubsection{MNE\_ext (foreign subsidiaries)}
+%...............................................
+
+% NOTE: fig_1_1_1_ext_by_country was not generated in the current do-file version.
+\figone{Graphs/1_1_ExportingCountries/fig_1_1_2_ext_vs_GDPpc.png}
+       {Figure 1.1.2b (MNE\_ext) --- Export share vs.\ log GDP per capita}
+
+\figone{Graphs/1_1_ExportingCountries/fig_1_1_3_top10_home_countries.png}
+       {Figure 1.1.3 --- Top-10 home countries of MNE parents}
+
+%...............................................
+\subsubsection{Domestic Firms --- GDP per capita comparison}
+%...............................................
+
+\figone{Graphs/1_1_ExportingCountries/fig_1_1_2_dom_vs_GDPpc.png}
+       {Figure 1.1.2c (Domestic) --- Export share vs.\ log GDP per capita}
+
+%..............................................
+\subsubsection{MNE Share Trends over Time (Block A)}
+%..............................................
+
+\figtwo{Graphs/1_1_Trends/fig_1_1_tr_mnevalue_total.png}
+       {Graphs/1_1_Trends/fig_1_1_tr_mnefirms_total.png}
+       {Figure 1.1.4a (MNE\_total) --- Export value share and exporter count share over time, by country}
+
+\figtwo{Graphs/1_1_Trends/fig_1_1_tr_mnevalue_ext.png}
+       {Graphs/1_1_Trends/fig_1_1_tr_mnefirms_ext.png}
+       {Figure 1.1.4b (MNE\_ext) --- Export value share and exporter count share over time, by country}
+
+%..............................................
+\subsubsection{MNE vs.\ Domestic Firm Profile (Block B)}
+%..............................................
+
+\figtwo{Graphs/1_1_FirmProfile/fig_1_1_fp_boxplot_total.png}
+       {Graphs/1_1_FirmProfile/fig_1_1_fp_boxplot_ext.png}
+       {Figure 1.1.5 --- Firm export distribution: MNE vs.\ domestic, by country (total and ext)}
+
+% Country-by-country firm profile mean comparison table: see Table 3.4 in Section~\ref{sec:sumstats}.
+
+%------------------------------------------------------------------
+\subsection{Across Export Destination Countries}
+\label{subsec:destinations}
+%------------------------------------------------------------------
+
+\begin{itemize}
+    \item[\ding{114}] Bar graphs of the share of MNEs in total exports and number of exporters by destination country category.
+    \begin{itemize}
+        \item \textit{Categories:} (1) income group; (2) intra/extra-regional; (3) contiguous/non-contiguous; (4) broad region; (5) distance above/below median.
+        \item \textit{Exporting countries:} aggregate figures here; country-by-country in Appendix~\ref{app:country_graphs}.
+    \end{itemize}
+    \item[\ding{114}] Regressions on origin, destination, and bilateral characteristics. \textit{Samples:} ODY and ODPY. \textit{Controls:} log GDP per capita and population (origin, destination), log distance, contiguity, common language, colonial tie, FTA, BIT, DTT, average tariff. \textit{FE:} none through origin$\times$year + destination$\times$year + origin-destination.
+\end{itemize}
+
+%...............................................
+\subsubsection{MNE\_total (all matched firms) --- Main Results}
+%...............................................
+
+\figthree{Graphs/1_2_DestinationCountries/fig_1_2_1_total_agg.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_2_total_agg.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_3_total_agg.png}
+         {Figure 1.2.1--1.2.3 (MNE\_total) --- Shares by income group, regional proximity, contiguity}
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_4_total_agg.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_5_total_agg.png}
+       {Figure 1.2.4--1.2.5 (MNE\_total) --- Shares by broad region and distance quartile}
+
+\regtable{Regressions/S1_Determinants/reg_1_2_ody_total_share_mne_value}
+         {8}
+         {Table 1.2.1 (MNE\_total) --- Value share on origin/destination characteristics, ODY}
+
+\regtable{Regressions/S1_Determinants/reg_1_2_ody_total_share_total_nfirms}
+         {8}
+         {Table 1.2.2 (MNE\_total) --- Exporter share on origin/destination characteristics, ODY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_2_odpy_total_share_mne_value}
+          {10}
+          {Table 1.2.3 (MNE\_total) --- Value share on origin/destination characteristics, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_2_odpy_total_share_total_nfirms}
+          {10}
+          {Table 1.2.4 (MNE\_total) --- Exporter share on origin/destination characteristics, ODPY}
+
+%...............................................
+\subsubsection{MNE\_ext (foreign subsidiaries)}
+%...............................................
+
+\figthree{Graphs/1_2_DestinationCountries/fig_1_2_1_ext_agg.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_2_ext_agg.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_3_ext_agg.png}
+         {Figure 1.2.1--1.2.3 (MNE\_ext) --- Shares by income group, regional proximity, contiguity}
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_4_ext_agg.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_5_ext_agg.png}
+       {Figure 1.2.4--1.2.5 (MNE\_ext) --- Shares by broad region and distance quartile}
+
+\regtable{Regressions/S1_Determinants/reg_1_2_ody_ext_share_mne_ext_value}
+         {8}
+         {Table 1.2.5 (MNE\_ext) --- Value share on origin/destination characteristics, ODY}
+
+\regtable{Regressions/S1_Determinants/reg_1_2_ody_ext_share_ext_nfirms}
+         {8}
+         {Table 1.2.6 (MNE\_ext) --- Exporter share on origin/destination characteristics, ODY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_2_odpy_ext_share_mne_ext_value}
+          {10}
+          {Table 1.2.7 (MNE\_ext) --- Value share on origin/destination characteristics, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_2_odpy_ext_share_ext_nfirms}
+          {10}
+          {Table 1.2.8 (MNE\_ext) --- Exporter share on origin/destination characteristics, ODPY}
+
+%..............................................
+\subsubsection{MNE Share vs.\ Average Tariff (Block C Extra)}
+%..............................................
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_6_total_tariff_scatter.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_6_ext_tariff_scatter.png}
+       {Figure 1.2.6 --- MNE share in exports vs.\ average bilateral tariff, by destination income group (total and ext)}
+
+
+%------------------------------------------------------------------
+\subsection{By Product}
+\label{subsec:products}
+%------------------------------------------------------------------
+
+\begin{itemize}
+    \item[\ding{114}] Bar graphs by product characteristic (above/below median and by decile): upstreamness, sigma, complexity, quality ladder, RCA, RHCI, Lall (2000), Lybbert-Zolas IPC; HS sections; top/bottom 10 HS2 chapters. Aggregate figures here; country-by-country in Appendix~\ref{app:country_graphs}.
+    \item[\ding{114}] Regressions on product characteristics. \textit{Samples:} OPY (8 FE specs) and ODPY (9 FE specs + HS sections column). SE clustered at origin-product level (OPY) and origin-destination-product level (ODPY).
+\end{itemize}
+
+%...............................................
+\subsubsection{MNE\_total (all matched firms) --- Main Results}
+%...............................................
+
+% Above/below median
+\figthree{Graphs/1_3_ByProduct/fig_1_3_total_upstreamness_median.png}
+         {Graphs/1_3_ByProduct/fig_1_3_total_sigma_median.png}
+         {Graphs/1_3_ByProduct/fig_1_3_total_complexity_median.png}
+         {Figure 1.3.1a (MNE\_total) --- Shares: upstreamness, sigma, complexity (above/below median)}
+
+\figthree{Graphs/1_3_ByProduct/fig_1_3_total_quality_ladder_median.png}
+         {Graphs/1_3_ByProduct/fig_1_3_total_rca_median.png}
+         {Graphs/1_3_ByProduct/fig_1_3_total_rhci_median.png}
+         {Figure 1.3.1b (MNE\_total) --- Shares: quality ladder, RCA, RHCI (above/below median)}
+
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_total_lall2000_median.png}
+       {Graphs/1_3_ByProduct/fig_1_3_total_ipc1_median.png}
+       {Figure 1.3.1c (MNE\_total) --- Shares: Lall (2000) and Lybbert-Zolas technology intensity}
+
+% By decile
+\figthree{Graphs/1_3_ByProduct/fig_1_3_total_upstreamness_decile.png}
+         {Graphs/1_3_ByProduct/fig_1_3_total_sigma_decile.png}
+         {Graphs/1_3_ByProduct/fig_1_3_total_complexity_decile.png}
+         {Figure 1.3.2a (MNE\_total) --- Value share by decile: upstreamness, sigma, complexity}
+
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_total_quality_ladder_decile.png}
+       {Graphs/1_3_ByProduct/fig_1_3_total_rca_decile.png}
+       {Figure 1.3.2b (MNE\_total) --- Value share by decile: quality ladder, RCA}
+
+% HS sections and chapters
+\figone{Graphs/1_3_ByProduct/fig_1_3_total_hs_sections.png}
+       {Figure 1.3.3a (MNE\_total) --- Shares by HS section}
+
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_total_top10_hs2.png}
+       {Graphs/1_3_ByProduct/fig_1_3_total_bot10_hs2.png}
+       {Figure 1.3.4a (MNE\_total) --- Top 10 and bottom 10 HS2 chapters by MNE share}
+
+% OPY regressions --- exporter share (nfirms)
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_total_nfirms_upstreamness_A}
+          {9}{Table 1.3.1 (MNE\_total) --- Exporter share and upstreamness, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_total_nfirms_upstreamness_B}
+          {9}{Table 1.3.1 (MNE\_total) --- Exporter share and upstreamness, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_total_nfirms_sigma_A}
+          {9}{Table 1.3.2 (MNE\_total) --- Exporter share and elasticity of substitution, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_total_nfirms_sigma_B}
+          {9}{Table 1.3.2 (MNE\_total) --- Exporter share and elasticity of substitution, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_total_nfirms_complexity_A}
+          {9}{Table 1.3.3 (MNE\_total) --- Exporter share and product complexity, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_total_nfirms_complexity_B}
+          {9}{Table 1.3.3 (MNE\_total) --- Exporter share and product complexity, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_total_nfirms_quality_ladder_A}
+          {9}{Table 1.3.4 (MNE\_total) --- Exporter share and quality ladder, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_total_nfirms_quality_ladder_B}
+          {9}{Table 1.3.4 (MNE\_total) --- Exporter share and quality ladder, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_total_nfirms_rca_A}
+          {9}{Table 1.3.5 (MNE\_total) --- Exporter share and RCA, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_total_nfirms_rca_B}
+          {9}{Table 1.3.5 (MNE\_total) --- Exporter share and RCA, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_total_nfirms_rhci_A}
+          {9}{Table 1.3.6 (MNE\_total) --- Exporter share and RHCI, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_total_nfirms_rhci_B}
+          {9}{Table 1.3.6 (MNE\_total) --- Exporter share and RHCI, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_total_nfirms_lall2000_A}
+          {9}{Table 1.3.7 (MNE\_total) --- Exporter share and Lall (2000), OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_total_nfirms_lall2000_B}
+          {9}{Table 1.3.7 (MNE\_total) --- Exporter share and Lall (2000), OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_total_nfirms_ipc1_A}
+          {9}{Table 1.3.8 (MNE\_total) --- Exporter share and Lybbert-Zolas IPC, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_total_nfirms_ipc1_B}
+          {9}{Table 1.3.8 (MNE\_total) --- Exporter share and Lybbert-Zolas IPC, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+% OPY regressions --- value share
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_mne_value_upstreamness_A}
+          {9}{Table 1.3.9 (MNE\_total) --- Value share and upstreamness, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_mne_value_upstreamness_B}
+          {9}{Table 1.3.9 (MNE\_total) --- Value share and upstreamness, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_mne_value_sigma_A}
+          {9}{Table 1.3.10 (MNE\_total) --- Value share and elasticity of substitution, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_mne_value_sigma_B}
+          {9}{Table 1.3.10 (MNE\_total) --- Value share and elasticity of substitution, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_mne_value_complexity_A}
+          {9}{Table 1.3.11 (MNE\_total) --- Value share and product complexity, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_mne_value_complexity_B}
+          {9}{Table 1.3.11 (MNE\_total) --- Value share and product complexity, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_mne_value_quality_ladder_A}
+          {9}{Table 1.3.12 (MNE\_total) --- Value share and quality ladder, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_mne_value_quality_ladder_B}
+          {9}{Table 1.3.12 (MNE\_total) --- Value share and quality ladder, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_mne_value_rca_A}
+          {9}{Table 1.3.13 (MNE\_total) --- Value share and RCA, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_mne_value_rca_B}
+          {9}{Table 1.3.13 (MNE\_total) --- Value share and RCA, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_mne_value_rhci_A}
+          {9}{Table 1.3.14 (MNE\_total) --- Value share and RHCI, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_mne_value_rhci_B}
+          {9}{Table 1.3.14 (MNE\_total) --- Value share and RHCI, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_mne_value_lall2000_A}
+          {9}{Table 1.3.15 (MNE\_total) --- Value share and Lall (2000), OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_mne_value_lall2000_B}
+          {9}{Table 1.3.15 (MNE\_total) --- Value share and Lall (2000), OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_mne_value_ipc1_A}
+          {9}{Table 1.3.16 (MNE\_total) --- Value share and Lybbert-Zolas IPC, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_total_share_mne_value_ipc1_B}
+          {9}{Table 1.3.16 (MNE\_total) --- Value share and Lybbert-Zolas IPC, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+% ODPY regressions --- exporter share (nfirms)
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_total_share_total_nfirms_upstreamness}
+          {9}{Table 1.3.17 (MNE\_total) --- Exporter share and upstreamness, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_total_share_total_nfirms_sigma}
+          {9}{Table 1.3.18 (MNE\_total) --- Exporter share and elasticity of substitution, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_total_share_total_nfirms_complexity}
+          {9}{Table 1.3.19 (MNE\_total) --- Exporter share and product complexity, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_total_share_total_nfirms_quality_ladder}
+          {9}{Table 1.3.20 (MNE\_total) --- Exporter share and quality ladder, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_total_share_total_nfirms_rca}
+          {9}{Table 1.3.21 (MNE\_total) --- Exporter share and RCA, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_total_share_total_nfirms_rhci}
+          {9}{Table 1.3.22 (MNE\_total) --- Exporter share and RHCI, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_total_share_total_nfirms_lall2000}
+          {9}{Table 1.3.23 (MNE\_total) --- Exporter share and Lall (2000), ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_total_share_total_nfirms_ipc1}
+          {9}{Table 1.3.24 (MNE\_total) --- Exporter share and Lybbert-Zolas IPC, ODPY}
+
+% ODPY regressions --- value share
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_total_share_mne_value_upstreamness}
+          {9}{Table 1.3.25 (MNE\_total) --- Value share and upstreamness, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_total_share_mne_value_sigma}
+          {9}{Table 1.3.26 (MNE\_total) --- Value share and elasticity of substitution, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_total_share_mne_value_complexity}
+          {9}{Table 1.3.27 (MNE\_total) --- Value share and product complexity, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_total_share_mne_value_quality_ladder}
+          {9}{Table 1.3.28 (MNE\_total) --- Value share and quality ladder, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_total_share_mne_value_rca}
+          {9}{Table 1.3.29 (MNE\_total) --- Value share and RCA, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_total_share_mne_value_rhci}
+          {9}{Table 1.3.30 (MNE\_total) --- Value share and RHCI, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_total_share_mne_value_lall2000}
+          {9}{Table 1.3.31 (MNE\_total) --- Value share and Lall (2000), ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_total_share_mne_value_ipc1}
+          {9}{Table 1.3.32 (MNE\_total) --- Value share and Lybbert-Zolas IPC, ODPY}
+
+%...............................................
+\subsubsection{MNE\_ext (foreign subsidiaries)}
+%...............................................
+
+% Above/below median
+\figthree{Graphs/1_3_ByProduct/fig_1_3_ext_upstreamness_median.png}
+         {Graphs/1_3_ByProduct/fig_1_3_ext_sigma_median.png}
+         {Graphs/1_3_ByProduct/fig_1_3_ext_complexity_median.png}
+         {Figure 1.3.1a (MNE\_ext) --- Shares: upstreamness, sigma, complexity (above/below median)}
+
+\figthree{Graphs/1_3_ByProduct/fig_1_3_ext_quality_ladder_median.png}
+         {Graphs/1_3_ByProduct/fig_1_3_ext_rca_median.png}
+         {Graphs/1_3_ByProduct/fig_1_3_ext_rhci_median.png}
+         {Figure 1.3.1b (MNE\_ext) --- Shares: quality ladder, RCA, RHCI (above/below median)}
+
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_ext_lall2000_median.png}
+       {Graphs/1_3_ByProduct/fig_1_3_ext_ipc1_median.png}
+       {Figure 1.3.1c (MNE\_ext) --- Shares: Lall (2000) and Lybbert-Zolas technology intensity}
+
+% By decile
+\figthree{Graphs/1_3_ByProduct/fig_1_3_ext_upstreamness_decile.png}
+         {Graphs/1_3_ByProduct/fig_1_3_ext_sigma_decile.png}
+         {Graphs/1_3_ByProduct/fig_1_3_ext_complexity_decile.png}
+         {Figure 1.3.2a (MNE\_ext) --- Value share by decile: upstreamness, sigma, complexity}
+
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_ext_quality_ladder_decile.png}
+       {Graphs/1_3_ByProduct/fig_1_3_ext_rca_decile.png}
+       {Figure 1.3.2b (MNE\_ext) --- Value share by decile: quality ladder, RCA}
+
+% HS sections and chapters
+\figone{Graphs/1_3_ByProduct/fig_1_3_ext_hs_sections.png}
+       {Figure 1.3.3b (MNE\_ext) --- Shares by HS section}
+
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_ext_top10_hs2.png}
+       {Graphs/1_3_ByProduct/fig_1_3_ext_bot10_hs2.png}
+       {Figure 1.3.4b (MNE\_ext) --- Top 10 and bottom 10 HS2 chapters by MNE share}
+
+% OPY regressions --- value share (9 metrics)
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_mne_ext_value_upstreamness_A}
+          {9}{Table 1.3.33 (MNE\_ext) --- Value share and upstreamness, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_mne_ext_value_upstreamness_B}
+          {9}{Table 1.3.33 (MNE\_ext) --- Value share and upstreamness, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_mne_ext_value_sigma_A}
+          {9}{Table 1.3.34 (MNE\_ext) --- Value share and elasticity of substitution, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_mne_ext_value_sigma_B}
+          {9}{Table 1.3.34 (MNE\_ext) --- Value share and elasticity of substitution, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_mne_ext_value_complexity_A}
+          {9}{Table 1.3.35 (MNE\_ext) --- Value share and product complexity, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_mne_ext_value_complexity_B}
+          {9}{Table 1.3.35 (MNE\_ext) --- Value share and product complexity, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_mne_ext_value_quality_ladder_A}
+          {9}{Table 1.3.36 (MNE\_ext) --- Value share and quality ladder, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_mne_ext_value_quality_ladder_B}
+          {9}{Table 1.3.36 (MNE\_ext) --- Value share and quality ladder, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_mne_ext_value_rca_A}
+          {9}{Table 1.3.37 (MNE\_ext) --- Value share and RCA, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_mne_ext_value_rca_B}
+          {9}{Table 1.3.37 (MNE\_ext) --- Value share and RCA, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_mne_ext_value_rhci_A}
+          {9}{Table 1.3.38 (MNE\_ext) --- Value share and RHCI, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_mne_ext_value_rhci_B}
+          {9}{Table 1.3.38 (MNE\_ext) --- Value share and RHCI, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_mne_ext_value_lall2000_A}
+          {9}{Table 1.3.39 (MNE\_ext) --- Value share and Lall (2000) technology intensity, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_mne_ext_value_lall2000_B}
+          {9}{Table 1.3.39 (MNE\_ext) --- Value share and Lall (2000) technology intensity, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_mne_ext_value_ipc1_A}
+          {9}{Table 1.3.40 (MNE\_ext) --- Value share and Lybbert-Zolas IPC intensity, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_mne_ext_value_ipc1_B}
+          {9}{Table 1.3.40 (MNE\_ext) --- Value share and Lybbert-Zolas IPC intensity, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+% OPY regressions --- exporter share (nfirms)
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_ext_nfirms_upstreamness_A}
+          {9}{Table 1.3.41 (MNE\_ext) --- Exporter share and upstreamness, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_ext_nfirms_upstreamness_B}
+          {9}{Table 1.3.41 (MNE\_ext) --- Exporter share and upstreamness, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_ext_nfirms_sigma_A}
+          {9}{Table 1.3.42 (MNE\_ext) --- Exporter share and elasticity of substitution, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_ext_nfirms_sigma_B}
+          {9}{Table 1.3.42 (MNE\_ext) --- Exporter share and elasticity of substitution, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_ext_nfirms_complexity_A}
+          {9}{Table 1.3.43 (MNE\_ext) --- Exporter share and product complexity, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_ext_nfirms_complexity_B}
+          {9}{Table 1.3.43 (MNE\_ext) --- Exporter share and product complexity, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_ext_nfirms_quality_ladder_A}
+          {9}{Table 1.3.44 (MNE\_ext) --- Exporter share and quality ladder, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_ext_nfirms_quality_ladder_B}
+          {9}{Table 1.3.44 (MNE\_ext) --- Exporter share and quality ladder, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_ext_nfirms_rca_A}
+          {9}{Table 1.3.45 (MNE\_ext) --- Exporter share and RCA, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_ext_nfirms_rca_B}
+          {9}{Table 1.3.45 (MNE\_ext) --- Exporter share and RCA, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_ext_nfirms_rhci_A}
+          {9}{Table 1.3.46 (MNE\_ext) --- Exporter share and RHCI, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_ext_nfirms_rhci_B}
+          {9}{Table 1.3.46 (MNE\_ext) --- Exporter share and RHCI, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_ext_nfirms_lall2000_A}
+          {9}{Table 1.3.47 (MNE\_ext) --- Exporter share and Lall (2000), OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_ext_nfirms_lall2000_B}
+          {9}{Table 1.3.47 (MNE\_ext) --- Exporter share and Lall (2000), OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_ext_nfirms_ipc1_A}
+          {9}{Table 1.3.48 (MNE\_ext) --- Exporter share and Lybbert-Zolas IPC, OPY --- Part A: HS Sections I--XI}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_opy_ext_share_ext_nfirms_ipc1_B}
+          {9}{Table 1.3.48 (MNE\_ext) --- Exporter share and Lybbert-Zolas IPC, OPY (cont.) --- Part B: HS Sections XII--XXI}
+
+% ODPY regressions --- value share (9 metrics)
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_ext_share_mne_ext_value_upstreamness}
+          {9}{Table 1.3.49 (MNE\_ext) --- Value share and upstreamness, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_ext_share_mne_ext_value_sigma}
+          {9}{Table 1.3.50 (MNE\_ext) --- Value share and elasticity of substitution, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_ext_share_mne_ext_value_complexity}
+          {9}{Table 1.3.51 (MNE\_ext) --- Value share and product complexity, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_ext_share_mne_ext_value_quality_ladder}
+          {9}{Table 1.3.52 (MNE\_ext) --- Value share and quality ladder, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_ext_share_mne_ext_value_rca}
+          {9}{Table 1.3.53 (MNE\_ext) --- Value share and RCA, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_ext_share_mne_ext_value_rhci}
+          {9}{Table 1.3.54 (MNE\_ext) --- Value share and RHCI, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_ext_share_mne_ext_value_lall2000}
+          {9}{Table 1.3.55 (MNE\_ext) --- Value share and Lall (2000), ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_ext_share_mne_ext_value_ipc1}
+          {9}{Table 1.3.56 (MNE\_ext) --- Value share and Lybbert-Zolas IPC intensity, ODPY}
+
+% ODPY regressions --- exporter share (nfirms)
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_ext_share_ext_nfirms_upstreamness}
+          {9}{Table 1.3.57 (MNE\_ext) --- Exporter share and upstreamness, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_ext_share_ext_nfirms_sigma}
+          {9}{Table 1.3.58 (MNE\_ext) --- Exporter share and elasticity of substitution, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_ext_share_ext_nfirms_complexity}
+          {9}{Table 1.3.59 (MNE\_ext) --- Exporter share and product complexity, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_ext_share_ext_nfirms_quality_ladder}
+          {9}{Table 1.3.60 (MNE\_ext) --- Exporter share and quality ladder, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_ext_share_ext_nfirms_rca}
+          {9}{Table 1.3.61 (MNE\_ext) --- Exporter share and RCA, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_ext_share_ext_nfirms_rhci}
+          {9}{Table 1.3.62 (MNE\_ext) --- Exporter share and RHCI, ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_ext_share_ext_nfirms_lall2000}
+          {9}{Table 1.3.63 (MNE\_ext) --- Exporter share and Lall (2000), ODPY}
+
+\regtableW{Regressions/S1_Determinants/reg_1_3_odpy_ext_share_ext_nfirms_ipc1}
+          {9}{Table 1.3.64 (MNE\_ext) --- Exporter share and Lybbert-Zolas IPC intensity, ODPY}
+
+%...............................................
+\subsubsection{Domestic Firms (reference)}
+%...............................................
+
+% Above/below median
+\figthree{Graphs/1_3_ByProduct/fig_1_3_dom_upstreamness_median.png}
+         {Graphs/1_3_ByProduct/fig_1_3_dom_sigma_median.png}
+         {Graphs/1_3_ByProduct/fig_1_3_dom_complexity_median.png}
+         {Figure 1.3.1a (Domestic) --- Shares: upstreamness, sigma, complexity (above/below median)}
+
+\figthree{Graphs/1_3_ByProduct/fig_1_3_dom_quality_ladder_median.png}
+         {Graphs/1_3_ByProduct/fig_1_3_dom_rca_median.png}
+         {Graphs/1_3_ByProduct/fig_1_3_dom_rhci_median.png}
+         {Figure 1.3.1b (Domestic) --- Shares: quality ladder, RCA, RHCI (above/below median)}
+
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_dom_lall2000_median.png}
+       {Graphs/1_3_ByProduct/fig_1_3_dom_ipc1_median.png}
+       {Figure 1.3.1c (Domestic) --- Shares: Lall (2000) and Lybbert-Zolas technology intensity}
+
+% By decile
+\figthree{Graphs/1_3_ByProduct/fig_1_3_dom_upstreamness_decile.png}
+         {Graphs/1_3_ByProduct/fig_1_3_dom_sigma_decile.png}
+         {Graphs/1_3_ByProduct/fig_1_3_dom_complexity_decile.png}
+         {Figure 1.3.2a (Domestic) --- Value share by decile: upstreamness, sigma, complexity}
+
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_dom_quality_ladder_decile.png}
+       {Graphs/1_3_ByProduct/fig_1_3_dom_rca_decile.png}
+       {Figure 1.3.2b (Domestic) --- Value share by decile: quality ladder, RCA}
+
+% HS sections and chapters
+\figone{Graphs/1_3_ByProduct/fig_1_3_dom_hs_sections.png}
+       {Figure 1.3.3c (Domestic) --- Shares by HS section}
+
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_dom_top10_hs2.png}
+       {Graphs/1_3_ByProduct/fig_1_3_dom_bot10_hs2.png}
+       {Figure 1.3.4c (Domestic) --- Top 10 and bottom 10 HS2 chapters by domestic share}
+
+
+%==================================================================
+\section{Parent Country Analysis}
+\label{sec:parent_countries}
+%==================================================================
+
+\begin{itemize}
+    \item[\ding{114}] Bar graphs characterizing which parent countries drive MNE exports in LAC: pooled breakdown by parent region; breakdown by exporting country; and parent-destination matching for US- and EU-bound exports.
+\end{itemize}
+
+\figone{Graphs/1_4_ParentCountries/fig_1_4_1_parent_region_pool.png}
+       {Figure 1.4.1 --- MNE exports by parent region (pooled across all exporting countries)}
+
+\figone{Graphs/1_4_ParentCountries/fig_1_4_2_parent_region_by_origin.png}
+       {Figure 1.4.2 --- Parent region breakdown by exporting country (stacked shares)}
+
+\figtwo{Graphs/1_4_ParentCountries/fig_1_4_3_parent_dest_match_usa.png}
+       {Graphs/1_4_ParentCountries/fig_1_4_4_parent_dest_match_eu.png}
+       {Figure 1.4.3--1.4.4 --- Parent region composition for US-destined vs.\ EU-destined MNE exports}
+
+
+
+
+%==================================================================
+\section{Effects of Multinational Presence in Trade Patterns}
+\label{sec:effects}
+%==================================================================
+
+%------------------------------------------------------------------
+\subsection{Aggregate Regressions}
+\label{subsec:agg}
+%------------------------------------------------------------------
+
+\begin{itemize}
+    \item[\ding{114}] \textit{Sample:} ODY and ODPY. \textit{Dependent variable:} log exports; binary exports; PPML exports. \textit{Independent variable:} MNE share in value and in \# firms, with destination and bilateral/product interaction specs in separate tables.
+\end{itemize}
+
+% NOTE ON FILE NAMING:
+% Each run_agg_spec call produces:
+%   ..._baseline.tex   (7 cols ODY / 9 cols ODPY)
+%   ..._dest_int.tex   (3 cols, dest interactions --- ODY only)
+%   ..._bilat_int.tex  (3 cols, bilateral interactions --- ODY only)
+%   ..._prod_int.tex   (3 cols, product interactions --- ODPY only)
+
+%...............................................
+\subsubsection{MNE\_total (all matched firms) --- Main Results}
+%...............................................
+
+% ---- ODY: MNE_total VALUE share ----
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_total_share_mne_value_ln_total_value_baseline}
+         {7}{Table 2.1.1 (MNE\_total) --- Value share and log exports, baseline FE, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_total_share_mne_value_ln_total_value_dest_int}
+         {3}{Table 2.1.2 (MNE\_total) --- Value share and log exports, destination interactions, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_total_share_mne_value_ln_total_value_bilat_int}
+         {3}{Table 2.1.3 (MNE\_total) --- Value share and log exports, bilateral interactions, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_total_share_mne_value_total_value_baseline}
+         {7}{Table 2.1.4 (MNE\_total) --- Value share and PPML exports, baseline FE, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_total_share_mne_value_total_value_dest_int}
+         {3}{Table 2.1.4a (MNE\_total) --- Value share and PPML exports, destination interactions, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_total_share_mne_value_total_value_bilat_int}
+         {3}{Table 2.1.4b (MNE\_total) --- Value share and PPML exports, bilateral interactions, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_total_share_mne_value_positive_trade_baseline}
+         {7}{Table 2.1.5 (MNE\_total) --- Value share and binary exports, baseline FE, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_total_share_mne_value_positive_trade_dest_int}
+         {3}{Table 2.1.5a (MNE\_total) --- Value share and binary exports, destination interactions, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_total_share_mne_value_positive_trade_bilat_int}
+         {3}{Table 2.1.5b (MNE\_total) --- Value share and binary exports, bilateral interactions, ODY}
+
+% ---- ODY: MNE_total EXPORTER share ----
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_total_share_total_nfirms_ln_total_value_baseline}
+         {7}{Table 2.1.6 (MNE\_total) --- Exporter share and log exports, baseline FE, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_total_share_total_nfirms_ln_total_value_dest_int}
+         {3}{Table 2.1.7 (MNE\_total) --- Exporter share and log exports, destination interactions, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_total_share_total_nfirms_ln_total_value_bilat_int}
+         {3}{Table 2.1.8 (MNE\_total) --- Exporter share and log exports, bilateral interactions, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_total_share_total_nfirms_total_value_baseline}
+         {7}{Table 2.1.9 (MNE\_total) --- Exporter share and PPML exports, baseline FE, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_total_share_total_nfirms_total_value_dest_int}
+         {3}{Table 2.1.9a (MNE\_total) --- Exporter share and PPML exports, destination interactions, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_total_share_total_nfirms_total_value_bilat_int}
+         {3}{Table 2.1.9b (MNE\_total) --- Exporter share and PPML exports, bilateral interactions, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_total_share_total_nfirms_positive_trade_baseline}
+         {7}{Table 2.1.10 (MNE\_total) --- Exporter share and binary exports, baseline FE, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_total_share_total_nfirms_positive_trade_dest_int}
+         {3}{Table 2.1.10a (MNE\_total) --- Exporter share and binary exports, destination interactions, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_total_share_total_nfirms_positive_trade_bilat_int}
+         {3}{Table 2.1.10b (MNE\_total) --- Exporter share and binary exports, bilateral interactions, ODY}
+
+% ---- ODPY: MNE_total VALUE share ----
+
+\regtableW{Regressions/S2_Effects/reg_2_1_odpy_total_share_mne_value_ln_total_value_baseline}
+          {9}{Table 2.1.11 (MNE\_total) --- Value share and log exports, baseline FE, ODPY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_odpy_total_share_mne_value_ln_total_value_prod_int}
+         {3}{Table 2.1.12 (MNE\_total) --- Value share and log exports, product interactions, ODPY}
+
+\regtableW{Regressions/S2_Effects/reg_2_1_odpy_total_share_mne_value_total_value_baseline}
+          {9}{Table 2.1.13 (MNE\_total) --- Value share and PPML exports, baseline FE, ODPY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_odpy_total_share_mne_value_total_value_prod_int}
+         {3}{Table 2.1.13a (MNE\_total) --- Value share and PPML exports, product interactions, ODPY}
+
+\regtableW{Regressions/S2_Effects/reg_2_1_odpy_total_share_mne_value_positive_trade_baseline}
+          {9}{Table 2.1.14 (MNE\_total) --- Value share and binary exports, baseline FE, ODPY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_odpy_total_share_mne_value_positive_trade_prod_int}
+         {3}{Table 2.1.14a (MNE\_total) --- Value share and binary exports, product interactions, ODPY}
+
+% ---- ODPY: MNE_total EXPORTER share ----
+
+\regtableW{Regressions/S2_Effects/reg_2_1_odpy_total_share_total_nfirms_ln_total_value_baseline}
+          {9}{Table 2.1.15 (MNE\_total) --- Exporter share and log exports, baseline FE, ODPY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_odpy_total_share_total_nfirms_ln_total_value_prod_int}
+         {3}{Table 2.1.16 (MNE\_total) --- Exporter share and log exports, product interactions, ODPY}
+
+\regtableW{Regressions/S2_Effects/reg_2_1_odpy_total_share_total_nfirms_total_value_baseline}
+          {9}{Table 2.1.17 (MNE\_total) --- Exporter share and PPML exports, baseline FE, ODPY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_odpy_total_share_total_nfirms_total_value_prod_int}
+         {3}{Table 2.1.17a (MNE\_total) --- Exporter share and PPML exports, product interactions, ODPY}
+
+\regtableW{Regressions/S2_Effects/reg_2_1_odpy_total_share_total_nfirms_positive_trade_baseline}
+          {9}{Table 2.1.18 (MNE\_total) --- Exporter share and binary exports, baseline FE, ODPY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_odpy_total_share_total_nfirms_positive_trade_prod_int}
+         {3}{Table 2.1.18a (MNE\_total) --- Exporter share and binary exports, product interactions, ODPY}
+
+
+%...............................................
+\subsubsection{MNE\_ext (foreign subsidiaries)}
+%...............................................
+
+% ---- ODY: MNE_ext VALUE share ----
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_ext_share_mne_ext_value_ln_total_value_baseline}
+         {7}{Table 2.1.19 (MNE\_ext) --- Value share and log exports, baseline FE, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_ext_share_mne_ext_value_ln_total_value_dest_int}
+         {3}{Table 2.1.20 (MNE\_ext) --- Value share and log exports, destination interactions, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_ext_share_mne_ext_value_ln_total_value_bilat_int}
+         {3}{Table 2.1.21 (MNE\_ext) --- Value share and log exports, bilateral interactions, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_ext_share_mne_ext_value_total_value_baseline}
+         {7}{Table 2.1.22 (MNE\_ext) --- Value share and PPML exports, baseline FE, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_ext_share_mne_ext_value_total_value_dest_int}
+         {3}{Table 2.1.22a (MNE\_ext) --- Value share and PPML exports, destination interactions, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_ext_share_mne_ext_value_total_value_bilat_int}
+         {3}{Table 2.1.22b (MNE\_ext) --- Value share and PPML exports, bilateral interactions, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_ext_share_mne_ext_value_positive_trade_baseline}
+         {7}{Table 2.1.23 (MNE\_ext) --- Value share and binary exports, baseline FE, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_ext_share_mne_ext_value_positive_trade_dest_int}
+         {3}{Table 2.1.23a (MNE\_ext) --- Value share and binary exports, destination interactions, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_ext_share_mne_ext_value_positive_trade_bilat_int}
+         {3}{Table 2.1.23b (MNE\_ext) --- Value share and binary exports, bilateral interactions, ODY}
+
+% ---- ODY: MNE_ext EXPORTER share ----
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_ext_share_ext_nfirms_ln_total_value_baseline}
+         {7}{Table 2.1.24 (MNE\_ext) --- Exporter share and log exports, baseline FE, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_ext_share_ext_nfirms_ln_total_value_dest_int}
+         {3}{Table 2.1.25 (MNE\_ext) --- Exporter share and log exports, destination interactions, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_ext_share_ext_nfirms_ln_total_value_bilat_int}
+         {3}{Table 2.1.26 (MNE\_ext) --- Exporter share and log exports, bilateral interactions, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_ext_share_ext_nfirms_total_value_baseline}
+         {7}{Table 2.1.27 (MNE\_ext) --- Exporter share and PPML exports, baseline FE, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_ext_share_ext_nfirms_total_value_dest_int}
+         {3}{Table 2.1.27a (MNE\_ext) --- Exporter share and PPML exports, destination interactions, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_ext_share_ext_nfirms_total_value_bilat_int}
+         {3}{Table 2.1.27b (MNE\_ext) --- Exporter share and PPML exports, bilateral interactions, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_ext_share_ext_nfirms_positive_trade_baseline}
+         {7}{Table 2.1.28 (MNE\_ext) --- Exporter share and binary exports, baseline FE, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_ext_share_ext_nfirms_positive_trade_dest_int}
+         {3}{Table 2.1.28a (MNE\_ext) --- Exporter share and binary exports, destination interactions, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_ody_ext_share_ext_nfirms_positive_trade_bilat_int}
+         {3}{Table 2.1.28b (MNE\_ext) --- Exporter share and binary exports, bilateral interactions, ODY}
+
+% ---- ODPY: MNE_ext VALUE share ----
+
+\regtableW{Regressions/S2_Effects/reg_2_1_odpy_ext_share_mne_ext_value_ln_total_value_baseline}
+          {9}{Table 2.1.29 (MNE\_ext) --- Value share and log exports, baseline FE, ODPY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_odpy_ext_share_mne_ext_value_ln_total_value_prod_int}
+         {3}{Table 2.1.30 (MNE\_ext) --- Value share and log exports, product interactions, ODPY}
+
+\regtableW{Regressions/S2_Effects/reg_2_1_odpy_ext_share_mne_ext_value_total_value_baseline}
+          {9}{Table 2.1.31 (MNE\_ext) --- Value share and PPML exports, baseline FE, ODPY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_odpy_ext_share_mne_ext_value_total_value_prod_int}
+         {3}{Table 2.1.31a (MNE\_ext) --- Value share and PPML exports, product interactions, ODPY}
+
+\regtableW{Regressions/S2_Effects/reg_2_1_odpy_ext_share_mne_ext_value_positive_trade_baseline}
+          {9}{Table 2.1.32 (MNE\_ext) --- Value share and binary exports, baseline FE, ODPY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_odpy_ext_share_mne_ext_value_positive_trade_prod_int}
+         {3}{Table 2.1.32a (MNE\_ext) --- Value share and binary exports, product interactions, ODPY}
+
+% ---- ODPY: MNE_ext EXPORTER share ----
+
+\regtableW{Regressions/S2_Effects/reg_2_1_odpy_ext_share_ext_nfirms_ln_total_value_baseline}
+          {9}{Table 2.1.33 (MNE\_ext) --- Exporter share and log exports, baseline FE, ODPY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_odpy_ext_share_ext_nfirms_ln_total_value_prod_int}
+         {3}{Table 2.1.34 (MNE\_ext) --- Exporter share and log exports, product interactions, ODPY}
+
+\regtableW{Regressions/S2_Effects/reg_2_1_odpy_ext_share_ext_nfirms_total_value_baseline}
+          {9}{Table 2.1.35 (MNE\_ext) --- Exporter share and PPML exports, baseline FE, ODPY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_odpy_ext_share_ext_nfirms_total_value_prod_int}
+         {3}{Table 2.1.35a (MNE\_ext) --- Exporter share and PPML exports, product interactions, ODPY}
+
+\regtableW{Regressions/S2_Effects/reg_2_1_odpy_ext_share_ext_nfirms_positive_trade_baseline}
+          {9}{Table 2.1.36 (MNE\_ext) --- Exporter share and binary exports, baseline FE, ODPY}
+
+\regtable{Regressions/S2_Effects/reg_2_1_odpy_ext_share_ext_nfirms_positive_trade_prod_int}
+         {3}{Table 2.1.36a (MNE\_ext) --- Exporter share and binary exports, product interactions, ODPY}
+
+
+%------------------------------------------------------------------
+\subsection{Gravity Regressions}
+\label{subsec:gravity}
+%------------------------------------------------------------------
+
+\begin{itemize}
+    \item[\ding{114}] \textit{Sample:} firm-destination-year (FDY) and firm-destination-product-year (FDPY). \textit{Regressors:} MNE$\times$gravity and DOM$\times$gravity interaction terms, allowing MNEs and domestic firms to respond differently to bilateral frictions. FDY: 6 baseline FE specs + 2 destination-interaction specs (16 columns total). FDPY: \texttt{\_baseline} (8 FE specs) + \texttt{\_prod\_int} (2 product-interaction specs).
+\end{itemize}
+
+%...............................................
+\subsubsection{MNE\_total (all matched firms) --- Main Results}
+%...............................................
+
+% --- FDY ---
+\regtableW{Regressions/S2_Effects/reg_2_2_grav_fdy_total_ln_exports}
+          {16}{Table 2.2.1 (MNE\_total) --- Gravity, log exports, FDY}
+
+\regtableW{Regressions/S2_Effects/reg_2_2_grav_fdy_total_positive_trade}
+          {16}{Table 2.2.2 (MNE\_total) --- Gravity, binary exports, FDY}
+
+\regtableW{Regressions/S2_Effects/reg_2_2_grav_fdy_total_firm_dest_exports}
+          {16}{Table 2.2.3 (MNE\_total) --- Gravity, total firm-destination exports, FDY}
+
+% --- FDPY ---
+\regtableW{Regressions/S2_Effects/reg_2_2_grav_fdpy_total_ln_exports_baseline}
+          {8}{Table 2.2.4 (MNE\_total) --- Gravity, log exports, baseline FE, FDPY}
+
+\regtable{Regressions/S2_Effects/reg_2_2_grav_fdpy_total_ln_exports_prod_int}
+         {2}{Table 2.2.5 (MNE\_total) --- Gravity, log exports, product interactions, FDPY}
+
+\regtableW{Regressions/S2_Effects/reg_2_2_grav_fdpy_total_positive_trade_baseline}
+          {8}{Table 2.2.6 (MNE\_total) --- Gravity, binary exports, baseline FE, FDPY}
+
+\regtable{Regressions/S2_Effects/reg_2_2_grav_fdpy_total_positive_trade_prod_int}
+         {2}{Table 2.2.7 (MNE\_total) --- Gravity, binary exports, product interactions, FDPY}
+
+\regtableW{Regressions/S2_Effects/reg_2_2_grav_fdpy_total_value_fob_baseline}
+          {8}{Table 2.2.8 (MNE\_total) --- Gravity, FOB value, baseline FE, FDPY}
+
+\regtable{Regressions/S2_Effects/reg_2_2_grav_fdpy_total_value_fob_prod_int}
+         {2}{Table 2.2.9 (MNE\_total) --- Gravity, FOB value, product interactions, FDPY}
+
+%...............................................
+\subsubsection{MNE\_ext (foreign subsidiaries)}
+%...............................................
+
+% --- FDY ---
+\regtableW{Regressions/S2_Effects/reg_2_2_grav_fdy_ext_ln_exports}
+          {16}{Table 2.2.10 (MNE\_ext) --- Gravity, log exports, FDY}
+
+\regtableW{Regressions/S2_Effects/reg_2_2_grav_fdy_ext_positive_trade}
+          {16}{Table 2.2.11 (MNE\_ext) --- Gravity, binary exports, FDY}
+
+\regtableW{Regressions/S2_Effects/reg_2_2_grav_fdy_ext_firm_dest_exports}
+          {16}{Table 2.2.12 (MNE\_ext) --- Gravity, total firm-destination exports, FDY}
+
+% --- FDPY ---
+\regtableW{Regressions/S2_Effects/reg_2_2_grav_fdpy_ext_ln_exports_baseline}
+          {8}{Table 2.2.13 (MNE\_ext) --- Gravity, log exports, baseline FE, FDPY}
+
+\regtable{Regressions/S2_Effects/reg_2_2_grav_fdpy_ext_ln_exports_prod_int}
+         {2}{Table 2.2.14 (MNE\_ext) --- Gravity, log exports, product interactions, FDPY}
+
+\regtableW{Regressions/S2_Effects/reg_2_2_grav_fdpy_ext_positive_trade_baseline}
+          {8}{Table 2.2.15 (MNE\_ext) --- Gravity, binary exports, baseline FE, FDPY}
+
+\regtable{Regressions/S2_Effects/reg_2_2_grav_fdpy_ext_positive_trade_prod_int}
+         {2}{Table 2.2.16 (MNE\_ext) --- Gravity, binary exports, product interactions, FDPY}
+
+\regtableW{Regressions/S2_Effects/reg_2_2_grav_fdpy_ext_value_fob_baseline}
+          {8}{Table 2.2.17 (MNE\_ext) --- Gravity, FOB value, baseline FE, FDPY}
+
+\regtable{Regressions/S2_Effects/reg_2_2_grav_fdpy_ext_value_fob_prod_int}
+         {2}{Table 2.2.18 (MNE\_ext) --- Gravity, FOB value, product interactions, FDPY}
+
+
+%------------------------------------------------------------------
+\subsection{MNE Network Regressions}
+\label{subsec:network}
+%------------------------------------------------------------------
+
+\begin{itemize}
+    \item[\ding{114}] \textit{Sample:} firm-destination-year. \textit{Three decompositions} (D1--D3) of how MNE corporate network structure at the destination shapes the sensitivity of trade to distance, across the standard 6-spec FE ladder. D1 tests whether MNEs trade differently with destinations where their corporate network is present vs.\ absent. D2 further separates HQ vs.\ affiliate presence. D3 adds a neighbor indicator. MNE\_ext and MNE\_total produce qualitatively similar patterns; MNE\_total results shown first as the main specification, followed by MNE\_ext.
+    \begin{itemize}
+        \item D1: MNE$\times$Present$\times$Dist,\ MNE$\times$NotPresent$\times$Dist,\ DOM$\times$Dist
+        \item D2: MNE$\times$HQ$\times$Dist,\ MNE$\times$Aff$\times$Dist,\ MNE$\times$NotPr$\times$Dist,\ DOM$\times$Dist
+        \item D3: MNE$\times$HQ$\times$Dist,\ MNE$\times$Aff$\times$Dist,\ MNE$\times$Neighbor$\times$Dist,\ MNE$\times$NoPres$\times$Dist,\ DOM$\times$Dist
+    \end{itemize}
+\end{itemize}
+
+%...............................................
+\subsubsection{MNE\_total (all matched firms) --- Main Results}
+%...............................................
+
+\regtable{Regressions/S2_Effects/reg_2_3_net_D1_total_ln_exports}
+         {6}{Table 2.3.1 (MNE\_total, D1) --- Network presence $\times$ distance, log exports, FDY}
+
+\regtable{Regressions/S2_Effects/reg_2_3_net_D1_total_firm_dest_exports}
+         {6}{Table 2.3.2 (MNE\_total, D1) --- Network presence $\times$ distance, total exports, FDY}
+
+\regtable{Regressions/S2_Effects/reg_2_3_net_D2_total_ln_exports}
+         {6}{Table 2.3.3 (MNE\_total, D2) --- HQ vs.\ affiliate $\times$ distance, log exports, FDY}
+
+\regtable{Regressions/S2_Effects/reg_2_3_net_D2_total_firm_dest_exports}
+         {6}{Table 2.3.4 (MNE\_total, D2) --- HQ vs.\ affiliate $\times$ distance, total exports, FDY}
+
+\regtable{Regressions/S2_Effects/reg_2_3_net_D3_total_ln_exports}
+         {6}{Table 2.3.5 (MNE\_total, D3) --- Network with neighbor $\times$ distance, log exports, FDY}
+
+\regtable{Regressions/S2_Effects/reg_2_3_net_D3_total_firm_dest_exports}
+         {6}{Table 2.3.6 (MNE\_total, D3) --- Network with neighbor $\times$ distance, total exports, FDY}
+
+%...............................................
+\subsubsection{MNE\_ext (foreign subsidiaries)}
+%...............................................
+
+\regtable{Regressions/S2_Effects/reg_2_3_net_D1_ext_ln_exports}
+         {6}{Table 2.3.7 (MNE\_ext, D1) --- Network presence $\times$ distance, log exports, FDY}
+
+\regtable{Regressions/S2_Effects/reg_2_3_net_D1_ext_firm_dest_exports}
+         {6}{Table 2.3.8 (MNE\_ext, D1) --- Network presence $\times$ distance, total exports, FDY}
+
+\regtable{Regressions/S2_Effects/reg_2_3_net_D2_ext_ln_exports}
+         {6}{Table 2.3.9 (MNE\_ext, D2) --- HQ vs.\ affiliate $\times$ distance, log exports, FDY}
+
+\regtable{Regressions/S2_Effects/reg_2_3_net_D2_ext_firm_dest_exports}
+         {6}{Table 2.3.10 (MNE\_ext, D2) --- HQ vs.\ affiliate $\times$ distance, total exports, FDY}
+
+\regtable{Regressions/S2_Effects/reg_2_3_net_D3_ext_ln_exports}
+         {6}{Table 2.3.11 (MNE\_ext, D3) --- Network with neighbor $\times$ distance, log exports, FDY}
+
+\regtable{Regressions/S2_Effects/reg_2_3_net_D3_ext_firm_dest_exports}
+         {6}{Table 2.3.12 (MNE\_ext, D3) --- Network with neighbor $\times$ distance, total exports, FDY}
+
+
+%------------------------------------------------------------------
+\subsection{Concentration Descriptives (Block E)}
+\label{subsec:conc_descriptives}
+%------------------------------------------------------------------
+
+\begin{itemize}
+    \item[\ding{114}] Per-country bar charts comparing top-1, top-3, and top-5 exporter concentration shares in origin-destination-year cells that contain at least one MNE vs.\ cells with no MNEs. Each bar represents the mean concentration share across cells of each type for a given country. A pooled scatter of top-1 concentration against log number of exporters (coloured by MNE presence) was generated but is not yet synced to the Overleaf folder.
+\end{itemize}
+
+\figthree{Graphs/2_4_Concentration/fig_2_4_conc_mne_present_ARG.png}
+         {Graphs/2_4_Concentration/fig_2_4_conc_mne_present_CHL.png}
+         {Graphs/2_4_Concentration/fig_2_4_conc_mne_present_COL.png}
+         {Figure 2.4.1 --- Concentration by MNE presence: ARG, CHL, COL}
+
+\figthree{Graphs/2_4_Concentration/fig_2_4_conc_mne_present_CRI.png}
+         {Graphs/2_4_Concentration/fig_2_4_conc_mne_present_DOM.png}
+         {Graphs/2_4_Concentration/fig_2_4_conc_mne_present_PER.png}
+         {Figure 2.4.2 --- Concentration by MNE presence: CRI, DOM, PER}
+
+\figthree{Graphs/2_4_Concentration/fig_2_4_conc_mne_present_PRY.png}
+         {Graphs/2_4_Concentration/fig_2_4_conc_mne_present_SLV.png}
+         {Graphs/2_4_Concentration/fig_2_4_conc_mne_present_URY.png}
+         {Figure 2.4.3 --- Concentration by MNE presence: PRY, SLV, URY}
+
+
+%------------------------------------------------------------------
+\subsection{Concentration Patterns}
+\label{subsec:concentration}
+%------------------------------------------------------------------
+
+\begin{itemize}
+    \item[\ding{114}] \textit{Sample:} ODY and ODPY. \textit{Dependent variables:} top-1/3/5 exporter concentration shares and log number of exporters, for all firms and domestic-only. \textit{Regressor:} MNE share in value and in number of exporters. ODY: 6-spec FE ladder. ODPY: 8-spec FE ladder (baseline) + 4-spec product-interaction table. MNE\_total is the main specification; MNE\_ext results are qualitatively similar and shown thereafter.
+    \item[\ding{114}] For brevity, the main text shows top-1 concentration and log number of exporters (all-firm measures) for both MNE measures and both MNE definitions. Results for top-3, top-5, and domestic-only measures are not shown because they follow the same direction and magnitude as the top-1 results; all tables are available on disk.
+\end{itemize}
+
+%...............................................
+\subsubsection{MNE\_total (all matched firms) --- ODY, Main Results}
+%...............................................
+
+\regtable{Regressions/S2_Effects/reg_2_4_conc_ody_total_share_mne_value_share_top1_all}
+         {6}{Table 2.4.1 (MNE\_total) --- Value share and top-1 concentration, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_4_conc_ody_total_share_mne_value_ln_n_exp_all}
+         {6}{Table 2.4.2 (MNE\_total) --- Value share and log \# exporters, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_4_conc_ody_total_share_total_nfirms_share_top1_all}
+         {6}{Table 2.4.3 (MNE\_total) --- Exporter share and top-1 concentration, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_4_conc_ody_total_share_total_nfirms_ln_n_exp_all}
+         {6}{Table 2.4.4 (MNE\_total) --- Exporter share and log \# exporters, ODY}
+
+% NOTE: Tables for share_top3_all, share_top5_all, share_top1_dom, share_top3_dom,
+% share_top5_dom, and ln_n_exp_dom are not shown because they follow identical patterns
+% to the top-1 all-firm results above. All 16 ODY (MNE_total) tables are available on disk.
+
+%...............................................
+\subsubsection{MNE\_ext (foreign subsidiaries) --- ODY}
+%...............................................
+
+\regtable{Regressions/S2_Effects/reg_2_4_conc_ody_ext_share_mne_ext_value_share_top1_all}
+         {6}{Table 2.4.5 (MNE\_ext) --- Value share and top-1 concentration, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_4_conc_ody_ext_share_mne_ext_value_ln_n_exp_all}
+         {6}{Table 2.4.6 (MNE\_ext) --- Value share and log \# exporters, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_4_conc_ody_ext_share_ext_nfirms_share_top1_all}
+         {6}{Table 2.4.7 (MNE\_ext) --- Exporter share and top-1 concentration, ODY}
+
+\regtable{Regressions/S2_Effects/reg_2_4_conc_ody_ext_share_ext_nfirms_ln_n_exp_all}
+         {6}{Table 2.4.8 (MNE\_ext) --- Exporter share and log \# exporters, ODY}
+
+% NOTE: Remaining 8 ODY (MNE_ext) tables follow the same patterns and are available on disk.
+
+%...............................................
+\subsubsection{MNE\_total (all matched firms) --- ODPY, Baseline}
+%...............................................
+
+\regtableW{Regressions/S2_Effects/reg_2_4_conc_odpy_total_share_mne_value_share_top1_all_p}
+          {8}{Table 2.4.9 (MNE\_total) --- Value share and top-1 concentration, ODPY}
+
+\regtableW{Regressions/S2_Effects/reg_2_4_conc_odpy_total_share_mne_value_ln_n_exp_all_p}
+          {8}{Table 2.4.10 (MNE\_total) --- Value share and log \# exporters, ODPY}
+
+\regtableW{Regressions/S2_Effects/reg_2_4_conc_odpy_total_share_total_nfirms_share_top1_all_p}
+          {8}{Table 2.4.11 (MNE\_total) --- Exporter share and top-1 concentration, ODPY}
+
+\regtableW{Regressions/S2_Effects/reg_2_4_conc_odpy_total_share_total_nfirms_ln_n_exp_all_p}
+          {8}{Table 2.4.12 (MNE\_total) --- Exporter share and log \# exporters, ODPY}
+
+% NOTE: Remaining 12 ODPY baseline (MNE_total) tables (top-3, top-5, domestic variants)
+% follow the same pattern and are available on disk.
+
+%...............................................
+\subsubsection{MNE\_ext (foreign subsidiaries) --- ODPY, Baseline}
+%...............................................
+
+\regtableW{Regressions/S2_Effects/reg_2_4_conc_odpy_ext_share_mne_ext_value_share_top1_all_p}
+          {8}{Table 2.4.13 (MNE\_ext) --- Value share and top-1 concentration, ODPY}
+
+\regtableW{Regressions/S2_Effects/reg_2_4_conc_odpy_ext_share_mne_ext_value_ln_n_exp_all_p}
+          {8}{Table 2.4.14 (MNE\_ext) --- Value share and log \# exporters, ODPY}
+
+\regtableW{Regressions/S2_Effects/reg_2_4_conc_odpy_ext_share_ext_nfirms_share_top1_all_p}
+          {8}{Table 2.4.15 (MNE\_ext) --- Exporter share and top-1 concentration, ODPY}
+
+\regtableW{Regressions/S2_Effects/reg_2_4_conc_odpy_ext_share_ext_nfirms_ln_n_exp_all_p}
+          {8}{Table 2.4.16 (MNE\_ext) --- Exporter share and log \# exporters, ODPY}
+
+% NOTE: Remaining 12 ODPY baseline (MNE_ext) tables are available on disk and follow the same patterns.
+
+%...............................................
+\subsubsection{ODPY Product Interactions}
+%...............................................
+
+\begin{itemize}
+    \item[\ding{114}] Each table contains 4 columns, all using OxT$+$DxT fixed effects, interacting the MNE share with: log GDP per capita of destination, log bilateral distance, upstreamness, and elasticity of substitution. The interaction tables ask whether the concentration effect of MNE presence is heterogeneous across product characteristics or destination income. All 64 interaction tables (4 outcomes $\times$ 2 MNE definitions $\times$ 2 MNE measures $\times$ 4 interaction variables) are available on disk; results are broadly consistent across outcomes. The four tables below report the main specification (MNE\_total, exporter share, top-1 and log exporters).
+\end{itemize}
+
+\regtable{Regressions/S2_Effects/reg_2_4_conc_odpy_int_total_share_total_nfirms_share_top1_all_p}
+         {4}{Table 2.4.17 (MNE\_total) --- Exporter share $\times$ interactions and top-1 concentration, ODPY}
+
+\regtable{Regressions/S2_Effects/reg_2_4_conc_odpy_int_total_share_total_nfirms_ln_n_exp_all_p}
+         {4}{Table 2.4.18 (MNE\_total) --- Exporter share $\times$ interactions and log \# exporters, ODPY}
+
+\regtable{Regressions/S2_Effects/reg_2_4_conc_odpy_int_total_share_mne_value_share_top1_all_p}
+         {4}{Table 2.4.19 (MNE\_total) --- Value share $\times$ interactions and top-1 concentration, ODPY}
+
+\regtable{Regressions/S2_Effects/reg_2_4_conc_odpy_int_total_share_mne_value_ln_n_exp_all_p}
+         {4}{Table 2.4.20 (MNE\_total) --- Value share $\times$ interactions and log \# exporters, ODPY}
+
+% MNE_ext interaction tables (same structure, available on disk, similar results):
+% reg_2_4_conc_odpy_int_ext_share_ext_nfirms_{outcome}.tex
+% reg_2_4_conc_odpy_int_ext_share_mne_ext_value_{outcome}.tex
+
+
+%------------------------------------------------------------------
+\subsection{New Product Introduction by Firm Type (Block F)}
+\label{subsec:newprod_descriptives}
+%------------------------------------------------------------------
+
+\begin{itemize}
+    \item[\ding{114}] Stacked bar charts showing the share of newly introduced products (i.e., HS6 codes not previously exported by that origin) attributable to: MNE-only introduction, joint introduction by MNEs and domestic firms, and domestic-only introduction. Figures shown for the pooled sample and per country.
+\end{itemize}
+
+\figone{Graphs/2_5_ExtensiveMargin/fig_2_5_newprod_by_type_year.png}
+       {Figure 2.5.1 --- New product introduction by firm type and year (pooled)}
+
+\figthree{Graphs/2_5_ExtensiveMargin/fig_2_5_newprod_by_type_ARG.png}
+         {Graphs/2_5_ExtensiveMargin/fig_2_5_newprod_by_type_CHL.png}
+         {Graphs/2_5_ExtensiveMargin/fig_2_5_newprod_by_type_COL.png}
+         {Figure 2.5.2 --- New product introduction by type: ARG, CHL, COL}
+
+\figthree{Graphs/2_5_ExtensiveMargin/fig_2_5_newprod_by_type_CRI.png}
+         {Graphs/2_5_ExtensiveMargin/fig_2_5_newprod_by_type_DOM.png}
+         {Graphs/2_5_ExtensiveMargin/fig_2_5_newprod_by_type_PER.png}
+         {Figure 2.5.3 --- New product introduction by type: CRI, DOM, PER}
+
+\figthree{Graphs/2_5_ExtensiveMargin/fig_2_5_newprod_by_type_PRY.png}
+         {Graphs/2_5_ExtensiveMargin/fig_2_5_newprod_by_type_SLV.png}
+         {Graphs/2_5_ExtensiveMargin/fig_2_5_newprod_by_type_URY.png}
+         {Figure 2.5.4 --- New product introduction by type: PRY, SLV, URY}
+
+
+%------------------------------------------------------------------
+\subsection{Extensive Margin: Country-Product Level}
+\label{subsec:extm_cp}
+%------------------------------------------------------------------
+
+\begin{itemize}
+    \item[\ding{114}] Kernel densities by year of (i) the log number of new products introduced and (ii) the share of new products introduced by MNEs. Figures shown for three representative years (2011, 2015, 2019); the remaining six years (2012--2014, 2016--2018) display qualitatively identical shapes and are available on disk in \texttt{Graphs/2\_5\_ExtensiveMargin/}.
+    \item[\ding{114}] Regressions at the origin-product-year (OPY) and origin-destination-product-year (ODPY) levels. Dependent variable: binary indicator equal to 1 if a new product is introduced in that cell. Regressors: dummies for introduction by MNE only vs.\ jointly by MNE and domestic firms. These regressions are definition-agnostic (the new-product dummies do not depend on the MNE definition).
+\end{itemize}
+
+% --- Kernel density: log number of new products ---
+\figthree{Graphs/2_5_ExtensiveMargin/fig_2_5_kdens_nnewprod_2011.png}
+         {Graphs/2_5_ExtensiveMargin/fig_2_5_kdens_nnewprod_2015.png}
+         {Graphs/2_5_ExtensiveMargin/fig_2_5_kdens_nnewprod_2019.png}
+         {Figure 2.5.5 --- Kernel density: log \# new products (2011, 2015, 2019)}
+
+% --- Kernel density: MNE share of new products ---
+\figthree{Graphs/2_5_ExtensiveMargin/fig_2_5_kdens_sh_mne_2011.png}
+         {Graphs/2_5_ExtensiveMargin/fig_2_5_kdens_sh_mne_2015.png}
+         {Graphs/2_5_ExtensiveMargin/fig_2_5_kdens_sh_mne_2019.png}
+         {Figure 2.5.6 --- Kernel density: MNE share of new products (2011, 2015, 2019)}
+
+% --- Regressions ---
+\regtable{Regressions/S2_Effects/reg_2_5_newprod_opy}
+         {4}{Table 2.5.1 --- New product introduction and MNE status, OPY}
+
+\regtable{Regressions/S2_Effects/reg_2_5_newprod_odpy}
+         {5}{Table 2.5.2 --- New product introduction and MNE status, ODPY}
+
+
+%------------------------------------------------------------------
+\subsection{Extensive Margin: Firm Level}
+\label{subsec:extm_firm}
+%------------------------------------------------------------------
+
+\begin{itemize}
+    \item[\ding{114}] MNE dummy regressed on six firm-level outcomes: log total firm exports, log number of export destinations, log exports per destination, log number of export products, log exports per product, and log average export distance. Each outcome is run with and without a firm-size control (log total firm exports), across three FE specifications: origin$+$year; origin$\times$year; origin$\times$year$+$sector. The firm-year table is therefore very wide (33 columns across 6 outcomes and 5--6 FE/size combinations each) and rendered in landscape. The firm-destination-year and firm-product-year tables are narrower.
+    \item[\ding{114}] Results are currently available for MNE\_ext. MNE\_total results are not yet present in the Overleaf folder (the do-file generates them, but the output files have not been synced).
+\end{itemize}
+
+%...............................................
+\subsubsection{MNE\_ext (foreign subsidiaries)}
+%...............................................
+
+\regtableW{Regressions/S2_Effects/reg_2_6_firm_ext}
+          {33}{Table 2.6.1 (MNE\_ext) --- Firm-level outcomes, firm-year sample}
+
+\regtable{Regressions/S2_Effects/reg_2_6_fmd_ext}
+         {4}{Table 2.6.2 (MNE\_ext) --- Firm-level log exports, firm-destination-year sample}
+
+\regtable{Regressions/S2_Effects/reg_2_6_fmp_ext}
+         {2}{Table 2.6.3 (MNE\_ext) --- Firm-level product outcomes, firm-product-year sample}
+
+%...............................................
+\subsubsection{MNE\_total (all matched firms) --- Pending}
+%...............................................
+
+% The MNE_total firm-level tables (reg_2_6_firm_total, reg_2_6_fmd_total, reg_2_6_fmp_total)
+% are generated by the do-file but not yet present in the Overleaf folder. Results are
+% expected to be qualitatively identical to MNE_ext since MNE_total is a superset definition.
+
+
+%==================================================================
+\section{Summary Statistics}
+\label{sec:sumstats}
+%==================================================================
+
+\begin{table}[H]
+  \centering
+  \caption{Table 3.1 --- Export statistics by origin country}
+  \footnotesize
+  \adjustbox{max width=\textwidth}{%
+    \estauto{Tables/S3_Summary/tab_3_1_sumstats_country}{6}{c}%
+  }
+  \normalsize
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \caption{Table 3.2 --- Summary statistics, origin-destination-year sample}
+  \footnotesize
+  \adjustbox{max width=\textwidth}{%
+    \estauto{Tables/S3_Summary/tab_3_2_sumstats_ody}{6}{c}%
+  }
+  \normalsize
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \caption{Table 3.3 --- Summary statistics, origin-destination-product-year sample}
+  \footnotesize
+  \adjustbox{max width=\textwidth}{%
+    \estauto{Tables/S3_Summary/tab_3_3_sumstats_odpy}{6}{c}%
+  }
+  \normalsize
+\end{table}
+
+
+\input{Tables/S3_Summary/tab_3_4_firm_profile_comparison}
+
+\input{Tables/S3_Summary/tab_3_5_prodchar_corr}
+
+
+%==================================================================
+\appendix
+\section{Country-by-Country Graphs}
+\label{app:country_graphs}
+%==================================================================
+
+Country-specific versions of Sections~\ref{subsec:destinations} and~\ref{subsec:products}. Filename patterns:
+\begin{itemize}
+  \item Destination categories: \verb|fig_1_2_{mne_def}_{category}_{ISO3}.png|
+  \item Product categories:     \verb|fig_1_3_{mne_def}_{category}_{ISO3}.png|
+\end{itemize}
+Each country shows MNE\_total first (main results), followed by MNE\_ext.
+
+%------------------------------------------------------------------
+\subsection*{A.1 --- Destination category graphs by country}
+%------------------------------------------------------------------
+
+\subsubsection*{Argentina (ARG)}
+
+\subsubsection*{MNE\_total}
+\figthree{Graphs/1_2_DestinationCountries/fig_1_2_total_income_group_dest_ARG.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_total_intra_regional_ARG.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_total_contig_ARG.png}
+         {ARG (MNE\_total) --- Shares by income group, regional proximity, contiguity}
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_total_dest_region_num_ARG.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_total_dist_above_med_ARG.png}
+       {ARG (MNE\_total) --- Shares by broad region and distance}
+
+\subsubsection*{MNE\_ext}
+\figthree{Graphs/1_2_DestinationCountries/fig_1_2_ext_income_group_dest_ARG.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_ext_intra_regional_ARG.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_ext_contig_ARG.png}
+         {ARG (MNE\_ext) --- Shares by income group, regional proximity, contiguity}
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_ext_dest_region_num_ARG.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_ext_dist_above_med_ARG.png}
+       {ARG (MNE\_ext) --- Shares by broad region and distance}
+
+\subsubsection*{Chile (CHL)}
+
+\subsubsection*{MNE\_total}
+\figthree{Graphs/1_2_DestinationCountries/fig_1_2_total_income_group_dest_CHL.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_total_intra_regional_CHL.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_total_contig_CHL.png}
+         {CHL (MNE\_total) --- Shares by income group, regional proximity, contiguity}
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_total_dest_region_num_CHL.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_total_dist_above_med_CHL.png}
+       {CHL (MNE\_total) --- Shares by broad region and distance}
+
+\subsubsection*{MNE\_ext}
+\figthree{Graphs/1_2_DestinationCountries/fig_1_2_ext_income_group_dest_CHL.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_ext_intra_regional_CHL.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_ext_contig_CHL.png}
+         {CHL (MNE\_ext) --- Shares by income group, regional proximity, contiguity}
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_ext_dest_region_num_CHL.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_ext_dist_above_med_CHL.png}
+       {CHL (MNE\_ext) --- Shares by broad region and distance}
+
+\subsubsection*{Colombia (COL)}
+
+\subsubsection*{MNE\_total}
+\figthree{Graphs/1_2_DestinationCountries/fig_1_2_total_income_group_dest_COL.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_total_intra_regional_COL.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_total_contig_COL.png}
+         {COL (MNE\_total) --- Shares by income group, regional proximity, contiguity}
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_total_dest_region_num_COL.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_total_dist_above_med_COL.png}
+       {COL (MNE\_total) --- Shares by broad region and distance}
+
+\subsubsection*{MNE\_ext}
+\figthree{Graphs/1_2_DestinationCountries/fig_1_2_ext_income_group_dest_COL.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_ext_intra_regional_COL.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_ext_contig_COL.png}
+         {COL (MNE\_ext) --- Shares by income group, regional proximity, contiguity}
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_ext_dest_region_num_COL.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_ext_dist_above_med_COL.png}
+       {COL (MNE\_ext) --- Shares by broad region and distance}
+
+\subsubsection*{Costa Rica (CRI)}
+
+\subsubsection*{MNE\_total}
+\figthree{Graphs/1_2_DestinationCountries/fig_1_2_total_income_group_dest_CRI.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_total_intra_regional_CRI.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_total_contig_CRI.png}
+         {CRI (MNE\_total) --- Shares by income group, regional proximity, contiguity}
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_total_dest_region_num_CRI.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_total_dist_above_med_CRI.png}
+       {CRI (MNE\_total) --- Shares by broad region and distance}
+
+\subsubsection*{MNE\_ext}
+\figthree{Graphs/1_2_DestinationCountries/fig_1_2_ext_income_group_dest_CRI.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_ext_intra_regional_CRI.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_ext_contig_CRI.png}
+         {CRI (MNE\_ext) --- Shares by income group, regional proximity, contiguity}
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_ext_dest_region_num_CRI.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_ext_dist_above_med_CRI.png}
+       {CRI (MNE\_ext) --- Shares by broad region and distance}
+
+\subsubsection*{Dominican Republic (DOM)}
+
+\subsubsection*{MNE\_total}
+\figthree{Graphs/1_2_DestinationCountries/fig_1_2_total_income_group_dest_DOM.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_total_intra_regional_DOM.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_total_contig_DOM.png}
+         {DOM (MNE\_total) --- Shares by income group, regional proximity, contiguity}
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_total_dest_region_num_DOM.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_total_dist_above_med_DOM.png}
+       {DOM (MNE\_total) --- Shares by broad region and distance}
+
+\subsubsection*{MNE\_ext}
+\figthree{Graphs/1_2_DestinationCountries/fig_1_2_ext_income_group_dest_DOM.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_ext_intra_regional_DOM.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_ext_contig_DOM.png}
+         {DOM (MNE\_ext) --- Shares by income group, regional proximity, contiguity}
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_ext_dest_region_num_DOM.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_ext_dist_above_med_DOM.png}
+       {DOM (MNE\_ext) --- Shares by broad region and distance}
+
+\subsubsection*{Peru (PER)}
+
+\subsubsection*{MNE\_total}
+\figthree{Graphs/1_2_DestinationCountries/fig_1_2_total_income_group_dest_PER.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_total_intra_regional_PER.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_total_contig_PER.png}
+         {PER (MNE\_total) --- Shares by income group, regional proximity, contiguity}
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_total_dest_region_num_PER.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_total_dist_above_med_PER.png}
+       {PER (MNE\_total) --- Shares by broad region and distance}
+
+\subsubsection*{MNE\_ext}
+\figthree{Graphs/1_2_DestinationCountries/fig_1_2_ext_income_group_dest_PER.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_ext_intra_regional_PER.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_ext_contig_PER.png}
+         {PER (MNE\_ext) --- Shares by income group, regional proximity, contiguity}
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_ext_dest_region_num_PER.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_ext_dist_above_med_PER.png}
+       {PER (MNE\_ext) --- Shares by broad region and distance}
+
+\subsubsection*{Paraguay (PRY)}
+
+\subsubsection*{MNE\_total}
+\figthree{Graphs/1_2_DestinationCountries/fig_1_2_total_income_group_dest_PRY.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_total_intra_regional_PRY.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_total_contig_PRY.png}
+         {PRY (MNE\_total) --- Shares by income group, regional proximity, contiguity}
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_total_dest_region_num_PRY.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_total_dist_above_med_PRY.png}
+       {PRY (MNE\_total) --- Shares by broad region and distance}
+
+\subsubsection*{MNE\_ext}
+\figthree{Graphs/1_2_DestinationCountries/fig_1_2_ext_income_group_dest_PRY.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_ext_intra_regional_PRY.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_ext_contig_PRY.png}
+         {PRY (MNE\_ext) --- Shares by income group, regional proximity, contiguity}
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_ext_dest_region_num_PRY.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_ext_dist_above_med_PRY.png}
+       {PRY (MNE\_ext) --- Shares by broad region and distance}
+
+\subsubsection*{El Salvador (SLV)}
+
+\subsubsection*{MNE\_total}
+\figthree{Graphs/1_2_DestinationCountries/fig_1_2_total_income_group_dest_SLV.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_total_intra_regional_SLV.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_total_contig_SLV.png}
+         {SLV (MNE\_total) --- Shares by income group, regional proximity, contiguity}
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_total_dest_region_num_SLV.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_total_dist_above_med_SLV.png}
+       {SLV (MNE\_total) --- Shares by broad region and distance}
+
+\subsubsection*{MNE\_ext}
+\figthree{Graphs/1_2_DestinationCountries/fig_1_2_ext_income_group_dest_SLV.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_ext_intra_regional_SLV.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_ext_contig_SLV.png}
+         {SLV (MNE\_ext) --- Shares by income group, regional proximity, contiguity}
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_ext_dest_region_num_SLV.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_ext_dist_above_med_SLV.png}
+       {SLV (MNE\_ext) --- Shares by broad region and distance}
+
+\subsubsection*{Uruguay (URY)}
+
+\subsubsection*{MNE\_total}
+\figthree{Graphs/1_2_DestinationCountries/fig_1_2_total_income_group_dest_URY.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_total_intra_regional_URY.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_total_contig_URY.png}
+         {URY (MNE\_total) --- Shares by income group, regional proximity, contiguity}
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_total_dest_region_num_URY.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_total_dist_above_med_URY.png}
+       {URY (MNE\_total) --- Shares by broad region and distance}
+
+\subsubsection*{MNE\_ext}
+\figthree{Graphs/1_2_DestinationCountries/fig_1_2_ext_income_group_dest_URY.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_ext_intra_regional_URY.png}
+         {Graphs/1_2_DestinationCountries/fig_1_2_ext_contig_URY.png}
+         {URY (MNE\_ext) --- Shares by income group, regional proximity, contiguity}
+
+\figtwo{Graphs/1_2_DestinationCountries/fig_1_2_ext_dest_region_num_URY.png}
+       {Graphs/1_2_DestinationCountries/fig_1_2_ext_dist_above_med_URY.png}
+       {URY (MNE\_ext) --- Shares by broad region and distance}
+
+
+%------------------------------------------------------------------
+\subsection*{A.2 --- Product category graphs by country}
+%------------------------------------------------------------------
+
+\subsubsection*{Argentina (ARG)}
+
+\subsubsection*{MNE\_total}
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_total_upstreamness_abovemed_ARG.png}
+       {Graphs/1_3_ByProduct/fig_1_3_total_hs_section_ARG.png}
+       {ARG (MNE\_total) --- Shares by upstreamness and HS section}
+
+\subsubsection*{MNE\_ext}
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_ext_upstreamness_abovemed_ARG.png}
+       {Graphs/1_3_ByProduct/fig_1_3_ext_hs_section_ARG.png}
+       {ARG (MNE\_ext) --- Shares by upstreamness and HS section}
+
+\subsubsection*{Chile (CHL)}
+
+\subsubsection*{MNE\_total}
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_total_upstreamness_abovemed_CHL.png}
+       {Graphs/1_3_ByProduct/fig_1_3_total_hs_section_CHL.png}
+       {CHL (MNE\_total) --- Shares by upstreamness and HS section}
+
+\subsubsection*{MNE\_ext}
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_ext_upstreamness_abovemed_CHL.png}
+       {Graphs/1_3_ByProduct/fig_1_3_ext_hs_section_CHL.png}
+       {CHL (MNE\_ext) --- Shares by upstreamness and HS section}
+
+\subsubsection*{Colombia (COL)}
+
+\subsubsection*{MNE\_total}
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_total_upstreamness_abovemed_COL.png}
+       {Graphs/1_3_ByProduct/fig_1_3_total_hs_section_COL.png}
+       {COL (MNE\_total) --- Shares by upstreamness and HS section}
+
+\subsubsection*{MNE\_ext}
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_ext_upstreamness_abovemed_COL.png}
+       {Graphs/1_3_ByProduct/fig_1_3_ext_hs_section_COL.png}
+       {COL (MNE\_ext) --- Shares by upstreamness and HS section}
+
+\subsubsection*{Costa Rica (CRI)}
+
+\subsubsection*{MNE\_total}
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_total_upstreamness_abovemed_CRI.png}
+       {Graphs/1_3_ByProduct/fig_1_3_total_hs_section_CRI.png}
+       {CRI (MNE\_total) --- Shares by upstreamness and HS section}
+
+\subsubsection*{MNE\_ext}
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_ext_upstreamness_abovemed_CRI.png}
+       {Graphs/1_3_ByProduct/fig_1_3_ext_hs_section_CRI.png}
+       {CRI (MNE\_ext) --- Shares by upstreamness and HS section}
+
+\subsubsection*{Dominican Republic (DOM)}
+
+\subsubsection*{MNE\_total}
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_total_upstreamness_abovemed_DOM.png}
+       {Graphs/1_3_ByProduct/fig_1_3_total_hs_section_DOM.png}
+       {DOM (MNE\_total) --- Shares by upstreamness and HS section}
+
+\subsubsection*{MNE\_ext}
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_ext_upstreamness_abovemed_DOM.png}
+       {Graphs/1_3_ByProduct/fig_1_3_ext_hs_section_DOM.png}
+       {DOM (MNE\_ext) --- Shares by upstreamness and HS section}
+
+\subsubsection*{Peru (PER)}
+
+\subsubsection*{MNE\_total}
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_total_upstreamness_abovemed_PER.png}
+       {Graphs/1_3_ByProduct/fig_1_3_total_hs_section_PER.png}
+       {PER (MNE\_total) --- Shares by upstreamness and HS section}
+
+\subsubsection*{MNE\_ext}
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_ext_upstreamness_abovemed_PER.png}
+       {Graphs/1_3_ByProduct/fig_1_3_ext_hs_section_PER.png}
+       {PER (MNE\_ext) --- Shares by upstreamness and HS section}
+
+\subsubsection*{Paraguay (PRY)}
+
+\subsubsection*{MNE\_total}
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_total_upstreamness_abovemed_PRY.png}
+       {Graphs/1_3_ByProduct/fig_1_3_total_hs_section_PRY.png}
+       {PRY (MNE\_total) --- Shares by upstreamness and HS section}
+
+\subsubsection*{MNE\_ext}
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_ext_upstreamness_abovemed_PRY.png}
+       {Graphs/1_3_ByProduct/fig_1_3_ext_hs_section_PRY.png}
+       {PRY (MNE\_ext) --- Shares by upstreamness and HS section}
+
+\subsubsection*{El Salvador (SLV)}
+
+\subsubsection*{MNE\_total}
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_total_upstreamness_abovemed_SLV.png}
+       {Graphs/1_3_ByProduct/fig_1_3_total_hs_section_SLV.png}
+       {SLV (MNE\_total) --- Shares by upstreamness and HS section}
+
+\subsubsection*{MNE\_ext}
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_ext_upstreamness_abovemed_SLV.png}
+       {Graphs/1_3_ByProduct/fig_1_3_ext_hs_section_SLV.png}
+       {SLV (MNE\_ext) --- Shares by upstreamness and HS section}
+
+\subsubsection*{Uruguay (URY)}
+
+\subsubsection*{MNE\_total}
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_total_upstreamness_abovemed_URY.png}
+       {Graphs/1_3_ByProduct/fig_1_3_total_hs_section_URY.png}
+       {URY (MNE\_total) --- Shares by upstreamness and HS section}
+
+\subsubsection*{MNE\_ext}
+\figtwo{Graphs/1_3_ByProduct/fig_1_3_ext_upstreamness_abovemed_URY.png}
+       {Graphs/1_3_ByProduct/fig_1_3_ext_hs_section_URY.png}
+       {URY (MNE\_ext) --- Shares by upstreamness and HS section}
+
+\end{document}

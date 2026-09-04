@@ -43,8 +43,15 @@ There's also a separate analysis just for **agricultural exports** (HS chapters 
 
 ## What's in This Repo
 
+> **Working on this project? Open `START_HERE.md` first.** It explains the folder, the
+> current work plan (`docs/WORKPLAN_working_paper.md`) and the technical spec (`CLAUDE.md`).
+
 ```
-orbis-dnb-customs-trade/
+Orbis_DNB_Customs_Final/
+│
+├── START_HERE.md                     ← orientation for anyone continuing the work
+├── CLAUDE.md                         ← technical spec: scripts, inputs, columns, traps
+├── config/paths.do, paths.py         ← every machine-specific path, in one place
 │
 ├── src/                              ← all scripts, run them in number order
 │   ├── 00_master.do                  ← start here
@@ -61,23 +68,37 @@ orbis-dnb-customs-trade/
 │   ├── 11_ultimate_parent_build.do           ← conduit reallocation: build the cube
 │   ├── 12_ultimate_parent_tables.do          ← conduit reallocation: the tables
 │   ├── 13_fact5_dpy_fe.do                    ← Fact 5: destination×product×year FE test
-│   └── 14_ownership_covariance.do            ← Cov(θ,S): the paper's headline object
+│   ├── 14_ownership_covariance.do            ← Cov(θ,S): the paper's headline object
+│   └── helpers/                                  ← helpers (WITS RCA download)
+│
+├── stylized_facts/                   ← the pipeline behind "Stylized Facts on Multinational
+│   ├── README.md                     │  Firms and Trade" (July 2026): figure → script → cache
+│   ├── stata/                        │  Part-0 cube build + Stata determinants/effects
+│   └── python/                       │  sf1…sf6 (the six facts), nsf_* (network facts), sf_explore_*
+│
+├── docs/
+│   ├── WORKPLAN_working_paper.md     ← the next steps (working paper + agriculture version)
+│   ├── stylized_facts_document/      ← the July-2026 PDF
+│   ├── exploration_2026-05/          ← May-2026 exploration document (.tex)
+│   └── agro/                         ← March-2026 agro results
 │
 ├── data/
-│   ├── README.md                     ← what data you need and where to put it
-│   ├── raw/                          ← put your input files here (not in git)
-│   └── intermediate/                 ← created automatically while running
+│   ├── README.md                     ← what data you need and where to put it (+ where it is on this machine)
+│   ├── raw/                          ← small inputs (product characteristics, gravity, concordances) — not in git
+│   └── intermediate/                 ← created automatically while running — not in git
 │
-├── output/                           ← all output files (not in git)
+├── output/                           ← all output files (not in git); tables/ holds the cubes from 09–14
+├── archive/                          ← legacy scripts/outputs, provenance only (not in git)
 │
 ├── requirements.txt                  ← Python packages needed
 ├── .gitignore                        ← keeps data files out of git
 └── README.md                         ← this file
 ```
 
-The `data/` and `output/` folders are not tracked by git because they contain proprietary or restricted data. Only the code and documentation live here.
+The `data/`, `output/` and `archive/` folders are not tracked by git because they contain proprietary or restricted data, or generated files. Only the code and documentation live here.
 
 ---
+
 
 ## How the Matching Works
 

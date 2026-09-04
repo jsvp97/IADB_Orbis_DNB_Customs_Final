@@ -72,3 +72,16 @@ agro/Output/
 
 # The data README describes data structure without containing data
 !data/README.md
+
+# ============================================================
+# Added 2026-09-03 (reorganisation for the stylized-facts WP)
+# ============================================================
+# Legacy material and the old nested clone -- provenance only
+archive/
+# Parquet caches (stylized-facts pipeline) and any local data samples
+*.parquet
+data/samples/
+# Large binary docs that are not our own text
+docs/agro/*.pdf
+# Local Overleaf stand-in
+output/overleaf_mirror/

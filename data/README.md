@@ -360,3 +360,26 @@ Git is configured (via `.gitignore`) to never track:
 - The Orbis and DNB source files
 
 If you need the processed datasets, reach out to the author (jsvp97@gmail.com).
+
+---
+
+## 10. Where the files live on Sebastián's machine (added 2026-09-03)
+
+All of this is centralised in `config/paths.do` and `config/paths.py`; the table is the
+human-readable version. Sizes and notes: `CLAUDE.md` §1.
+
+| What | Path |
+|---|---|
+| The base `Base_final_Customs_DNB_Orbis_product_complete.dta` (20.6 GB) | `C:\Sebas BID\Orbis_DNB_Customs\` (identical copy in `...\Claude\Data\Raw\`) |
+| Aggregate analysis cubes `collapsed_{oy,ody,opy,odpy}.dta` (456 MB) | **`data/intermediate/v4_cubes/` in this repo** (copied 2026-09-03; originals in `C:\Sebas BID\Orbis_DNB_Customs\Claude\Data\Intermediate_v4\`) |
+| Firm-level cubes (`firm_*_level.dta`, `firm_level_data(_full).dta` 13 GB, `intermediate_mne_presence.dta` 2 GB) | `C:\Sebas BID\Orbis_DNB_Customs\Claude\Data\Intermediate_v4\` |
+| Small inputs listed in sections 5, 6 and 9 above | **`data/raw/` in this repo** (copied; gitignored by extension) |
+| Orbis ∪ D&B merges (`Merge_DNB_Orbis_PostIA_v2.dta` 38 GB, `_par_` 10.9 GB) | `C:\Sebas BID\Orbis_DNB\IA review\` |
+| `Merge_DNB_Orbis_PostIA_v4.dta` (47.9 GB) | `C:\Sebas BID\Orbis_DNB_Customs\` |
+| Parent network-size tables (`Merge_DNB_Orbis_{affiliates,parent,total}_total_PostIA_v2.dta`) | `C:\Sebas BID\Orbis_DNB_Customs\Claude\Data\Raw\` |
+| Customs intermediates and manual review (`exp_fdpt_10c_names_180625.dta`, `Base_revision_manual_*`) | `C:\Sebas BID\Orbis_DNB_Customs\Customs\` |
+| Fuzzy-match and AI-review intermediates | `C:\Sebas BID\Orbis_DNB_Customs\` root and `IA_review\` |
+| Raw Orbis ownership links | `D:\BID\Orbis\FINAL\` (external drive) |
+| Cubes built by scripts 09–14 | `output/tables/` in this repo |
+
+Not on disk yet: Fontagné–Guimbard–Orefice (2022) HS6 elasticities; HS2007→BEC correspondence.
