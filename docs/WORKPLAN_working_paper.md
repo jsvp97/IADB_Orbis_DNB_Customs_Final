@@ -2,7 +2,7 @@
 
 **Source of the agenda:** Christian Volpe's comments, September 2026 (transcribed by
 Sebastián). **Starting document:** `stylized_facts_document/Multinational_Firms_and_Trade_2026-07-29.pdf`
-(six facts, 15 pp). **Status of every item below: NOT STARTED (2026-09-03).** This file
+(six facts, 15 pp). **Status (2026-09-07): items 1a–1f and 2 BUILT AND RUN** — code in `stylized_facts/python/wp_*.py`, exhibits in `output/wp/`, results and caveats in `docs/WP_RESULTS_2026-09-07.md`. What remains is interpretation, selection for the paper, and the two decisions in §0. This file
 says, for each item, what it means, which data it needs, which script it plugs into, and
 what must be decided. Update the status column as work lands; move decisions to the brain
 (`C:\Sebas BID\_Brain\P3_MNE_Trade_Model.md`, decision log).
@@ -59,7 +59,7 @@ Also decide up front (one line in the brain when decided):
 | Data | the §0 cube. Interim (origin level only): `output/tables/mne_export_destination_cube.dta` already gives Figure 1 by parent. |
 | Code | `stylized_facts/python/sf1_origin.py` (stacked bars per origin) and `sf3_products.py` (bars per bucket) — add a `by_parent=True` variant that stacks `owner_iso3` groups instead of {ext, dom}. Palette: one colour per top parent, gray for Other, hatched for unknown-parent. |
 | Decide | how many parents (5? 8?); whether unknown-parent is its own segment (recommended: yes, hatched) or dropped as in Figure 4. |
-| Status | not started |
+| Status | DONE 2026-09-07 — `wp1a_figures_by_parent.py`; `output/wp/{all,agro,mining,manufacturing}/Graphs/fig_wp1a_*`. Top parents chosen by value + CHN forced; unknown parent shown hatched. |
 
 ### 1b. Figure 2 — other product-complexity variants; substitution elasticities (Fontagné, Guimbard & Orefice 2022, JIE 137)
 
@@ -68,7 +68,7 @@ Also decide up front (one line in the brain when decided):
 | Meaning | Volpe's hypothesis: more substitutable (higher σ) = less complex; the foreign-MNE share should fall with σ. Show Figure 2 with alternative sophistication measures. |
 | Already available | `sf3_products.py` produces appendix quintile figures for `sigma` (Broda–Weinstein, in `product_characteristics_hs6_2002_adj.dta`), `upstreamness`, `quality_ladder`, `rhci`; `sf3_odpy_regressions.py` runs PCI + upstreamness. |
 | To add | FGO (2022) HS6 tariff-based elasticities — **download** from CEPII ("Product-Level Trade Elasticities" database; HS6, check the HS revision on download and map to HS2007 with `data/raw/Concordance_HS_2007_2002_WITS.dta` if needed) → `data/raw/FGO2022_trade_elasticities_hs6.dta` (`$f_fgo` in `config/paths.do`). Merge in `sf3_products.py` (characteristics block, ~lines 90–110; add to `CHARS`) and in `stata/10_part0_build.do` §0.5. Produce `fig_sf3_fgo_quintile` and add `sigma_fgo` as a column in the A.4 ladder. Interpretation: a negative gradient in σ mirrors the positive one in PCI. |
-| Status | not started; data not on disk |
+| Status | DONE 2026-09-07 — `wp1b_complexity_variants.py`; FGO data downloaded (`data/raw/ProTEE_0_1.csv`, HS6 rev. 2007, 90 % of HS6 lines). Result: NO monotone gradient in |σ| (foreign share by quintile 0.46 0.38 0.45 0.34 0.52); corr(PCI, |σ|FGO) = 0.08; in the A.4 ladder |σ| enters POSITIVE for the foreign share (+0.03 per s.d.) — against the hypothesis. See `docs/WP_RESULTS_2026-09-07.md`. |
 
 ### 1c. Two-way tables: parent country × export destination (value and % of value), region level then country level
 
@@ -77,7 +77,7 @@ Also decide up front (one line in the brain when decided):
 | Meaning | Beyond the regressions, Volpe wants to SEE the matrix: rows = parent country (or region) of the MNE, columns = destination country (or region); cells = export value and share (row %, column %, and share of total — decide which; recommendation: all three as separate panels or an appendix). |
 | Data | `output/tables/mne_export_destination_cube.dta` (origin × dest × year × iso3_parent, 201,847 rows) — sufficient; use `mne_ucp_cube.dta` for the non-conduit variant. Region maps: destination regions in `src/06` §0.7 (`dest_region_num`: LAC / NAM / EU / Asia / …) and in `stylized_facts/python/sf_explore_dest.py`; parent regions in `src/08` (Figure 7) and `src/06` §1.4. |
 | Code | new `src/15_parent_by_destination_tables.do` or `stylized_facts/python/wp1_parent_x_destination.py`. Outputs: `tab_wp_parent_x_dest_region_{value,rowpct,colpct}.tex`, `…_country_top20x20…`. Pooled over origins and years; also one panel per LAC origin (Volpe reads origin splits — SLV/DOM/CRI ship home, ARG/CHL/PER do not; brain §2). |
-| Status | not started |
+| Status | DONE 2026-09-07 — `wp1cd_parent_destination.py`; `output/wp/<scope>/Tables/tab_wp1c_*` (value, row %, col %; region and top-15 country; per-origin). Share to parent's own country 0.091 (matches src/10). |
 
 ### 1d. Heat map: main parent countries × main destinations
 
@@ -85,7 +85,7 @@ Also decide up front (one line in the brain when decided):
 |---|---|
 | Meaning | the 1c matrix as a colour map (top ~15 parents × top ~15 destinations, cell = share of that parent's exports going to that destination, annotated). |
 | Code | same data as 1c; heat-map code to reuse: `stylized_facts/python/sf_explore_dest_by_origin.py` (matplotlib `imshow` + annotations). One map for recorded parent, one for non-conduit owner; one for value shares, one for the "to parent's own country" diagonal highlighted. |
-| Status | not started |
+| Status | DONE 2026-09-07 — `fig_wp1d_heatmap_country_rowpct` / `_cellpct` / `_region_rowpct`, `fig_wp1d_home_share_by_parent`. |
 
 ### 1e. Headquarters, not only affiliates; "test MNE quantity"
 
@@ -94,7 +94,7 @@ Also decide up front (one line in the brain when decided):
 | Meaning — two readings, confirm with Volpe | (i) In the presence regressions (Fact 6, Table 2), distinguish MNEs present at the destination **through their headquarters** from those present **through an affiliate** — Table A.9 already does this in the appendix (`sf5_distance.py`, groups `g_hq`/`g_aff`, built at lines 105–176); promote it and extend it to the Fact 5 regressions (`sf4_presence.py`). (ii) Look at the **exporter itself being an HQ** (a LAC-headquartered group exporting from home) versus an affiliate exporting: identify with `subsidiarybvdid == guo25` (Orbis) or `dunsnumber == globalultimatedunsnumber` (D&B); a domestic MNE (`MNE_dom`) is by construction HQ-or-domestic-affiliate. |
 | "MNE cantidad" | use the **number** of MNEs (and separately the number of HQ-present vs affiliate-present MNEs) as the presence regressor. Table 1 already uses ln(# MNE firms) as the intensive margin; add counts by presence type. Fields: `n_mne`, `n_mne_ext`, `n_mne_dom` in `collapsed_odpy`; HQ/affiliate presence needs `intermediate_mne_presence.dta` (2 GB, `Intermediate_v4`) or Ignacio's `sf4_aff_pairs_matched.parquet` (group id × destination presence). |
 | Also | the model's Fact-6 prediction is exactly here: attenuation should survive at the affiliate level and weaken at the **parent** level (cannibalisation) — brain §5. A parent-level rerun of Table 2 is cheap once the FDPY cache exists. |
-| Status | not started |
+| Status | DONE 2026-09-07 with a data caveat — `wp1e_hq_affiliates.py`. Reading (ii) is NOT identifiable: every matched exporter is an affiliate (0 HQ exporters in 5.45 M rows). Reading (i) built: presence through HQ / through another affiliate / not present, counts by type (Fact-5 table), groups vs affiliates, distance regressions. |
 
 ### 1f. Product level: HS6 export shares, with descriptions
 
@@ -103,7 +103,7 @@ Also decide up front (one line in the brain when decided):
 | Meaning | tables of the MNE (foreign / domestic / by parent) share of exports **by HS6 product**, with the product description, so the reader can see WHICH goods multinationals export (top-N by value; by origin; by parent). |
 | Data | `data/intermediate/v4_cubes/collapsed_opy.dta` (origin × HS6 × year, has `mne_ext_value`, `mne_dom_value`, `total_value`) for the foreign/domestic split; the §0 cube for the by-parent version. Descriptions: `data/raw/JobID-46_Concordance_H3_to_H2.CSV` ("HS 2007 Product Description"), also `hs6_description` in `lall2000_hs2007.dta` and `hs2007productdescription` in `product_characteristics_hs6_2002_adj.dta`. |
 | Code | `stylized_facts/python/sf3_products.py` has `fig_sf3_top15_hs2_<def>` (HS2 chapters); add `tab_wp_top_hs6_<def>` (top 30 HS6 by value with share and description) and a value-weighted distribution of the HS6-level foreign share (histogram / Lorenz: what fraction of export value sits in products where foreign MNEs hold > 50 %, > 80 %). `nsf_product_conc.py` already computes product-level HHI naive vs grouped — reuse its `(hs, country, Tax_ID)` cache. |
-| Status | not started |
+| Status | DONE 2026-09-07 — `wp1f_hs6_products.py`; top-30 tables with descriptions, per-origin top-15, top-20 stacked (by owner type and by parent), share distribution, Lorenz. |
 
 ### Cross-cutting for the WP
 

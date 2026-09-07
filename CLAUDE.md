@@ -100,7 +100,36 @@ top (to be replaced by `config/paths.do`).
 | `12_ultimate_parent_tables.do` | recorded / naive-GUO / first-non-conduit owner concepts; θ range | ucp cube | `V1–V3*.csv`, `U1–U3*.csv`, `ultimate_parent.log` |
 | `13_fact5_dpy_fe.do` | Fact 5 with dest×product×year FE (+PPML) | `Intermediate_v4\collapsed_odpy.dta` | `fact5_dpy_fe.{csv,tex,log}` |
 | `14_ownership_covariance.do` | Σθ·S² = θ̄·HHI + Cov(θ,S), market = dest×HS6×year, group = `guo25` / parent name / firm | base | `ownership_cov_bymarket.dta` (5.4 M rows: `country_dest hs07_6d year gkey owner v`), `ownership_cov_owners.csv`, log |
+| **`15_wp_extract_fdpy.do`** (2026-09-07) | ONE pass over the base for the working paper: 17 columns → flags (`m_dnb`, `m_fr`, `exporter_is_hq`), parent group key, merge of `intermediate_mne_presence` (has affiliate in dest / neighbour) | base, `Intermediate_v4\intermediate_mne_presence.dta` | **`data/intermediate/wp/fdpy_base.dta`** (5,454,758 rows, 1.06 GB; parquet twin made by Python). Batch log `output/logs/15_wp_extract_fdpy_stata.log`. |
 | `helpers/Python_RCA_data_WITS.py` | downloads WITS RCA by origin-year | WITS API | `RCA_WITS_orig_year.dta` |
+
+### 4.1b `stylized_facts/python/wp_*.py` — the working-paper extensions (2026-09-07)
+
+Documented in `stylized_facts/README.md` §3b. All read `data/intermediate/wp/fdpy_base.*`,
+build `odpy_parent_cube.parquet` (3.2 M rows: origin × dest × HS6 × year × iso3_parent ×
+m_dnb × m_fr → value, n_firms, n_groups, HQ-in-dest and affiliate-in-dest sub-sums) and
+`hs6_classifications.parquet` (5,052 HS6 → PCI, σ BW, **σ FGO 2022**, upstreamness, ladder,
+Rauch, RHCI, IPC, Lall, **BEC4 + end use**, SITC3, NAICS, sector, agro section, agro-input
+flag). Convention switch `wp_common.CONVENTION` ("sf" default). Outputs `output/wp/`.
+
+**Data facts established while building them (2026-09-07):**
+- **`exporter_is_hq` is 0 for all 5.45 M rows.** Every matched exporter has a global ultimate
+  owner different from itself (Orbis `subsidiarybvdid ≠ guo25`; D&B `dunsnumber ≠
+  globalultimatedunsnumber`; 0 name matches either). The match is built from ownership
+  links, so LAC-headquartered groups' head companies exporting from home sit in the
+  UNMATCHED pool. "HQ exporters" are not identifiable in this base; "presence through HQ"
+  (affiliate ships to the parent's country) is.
+- **The current base has parent countries for 92 % of foreign-MNE export value** (script 02
+  + AI recovery, merged in the 2026-04-21 build), whereas the July-2026 document's Figure 4
+  note says ≈ half of foreign-MNE value had no recorded parent. Ignacio's parquet must
+  predate the recovery. Consequences: the parent ranking becomes USA 23.3 % > GBR 19.3 % >
+  CAN 7.8 % > **LIE 5.4 %** (Liechtenstein foundations owning ARG/CHL agro-and-mining
+  exporters: HS 26, 23, 10 — a conduit, treat like PAN/CHE) > DEU > NLD; and domestic-MNE
+  shares rise (COL 0.28 → 0.39, CHL 0.02 → 0.14) because recovered parents are often the
+  origin country. The WP must state which base version each exhibit uses.
+- Cross-tab of the two match flags (value, USD bn): both = 1,411; only `m_dnb` = 90; only
+  `m_fr` = 267; neither = 819. The manual review ADDS 267 bn of matched value that the
+  document's convention does not count.
 
 Headline numbers from 09–14 (all on the Sebastián convention, ten origins): 9.2 % of
 foreign-MNE export value goes to the parent's own country; θ_USA = 0.134 (range
@@ -125,7 +154,8 @@ concentration); `sf_explore_*` are the May-2026 exploration behind the fact sele
 | `output/tables/mne_export_destination_cube.dta` | origin × dest × year × **parent country** | 201,847 | `iso3_parent pcountry pflag MNE_ext MNE_dom MNE_total has_parent to_parent value_fob nrows` | **Volpe items 1c/1d (parent × destination tables, heat map) — already sufficient at origin×dest level** |
 | `output/tables/mne_ucp_cube.dta` | as above + ultimate owner concepts | 277,690 | `ucp50 ucp25 ucpdnb iso3_ucp MNE_ucp to_ucp moved` | robustness of owner country |
 | `output/tables/ownership_cov_bymarket.dta` | dest × HS6 × year × group | 5,403,889 | `gkey owner v` | product-level owner shares (item 1f, partially: no origin dimension) |
-| **MISSING: origin × dest × HS6 × year × parent** | | | | needed for items 1a (Figures 1–3 by parent), 1f (HS6 by parent), and the agro split by parent. Spec in `docs/WORKPLAN_working_paper.md` §0. |
+| **`data/intermediate/wp/odpy_parent_cube.parquet`** (built 2026-09-07) | origin × dest × HS6 × year × `iso3_parent` × `m_dnb` × `m_fr` | 3,197,777 | `value n_firms n_groups v_hq n_hq v_affpres n_affpres v_hqdest n_hqdest hs2` | THE cube behind every `wp_*` exhibit (items 1a–1f, 2). Rebuild: `python -c "import wp_common as W; W.build_cube(force=True)"` |
+| `data/intermediate/wp/fdpy_base.dta/.parquet` | firm × origin × dest × HS6 × year | 5,454,758 | see `src/15` header | firm-level regressions (Fact 6 with presence splits) |
 
 ## 5. Small inputs in `data/raw/` (copied 2026-09-03)
 

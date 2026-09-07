@@ -55,7 +55,34 @@ firms count as foreign); ECU excluded. Fig. 4 additionally drops unknown-parent 
 | 1f HS6-level shares with descriptions | `sf3_products.py` (`fig_sf3_top15_hs2_<def>` is HS2 — add an HS6 table) + descriptions from `data/raw/JobID-46_Concordance_H3_to_H2.CSV` | |
 | 2 agro version | add a `SECTOR` filter to `_common.py` (HS2 01–24) applied inside every chunked read, and a parallel output tree `Graphs/<sector>/…` | every script filters at read time, so one switch does it |
 
-## 4. Running it on this machine (nothing has been run here yet)
+## 3b. The working-paper extensions (`wp_*.py`, added 2026-09-07) — RUN on this machine
+
+New files only; Ignacio's scripts are untouched. They import his `_common.py` (palette,
+`save_figure`, `stars`, table writers) and `../../config/paths.py`, and read ONE cache:
+
+```
+src/15_wp_extract_fdpy.do      Stata, 1 pass over the 20.6 GB base (41 s read) ->
+                               data/intermediate/wp/fdpy_base.dta   5,454,758 firm x dest x HS6 x year rows
+python/wp_common.py            paths, CONVENTION switch ("sf" = document / "src"), sector & region maps,
+                               HS6 classification table (PCI, σ BW, σ FGO, BEC, SITC, NAICS, Lall, inputs),
+                               parent cube  data/intermediate/wp/odpy_parent_cube.parquet
+                               (origin x dest x HS6 x year x iso3_parent x m_dnb x m_fr; value, n_firms, n_groups,
+                                HQ-in-destination and affiliate-in-destination sub-sums), helpers
+python/wp1a_figures_by_parent.py     item 1a  Figures 1–4 with the foreign bar split by parent country (4 scopes)
+python/wp1b_complexity_variants.py   item 1b  Figure 2 for PCI, |σ| FGO 2022, σ BW, upstreamness, ladder, RHCI, Rauch, BEC + A.4 ladder with FGO
+python/wp1cd_parent_destination.py   items 1c/1d  parent x destination two-way tables (value, row %, col %; region and country) + heat maps
+python/wp1e_hq_affiliates.py         item 1e  presence through HQ vs through another affiliate; counts by type; groups vs affiliates; distance regressions
+python/wp1f_hs6_products.py          item 1f  HS6 tables with descriptions, top-20 stacked figures, distribution and Lorenz
+python/wp2_agro_sectors.py           item 2   four-sector comparison; agro sub-classifications (HS section, BEC end use, SITC, NAICS, Lall, inputs)
+python/wp_run_all.py                 runner:  python wp_run_all.py [cube 1a 1b 1cd 1e 1f 2]
+```
+
+Outputs: `output/wp/<scope>/{Graphs,Tables,Regressions}/` with scope ∈ {all, agro, mining,
+manufacturing, sectors}; the exhibit list with the headline numbers is
+`output/wp/README_WP_OUTPUTS.md` (also copied to `docs/WP_RESULTS_2026-09-07.md`).
+Console logs: `output/logs/wp_*.log`.
+
+## 4. Running Ignacio's own scripts on this machine (not done; the wp_* scripts do not need it)
 
 Ignacio's environment: Python 3.14, parquet copies of the base and of the Orbis∪D&B merge
 in `D:\MNEs_Trade\1_Input\Sebastian_Orbis_DNB_Customs\`, caches in
