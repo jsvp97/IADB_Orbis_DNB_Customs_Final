@@ -39,7 +39,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import wp_common as W  # noqa: E402
 
-SCOPES = ["all", "agro"]
+SCOPES = W.SCOPES_ALL
 TOP_TAB = 10    # parents/destinations shown in the two-way TABLES
 TOP_MAP = 15    # parents/destinations shown in the HEAT MAPS
 
@@ -73,6 +73,23 @@ def write_three(mat: pd.DataFrame, T: Path, stem: str, corner: str, note: str) -
                        row_total=pd.Series(100.0, index=mat.index), note="Row percentages: destination mix of each row group. " + note)
     W.write_matrix_tex(100 * mat.div(ct, axis=1), T / f"tab_{stem}_colpct.tex", fmt="{:.1f}", corner=corner,
                        col_total=pd.Series(100.0, index=mat.columns), note="Column percentages: who supplies each destination. " + note)
+
+
+def home_share_figure(ext: pd.DataFrame, parents: list, fname: str, G: Path, origin_label: str) -> pd.DataFrame:
+    home = ext.assign(home=(ext["country_dest"] == ext["iso3_parent"]).astype(int) * ext["value"])
+    hs = home.groupby("iso3_parent").agg(value=("value", "sum"), home=("home", "sum"))
+    hs = hs.reindex([p for p in parents if p in hs.index]); hs["share"] = hs["home"] / hs["value"]
+    fig, ax = plt.subplots(figsize=(8, 5.5))
+    y = np.arange(len(hs))[::-1]
+    ax.barh(y, hs["share"], color=W.C_MNE_EXT)
+    for yi, (i, r) in zip(y, hs.iterrows()):
+        ax.text(r["share"] + 0.005, yi, f"{r['share'] * 100:.1f}%  (${r['value'] / 1e9:,.1f}bn)", va="center", fontsize=8)
+    ax.set_yticks(y); ax.set_yticklabels(hs.index)
+    ax.set_xlim(0, max(0.5, float(hs["share"].max()) * 1.35 if len(hs) else 0.5))
+    ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"{v * 100:.0f}%"))
+    ax.set_xlabel(f"share of the parent's export value from {origin_label} shipped to the parent's own country")
+    W.savefig(fig, fname, G)
+    return home
 
 
 def run_scope(cube: pd.DataFrame, scope: str) -> None:
@@ -121,22 +138,25 @@ def run_scope(cube: pd.DataFrame, scope: str) -> None:
               xlabel="destination country", ylabel="parent country of the MNE", annotate_thresh=0.05)
 
     # --- 1d companion: share shipped to the parent's own country, by parent -----------------
-    home = ext.assign(home=(ext["country_dest"] == ext["iso3_parent"]).astype(int) * ext["value"])
-    hs = home.groupby("iso3_parent").agg(value=("value", "sum"), home=("home", "sum"))
-    hs = hs.loc[top_p]; hs["share"] = hs["home"] / hs["value"]
-    fig, ax = plt.subplots(figsize=(8, 5.5))
-    y = np.arange(len(hs))[::-1]
-    ax.barh(y, hs["share"], color=W.C_MNE_EXT)
-    for yi, (i, r) in zip(y, hs.iterrows()):
-        ax.text(r["share"] + 0.005, yi, f"{r['share'] * 100:.1f}%  (${r['value'] / 1e9:,.0f}bn)", va="center", fontsize=8)
-    ax.set_yticks(y); ax.set_yticklabels(hs.index)
-    ax.set_xlim(0, max(0.5, hs["share"].max() * 1.35))
-    ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"{v * 100:.0f}%"))
-    ax.set_xlabel("share of the parent's LAC export value shipped to the parent's own country")
-    W.savefig(fig, "fig_wp1d_home_share_by_parent", G)
+    home = home_share_figure(ext, top_p, "fig_wp1d_home_share_by_parent", G, "LAC")
     overall_home = home["home"].sum() / home["value"].sum()
+
+    # --- per-origin versions of the cell-share heat map and the home-share figure (scope all) --
+    if scope == "all":
+        for o in sorted(ext["country_orig"].unique()):
+            e_o = ext[ext["country_orig"] == o]
+            tp_o = e_o.groupby("iso3_parent")["value"].sum().sort_values(ascending=False)
+            td_o = e_o.groupby("country_dest")["value"].sum().sort_values(ascending=False)
+            p_o, d_o = list(tp_o.index[:TOP_MAP]), list(td_o.index[:TOP_MAP])
+            m_o = two_way(e_o, e_o["iso3_parent"].where(e_o["iso3_parent"].isin(p_o), "Other"),
+                          e_o["country_dest"].where(e_o["country_dest"].isin(d_o), "Other"), p_o + ["Other"], d_o + ["Other"])
+            W.heatmap(100 * m_o.loc[p_o, d_o] / m_o.values.sum(), f"fig_wp1d_heatmap_country_cellpct_{o}", G,
+                      cbar_label=f"% of all foreign-MNE export value from {o}", fmt="{:.1f}", vmin=0, cmap="Blues",
+                      xlabel="destination country", ylabel=f"parent country of the MNE (exports from {o})", annotate_thresh=0.05)
+            home_share_figure(e_o, list(tp_o.index[:TOP_TAB]), f"fig_wp1d_home_share_by_parent_{o}", G, o)
     print(f"   share to parent's own country, all known-parent foreign MNEs: {overall_home:.3f}")
-    print("   by parent: " + ", ".join(f"{i} {r['share']:.2f}" for i, r in hs.head(8).iterrows()))
+    hs_ = home.groupby("iso3_parent").agg(value=("value", "sum"), home=("home", "sum")).reindex(top_p[:8]); hs_["share"] = hs_["home"] / hs_["value"]
+    print("   by parent: " + ", ".join(f"{i} {r['share']:.2f}" for i, r in hs_.iterrows()))
 
     # --- by-origin region tables (one per LAC origin) -----------------------------------------
     for o in sorted(d["country_orig"].unique()):

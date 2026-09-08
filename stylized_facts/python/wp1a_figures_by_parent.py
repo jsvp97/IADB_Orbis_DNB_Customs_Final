@@ -33,7 +33,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import wp_common as W  # noqa: E402
 
-SCOPES = ["all", "agro", "mining", "manufacturing"]
+SCOPES = W.SCOPES_ALL
 TOP_K = W.TOP_K_FIG
 QLBL = {1: "Q1", 2: "Q2", 3: "Q3", 4: "Q4", 5: "Q5"}
 LALL_4 = {
@@ -92,7 +92,7 @@ def stacked_bars(sh: pd.DataFrame, groups: list[str], fname: str, gdir: Path, *,
         # annotate big segments
         for k in range(n):
             if vals[k] > 0.045:
-                txt_color = "white" if g in ("USA", "GBR", "DEU", "JPN", "CHN", "BRA") else "black"
+                txt_color = W.text_color(g, i)
                 if horizontal:
                     ax.text(left[k] + vals[k] / 2, pos[k], f"{vals[k]:.2f}", va="center", ha="center",
                             fontsize=7, color=txt_color)
@@ -115,12 +115,12 @@ def stacked_bars(sh: pd.DataFrame, groups: list[str], fname: str, gdir: Path, *,
         ax.set_xlim(0, lim); ax.set_xlabel(axis_label)
         ax.set_xticks(np.arange(0, lim + 1e-9, 0.1))
         if cat_label: ax.set_ylabel(cat_label)
-        ax.legend(frameon=False, fontsize=8, loc="lower right", ncol=2)
+        ax.legend(frameon=False, fontsize=7, loc="lower right", ncol=3)
     else:
         ax.set_xticks(pos); ax.set_xticklabels(labels, rotation=0)
         ax.set_ylim(0, lim); ax.set_ylabel(axis_label)
         if cat_label: ax.set_xlabel(cat_label)
-        ax.legend(frameon=False, fontsize=8, loc="upper left", ncol=3)
+        ax.legend(frameon=False, fontsize=7, loc="upper left", ncol=4)
     W.savefig(fig, fname, gdir)
 
 
@@ -227,6 +227,8 @@ def originals(d: pd.DataFrame, hs6q: pd.DataFrame, hs6l: pd.DataFrame, G: Path, 
         g["sh_ext"] = g["e"] / g["v"]; g["sh_dom"] = g["m"] / g["v"]
         return g
 
+    if hs6q is None or hs6l is None:
+        print("   originals: Fig1 only (no product classification in this scope)"); return
     gq = agg2(d.merge(hs6q, on="hs07_6d", how="inner"), "quintile")
     two_def(gq, QLBL, "PCI quintile (1 = lowest complexity, 5 = highest)", "fig_wp0_fig2_pci")
     gl = agg2(d.merge(hs6l, on="hs07_6d", how="inner"), "lall_4").reindex([c for c in LALL_4_ORDER if c in set(hs6l["lall_4"])])
@@ -257,12 +259,15 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     hs6 = d.groupby("hs07_6d", as_index=False)["value"].sum().merge(
         cls[["hs07_6d", "complexity", "lall2000_category"]], on="hs07_6d", how="left")
     q = hs6.dropna(subset=["complexity"]).copy()
+    if len(q) < 10:
+        print(f"   [{scope}] no complexity data ({len(q)} HS6); Figures 2-3 skipped")
+        originals(d, None, None, G, T); parent_share_figure(d, G, T, scope); return
     q["quintile"] = pd.qcut(q["complexity"], 5, labels=False, duplicates="drop") + 1
     dq = d.merge(q[["hs07_6d", "quintile"]], on="hs07_6d", how="inner")
     sh2 = shares_by(dq, "quintile", groups)
     stacked_bars(sh2, groups, "fig_wp1a_pci_by_parent", G, horizontal=False, xlabels=QLBL,
                  axis_label="Share in export value (value-weighted)",
-                 cat_label="PCI quintile (1 = lowest complexity, 5 = highest)", lim=0.9)
+                 cat_label="PCI quintile (1 = lowest complexity, 5 = highest)", lim=1.0)
     write_share_table(sh2, groups, T / "tab_wp1a_pci_by_parent.tex", "PCI quintile",
                       "Figure 2 split by parent country. Quintiles of the Hausmann--Hidalgo Product Complexity Index over HS6 products. " + note_conv, xlabels=QLBL)
 
@@ -271,7 +276,7 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     dl = d.merge(hs6[["hs07_6d", "lall_4"]].dropna(), on="hs07_6d", how="inner")
     sh3 = shares_by(dl, "lall_4", groups).reindex([c for c in LALL_4_ORDER if c in dl["lall_4"].unique()])
     stacked_bars(sh3, groups, "fig_wp1a_lall_by_parent", G, horizontal=False, xlabels=LALL_4_XLBL,
-                 axis_label="Share in export value (value-weighted)", lim=0.9)
+                 axis_label="Share in export value (value-weighted)", lim=1.0)
     write_share_table(sh3, groups, T / "tab_wp1a_lall_by_parent.tex", "Technology category",
                       "Figure 3 split by parent country. Lall (2000) technology classification, four categories. " + note_conv)
 

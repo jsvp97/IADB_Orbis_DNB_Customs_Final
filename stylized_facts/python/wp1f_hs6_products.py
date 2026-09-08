@@ -29,7 +29,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import wp_common as W  # noqa: E402
 
-SCOPES = ["all", "agro"]
+SCOPES = W.SCOPES_ALL
 TOP_N = 30
 MIN_VALUE = 5e8
 
@@ -43,9 +43,10 @@ def short(desc, n=58) -> str:
 def hs6_table(d: pd.DataFrame, cls: pd.DataFrame, top: list[str]) -> pd.DataFrame:
     d = d.copy()
     d["pgrp"] = W.parent_group(d, top)
+    d["n_mne_firms"] = d["n_firms"] * (d["owner_type"] != "local")
     g = d.groupby("hs07_6d", as_index=False).agg(total_value=("value", "sum"), val_ext=("val_ext", "sum"),
                                                    val_dom=("val_dom", "sum"), val_total=("val_total", "sum"),
-                                                   n_firms=("n_firms", "sum"))
+                                                   n_firms=("n_firms", "sum"), n_mne_firms=("n_mne_firms", "sum"))
     lead = (d[d["owner_type"] == "ext"].groupby(["hs07_6d", "iso3_parent"])["value"].sum().reset_index()
               .sort_values(["hs07_6d", "value"], ascending=[True, False]).drop_duplicates("hs07_6d"))
     lead = lead.rename(columns={"iso3_parent": "lead_parent", "value": "lead_value"})
@@ -80,6 +81,8 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     top = W.top_parents(d)
     g, d = hs6_table(d, cls, top)
     tot = g["total_value"].sum()
+    if len(g) < 25:
+        print(f"   [{scope}] too few HS6 products ({len(g)}); skipped"); return
     print(f"\n=== scope {scope}: {len(g):,} HS6, ${tot / 1e9:,.1f} bn")
 
     # tables ------------------------------------------------------------------------------------
@@ -132,23 +135,42 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     # distribution of the HS6 foreign share, value-weighted -----------------------------------------------
     bins = np.arange(0, 1.01, 0.1)
     g["bin"] = pd.cut(g["sh_ext"].clip(0, 1), bins, include_lowest=True, labels=[f"{int(b * 100)}–{int((b + .1) * 100)}" for b in bins[:-1]])
-    dist = g.groupby("bin", observed=False).agg(value=("total_value", "sum"), n=("hs07_6d", "count"))
-    dist["sh_value"] = dist["value"] / tot; dist["sh_n"] = dist["n"] / len(g)
+    dist = g.groupby("bin", observed=False).agg(value=("total_value", "sum"), n=("hs07_6d", "count"),
+                                                 nf=("n_firms", "sum"), nm=("n_mne_firms", "sum"))
+    dist["sh_value"] = dist["value"] / tot; dist["sh_n"] = dist["nm"] / dist["nf"].replace(0, np.nan)
     fig, ax = plt.subplots(figsize=(8.5, 4.5))
     x = np.arange(len(dist)); bw = 0.38
     ax.bar(x - bw / 2, dist["sh_value"], bw, color=W.C_MNE_EXT, label="share of export value")
-    ax.bar(x + bw / 2, dist["sh_n"], bw, color=W.C_MNE_DOM, label="share of HS6 products")
+    ax.bar(x + bw / 2, dist["sh_n"], bw, color=W.C_MNE_DOM, label="MNE share of exporting firms in the bin's products")
+    for xi, r in zip(x, dist.itertuples()):
+        if not np.isnan(r.sh_n): ax.text(xi + bw / 2, r.sh_n + 0.005, f"{r.sh_n:.2f}", ha="center", fontsize=7)
     for xi, r in zip(x, dist.itertuples()):
         ax.text(xi - bw / 2, r.sh_value + 0.005, f"{r.sh_value:.2f}", ha="center", fontsize=7)
     ax.set_xticks(x); ax.set_xticklabels(dist.index, rotation=0, fontsize=8)
-    ax.set_xlabel("foreign-MNE share of the product's export value (%)"); ax.set_ylabel("share")
+    ax.set_xlabel("foreign-MNE share of the product's export value (%)"); ax.set_ylabel("share"); ax.set_ylim(0, max(0.5, float(np.nanmax(dist[["sh_value", "sh_n"]].values)) * 1.15))
     ax.legend(frameon=False, fontsize=9)
     W.savefig(fig, "fig_wp1f_foreign_share_distribution", G)
     above = g.loc[g["sh_ext"] > 0.5, "total_value"].sum() / tot
     print(f"   {above:.0%} of export value is in HS6 products where foreign MNEs hold > 50%; "
           f"top 30 products = {by_val['total_value'].sum() / tot:.0%} of value")
-    W.write_matrix_tex(dist[["sh_value", "sh_n", "n"]].rename(columns={"sh_value": "Share of value", "sh_n": "Share of products", "n": "N HS6"}).astype(float),
-                       T / "tab_wp1f_foreign_share_distribution.tex", fmt="{:.3f}", corner="Foreign share bin (%)")
+    W.write_matrix_tex(dist[["sh_value", "sh_n", "n"]].rename(columns={"sh_value": "Share of value", "sh_n": "MNE share of exporting firms", "n": "N HS6"}).astype(float),
+                       T / "tab_wp1f_foreign_share_distribution.tex", fmt="{:.3f}", corner="Foreign share bin (%)",
+                       note="MNE share of exporting firms = matched firm-cells (firm x destination x HS6 x year) over all firm-cells in the bin's products.")
+
+    # HS sections by export value (same structure as the HS6 tables) --------------------------------------
+    d2 = d.copy(); d2["section"] = W.hs_section_label(d2["hs2"])
+    gs = d2.groupby("section").agg(total_value=("value", "sum"), val_ext=("val_ext", "sum"), val_dom=("val_dom", "sum"), val_total=("val_total", "sum"))
+    lead = (d2[d2["owner_type"] == "ext"].groupby(["section", "iso3_parent"])["value"].sum().reset_index()
+              .sort_values(["section", "value"], ascending=[True, False]).drop_duplicates("section").set_index("section"))
+    gs["lead_parent"] = lead["iso3_parent"]; gs["lead_share"] = lead["value"] / gs["val_ext"]
+    gs["sh_ext"] = gs["val_ext"] / gs["total_value"]; gs["sh_dom"] = gs["val_dom"] / gs["total_value"]; gs["sh_local"] = 1 - gs["val_total"] / gs["total_value"]
+    gs = gs.sort_values("total_value", ascending=False)
+    lines = [r"\begin{tabular}{@{}p{7.2cm} r r r r l@{}}", r"\toprule", r"HS section & \$bn & For. & Dom. & Local & Lead parent \\", r"\midrule"]
+    for sec, r in gs.iterrows():
+        lp = f"{r['lead_parent']} ({r['lead_share']:.2f})" if isinstance(r["lead_parent"], str) else "--"
+        lines.append(f"{W.tex_escape(sec)} & {r['total_value'] / 1e9:,.1f} & {100 * r['sh_ext']:.0f} & {100 * r['sh_dom']:.0f} & {100 * r['sh_local']:.0f} & {lp} \\\\")
+    lines += [r"\bottomrule", r"\multicolumn{6}{p{0.95\textwidth}}{\footnotesize HS sections ranked by export value. For./Dom./Local = foreign-MNE, domestic-MNE and local-firm shares of the section's export value, percent; Lead parent = largest parent country among the section's foreign MNEs and its share of the section's foreign-MNE value.} \\", r"\end{tabular}"]
+    W.write_tex(lines, T / "tab_wp1f_hs_sections.tex")
 
     # Lorenz: concentration of foreign-MNE exports across products -------------------------------------------
     s = g.sort_values("val_ext", ascending=False)

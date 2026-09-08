@@ -75,8 +75,8 @@ python/wp1e_hq_affiliates.py         item 1e  presence through HQ vs through ano
 python/wp1f_hs6_products.py          item 1f  HS6 tables with descriptions, top-20 stacked figures, distribution and Lorenz
 python/wp2_agro_sectors.py           item 2   four-sector comparison; agro sub-classifications (HS section, BEC end use, SITC, NAICS, Lall, inputs)
 python/wp_run_all.py                 runner:  python wp_run_all.py [cube 1a 1b 1cd 1e 1f 2]
-python/wp_build_overleaf.py          assembles output/wp/overleaf_WP_extensions/ (main.tex + all pdf figures + tex fragments),
-                                     compiles it with pdflatex (95 pp.) and zips it for Overleaf; copy of the PDF in docs/
+python/wp_build_overleaf.py          assembles THREE Overleaf projects (output/wp/overleaf_WP_{total,sectors,countries}/),
+                                     compiles each with pdflatex and zips them; copies of the PDFs in docs/
 ```
 
 Outputs: `output/wp/<scope>/{Graphs,Tables,Regressions}/` with scope ∈ {all, agro, mining,

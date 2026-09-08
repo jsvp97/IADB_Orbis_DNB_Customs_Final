@@ -119,33 +119,21 @@ def tex_escape(s: str) -> str:
 #   foreign total keeps Ignacio's navy; parents get distinct, print-safe hues;
 #   domestic stays light gray; unknown parent is hatched.
 # ---------------------------------------------------------------------
-PARENT_COLORS = {
-    "USA": "#1f3864",  # navy (same as C_MNE_EXT)
-    "GBR": "#8c1d1d",
-    "CAN": "#c8a24a",  # gold (Ignacio's third colour)
-    "NLD": "#e07b39",
-    "DEU": "#4c7a34",
-    "JPN": "#6a3d9a",
-    "BRA": "#2e8b9a",
-    "FRA": "#a6cee3",
-    "CHN": "#d62728",
-    "ESP": "#b5651d",
-    "CHE": "#7f7f7f",
-    "ITA": "#98df8a",
-    "MEX": "#ff9896",
-    "PAN": "#c5b0d5",
-    "AUS": "#17becf",
-    "LIE": "#8c564b",
-    "Other": "#9aa5b8",
-    "Unknown": "#cfd6e4",
-    "Domestic": C_MNE_DOM,
-}
-_FALLBACK = ["#393b79", "#637939", "#8c6d31", "#843c39", "#7b4173", "#3182bd", "#e6550d",
-             "#31a354", "#756bb1", "#636363"]
+# Ten shades of the document's navy for the parent countries (rank 1 = darkest), a gray-blue for
+# "Other foreign MNEs", the document's light gray for domestic MNEs.
+BLUE_SHADES = ["#1f3864", "#2a4a7f", "#365c99", "#446fb1", "#5682c4", "#6d95d1", "#86a8dc", "#a0bbe5", "#b9cdec", "#d2def3"]
+C_OTHER_FOREIGN = "#9fb0c8"
+C_UNKNOWN = "#cfd6e4"
+PARENT_COLORS = {"Other": C_OTHER_FOREIGN, "Unknown": C_UNKNOWN, "Domestic": C_MNE_DOM, "Local": "#e8e8e8"}
 
 
 def parent_color(code: str, i: int = 0) -> str:
-    return PARENT_COLORS.get(code, _FALLBACK[i % len(_FALLBACK)])
+    """Colour for the i-th parent group in a stacked split (i = rank among the shown parents)."""
+    return PARENT_COLORS.get(code, BLUE_SHADES[min(i, len(BLUE_SHADES) - 1)])
+
+
+def text_color(code: str, i: int = 0) -> str:
+    return "white" if code not in PARENT_COLORS and i < 6 else "black"
 
 
 # ---------------------------------------------------------------------
@@ -189,7 +177,13 @@ def classify_region(code) -> str:
 # ---------------------------------------------------------------------
 # Sectors (HS 2007 chapters)
 # ---------------------------------------------------------------------
-SECTOR_ORDER = ["Agriculture", "Mining & fuels", "Manufacturing"]
+SECTOR_ORDER = ["Agriculture", "Mining & fuels", "Manufacturing", "Rest"]
+SCOPE_OF_SECTOR = {"Agriculture": "agro", "Mining & fuels": "mining", "Manufacturing": "manufacturing", "Rest": "rest"}
+SECTOR_OF_SCOPE = {v: k for k, v in SCOPE_OF_SECTOR.items()}
+SCOPES_SECTORS = ["agro", "manufacturing", "mining", "rest"]
+SCOPES_ALL = ["all"] + SCOPES_SECTORS
+SCOPE_LABEL = {"all": "All goods", "agro": "Agriculture (HS 01--24)", "mining": "Mining \\& fuels (HS 25--27, 71)",
+               "manufacturing": "Manufacturing (HS 28--97 excl. 71)", "rest": "Rest (HS 98--99 and unclassified codes; services are not in customs data)"}
 AGRO_SECTION_LABEL = {1: "I Live animals & products (01-05)", 2: "II Vegetable products (06-14)",
                       3: "III Fats & oils (15)", 4: "IV Food, beverages, tobacco (16-24)"}
 
@@ -201,13 +195,14 @@ def hs2_of(hs6: pd.Series) -> pd.Series:
 def sector4(hs2: pd.Series) -> pd.Series:
     """Agriculture 01-24; Mining & fuels 25-27 (+71 if MINING_INCLUDES_HS71); Manufacturing = rest.
     Services are NOT in customs merchandise data (documented in the WORKPLAN)."""
-    s = pd.Series("Manufacturing", index=hs2.index, dtype="object")
+    hs2 = pd.to_numeric(hs2, errors="coerce")
+    s = pd.Series("Rest", index=hs2.index, dtype="object")   # HS 98-99, chapter 00 and unclassifiable codes
+    s[hs2.between(28, 97)] = "Manufacturing"
     s[hs2.between(1, 24)] = "Agriculture"
     mining = hs2.between(25, 27)
     if MINING_INCLUDES_HS71:
         mining = mining | (hs2 == 71)
     s[mining] = "Mining & fuels"
-    s[hs2.isna()] = np.nan
     return s
 
 
@@ -232,8 +227,7 @@ def scope_filter(df: pd.DataFrame, scope: str) -> pd.DataFrame:
     if scope == "all":
         return df
     sec = sector4(df["hs2"])
-    return df[sec == {"agro": "Agriculture", "mining": "Mining & fuels",
-                      "manufacturing": "Manufacturing"}[scope]]
+    return df[sec == SECTOR_OF_SCOPE[scope]]
 
 
 # ---------------------------------------------------------------------
@@ -307,13 +301,14 @@ def build_classifications(force: bool = False) -> pd.DataFrame:
     desc = desc.drop_duplicates("hs07_6d")[["hs07_6d", "hs6_desc"]]
 
     # product characteristics (Ignacio's F_PRODCHAR: pci sigma upstreamness ladder + Rauch)
-    pc = dta(F_PRODCHAR, ["hs07_6d", "pci", "sigma", "upstreamness", "ladder", "lib", "con", "lib_diff",
+    pc = dta(F_PRODCHAR, ["hs07_6d", "pci", "sigma", "upstreamness", "ladder", "con_34", "lib_diff",
                           "lib_ref_price", "lib_org_exch", "hs2007productdescription"])
     pc["hs07_6d"] = pc["hs07_6d"].astype(str).str.zfill(6)
     pc = pc.rename(columns={"pci": "complexity", "sigma": "sigma_bw", "ladder": "quality_ladder",
                             "hs2007productdescription": "hs6_desc_pc"})
-    # Rauch (liberal): differentiated / reference-priced / organised exchange
-    pc["rauch"] = np.select([pc["lib_diff"] == 1, pc["lib_ref_price"] == 1, pc["lib_org_exch"] == 1],
+    # Rauch (1999), conservative classification at SITC 3/4 digits mapped to HS6 (con_34 in the product file)
+    pc["rauch"] = pc["con_34"].map({"n": "Differentiated", "r": "Reference-priced", "w": "Homogeneous (exchange)"}) if "con_34" in pc.columns else None
+    pc["rauch_unused"] = np.select([pc["lib_diff"] == 1, pc["lib_ref_price"] == 1, pc["lib_org_exch"] == 1],
                             ["Differentiated", "Reference-priced", "Homogeneous (exchange)"], default=None)
     pc = pc.drop_duplicates("hs07_6d")
 
@@ -484,7 +479,7 @@ def mne_flags(cube: pd.DataFrame) -> pd.DataFrame:
     return d
 
 
-TOP_K_FIG = 5   # parents shown individually in every figure that splits the foreign bar by home country (2026-09-08)
+TOP_K_FIG = 10  # parents shown individually in every figure/table that splits the foreign bar by home country (2026-09-08, rev. 3)
 
 
 def top_parents(d: pd.DataFrame, k: int = TOP_K_FIG, force: tuple = ()) -> list[str]:
@@ -593,3 +588,34 @@ def fmt_bn(v: float) -> str:
 
 
 __all__ = [n for n in dir() if not n.startswith("_")]
+
+
+# ---------------------------------------------------------------------
+# HS sections (21) and the fast pyfixest call used by every regression script
+# ---------------------------------------------------------------------
+HS_SECTIONS = [(1, 5, "I Live animals; animal products"), (6, 14, "II Vegetable products"), (15, 15, "III Fats and oils"),
+               (16, 24, "IV Prepared foodstuffs, beverages, tobacco"), (25, 27, "V Mineral products"), (28, 38, "VI Chemicals"),
+               (39, 40, "VII Plastics and rubber"), (41, 43, "VIII Hides, skins, leather"), (44, 46, "IX Wood and articles"),
+               (47, 49, "X Pulp, paper"), (50, 63, "XI Textiles and apparel"), (64, 67, "XII Footwear, headgear"),
+               (68, 70, "XIII Stone, ceramics, glass"), (71, 71, "XIV Precious metals and stones"), (72, 83, "XV Base metals"),
+               (84, 85, "XVI Machinery and electrical equipment"), (86, 89, "XVII Transport equipment"),
+               (90, 92, "XVIII Optical, precision instruments"), (93, 93, "XIX Arms"), (94, 96, "XX Miscellaneous manufactures"),
+               (97, 97, "XXI Works of art"), (98, 99, "Special / unclassified (98-99)")]
+
+
+def hs_section_label(hs2: pd.Series) -> pd.Series:
+    h = pd.to_numeric(hs2, errors="coerce")
+    out = pd.Series("Unclassified", index=hs2.index, dtype="object")
+    for lo, hi, lab in HS_SECTIONS:
+        out[h.between(lo, hi)] = lab
+    return out
+
+
+HS_SECTION_ORDER = [lab for _, _, lab in HS_SECTIONS] + ["Unclassified"]
+
+
+def feols(fml: str, data: pd.DataFrame, **kw):
+    """pyfixest.feols with the Rust demeaner (identical estimates, ~50x faster on high-dimensional FE)."""
+    import pyfixest as pf
+    kw.setdefault("demeaner_backend", "rust")
+    return pf.feols(fml, data=data, **kw)

@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import wp_common as W  # noqa: E402
 
 NET_DTA = W.WP_INT / "parent_network_size.dta"
-SCOPES = ["all", "agro"]
+SCOPES = W.SCOPES_ALL
 EDGES = [0, 1, 10, 100, np.inf]
 BINLAB = ["1", "2--10", "11--100", "$>$100"]
 MID = "#c8a24a"
@@ -107,7 +107,7 @@ def fig6_hhi(f: pd.DataFrame, G: Path, T: Path, scope: str) -> None:
     rows = []
     for ax, (title, d) in zip(axes, panels):
         vals = [wm(d, "hhi"), wm(d, "hhi_w"), wm(d, "hhi_c")]
-        ax.bar(range(3), vals, color=[W.C_MNE_DOM, MID, W.C_MNE_EXT], width=0.6)
+        ax.bar(range(3), vals, color=[W.C_MNE_DOM, W.BLUE_SHADES[6], W.C_MNE_EXT], width=0.6)
         ax.set_xticks(range(3)); ax.set_xticklabels(["Naive\n(each affiliate\na firm)", "Grouped by parent\nwithin country", "Grouped by parent\nacross countries"], fontsize=9)
         ax.set_title(f"{title.replace(chr(92) + 'geq', '>=').replace(chr(92) + '%', '%').replace('$', '')}\n({len(d):,} HS6, {d['hstot'].sum() / M['hstot'].sum():.0%} of value)", fontsize=10)
         for i, v in enumerate(vals):
@@ -134,7 +134,9 @@ def main():
     f = load_firm_level()
     for scope in SCOPES:
         G, T, R = W.outdirs(scope)
-        d = f if scope == "all" else f[f["hs2"].astype(int).between(1, 24)]
+        d = f if scope == "all" else f[W.sector4(f["hs2"]) == W.SECTOR_OF_SCOPE[scope]]
+        if len(d) < 1000:
+            print(f"   [{scope}] too few rows ({len(d)}); skipped"); continue
         print(f"\n=== scope {scope}: {len(d):,} firm-cells, ${d['value_fob'].sum() / 1e9:,.1f} bn")
         fig5_network(d, G, T, scope)
         fig6_hhi(d, G, T, scope)

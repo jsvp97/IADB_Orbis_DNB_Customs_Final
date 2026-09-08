@@ -40,7 +40,7 @@ import pyfixest as pf
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import wp_common as W  # noqa: E402
 
-SCOPES = ["all", "agro"]
+SCOPES = W.SCOPES_ALL
 QLBL = {1: "Q1", 2: "Q2", 3: "Q3", 4: "Q4", 5: "Q5"}
 MEASURES = [  # (column, short label (figures), axis label, expected sign of the foreign gradient)
     ("complexity",     "PCI",            "PCI quintile (1 = lowest complexity, 5 = highest)",                         "+"),
@@ -91,6 +91,45 @@ def vbar_2def(ax, g: pd.DataFrame, xlabels, xlabel: str, ymax: float = 0.8, font
     ax.set_ylim(0, ymax)
 
 
+def histograms(hs6: pd.DataFrame, G: Path, nbins: int = 25) -> None:
+    """For every continuous measure: the distribution of export value across measure bins, stacked
+    by owner type (foreign / domestic / local), with the foreign-MNE share of each bin as a line,
+    and the number of HS6 products per bin. One figure per measure and a 2x3 panel."""
+    fig_p, axes_p = plt.subplots(2, 3, figsize=(15, 8.5))
+    tot = hs6["total_value"].sum()
+    for (col, short, xlabel, sign), axp in zip(MEASURES, axes_p.ravel()):
+        q = hs6.dropna(subset=[col]).copy()
+        if len(q) < 10:
+            continue
+        lo, hi = q[col].quantile(0.005), q[col].quantile(0.995)
+        q[col] = q[col].clip(lo, hi)
+        edges = np.linspace(lo, hi, nbins + 1)
+        q["bin"] = pd.cut(q[col], edges, include_lowest=True, labels=False)
+        g = q.groupby("bin").agg(v=("total_value", "sum"), e=("val_ext", "sum"), d=("val_dom", "sum"), n=("hs07_6d", "size")).reindex(range(nbins)).fillna(0.0)
+        g["l"] = g["v"] - g["e"] - g["d"]
+        mids = 0.5 * (edges[:-1] + edges[1:]); w = (edges[1] - edges[0]) * 0.9
+        fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12, 4.3), gridspec_kw={"width_ratios": [3, 2]})
+        for a in (ax, axp):
+            a.bar(mids, g["e"] / tot, w, color=W.C_MNE_EXT, label="Foreign MNEs")
+            a.bar(mids, g["d"] / tot, w, bottom=g["e"] / tot, color=W.C_MNE_DOM, label="Domestic MNEs")
+            a.bar(mids, g["l"] / tot, w, bottom=(g["e"] + g["d"]) / tot, color="#e8e8e8", edgecolor="#cccccc", linewidth=0.3, label="Local firms")
+            a.set_xlabel(xlabel.split(" quintile")[0].replace("|import-demand elasticity|", "|import-demand elasticity| (FGO 2022)"), fontsize=9)
+            a.set_ylabel("share of the scope's export value", fontsize=9)
+            ar = a.twinx()
+            sh = np.where(g["v"] / tot >= 0.002, g["e"] / g["v"].replace(0, np.nan), np.nan)   # line only where the bin holds >= 0.2% of value
+            ar.plot(mids, sh, color="#c8a24a", marker="o", markersize=3, linewidth=1.2, label="foreign-MNE share of the bin")
+            ar.set_ylim(0, 1); ar.set_ylabel("foreign-MNE share within bin", fontsize=9, color="#8a6d1f"); ar.tick_params(axis="y", colors="#8a6d1f", labelsize=8)
+        ax2.bar(mids, g["n"], w, color=W.C_MNE_DOM, edgecolor="#9e9e9e", linewidth=0.4)
+        ax2.set_xlabel("same bins", fontsize=9); ax2.set_ylabel("number of HS6 products", fontsize=9)
+        ax.legend(frameon=False, fontsize=8, loc="upper right")
+        fig.tight_layout()
+        W.savefig(fig, f"fig_wp1b_hist_{col}", G)
+        axp.set_title(short, fontsize=11)
+    axes_p[0, 0].legend(frameon=False, fontsize=8, loc="upper right")
+    fig_p.tight_layout()
+    W.savefig(fig_p, "fig_wp1b_panel_hist", G)
+
+
 def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     G, T, R = W.outdirs(scope)
     d = W.scope_filter(W.mne_flags(cube), scope)
@@ -99,11 +138,16 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     print(f"\n=== scope {scope}: {len(hs6):,} HS6 products; FGO coverage (value) "
           f"{hs6.loc[hs6['sigma_fgo_abs'].notna(), 'total_value'].sum() / hs6['total_value'].sum():.0%}")
 
+    if hs6.dropna(subset=["complexity"]).shape[0] < 25 or hs6.dropna(subset=["sigma_fgo_abs"]).shape[0] < 25:
+        print(f"   [{scope}] too few classified HS6 products; skipped"); return
+
     # --- one Figure-2 clone per measure + a 2x3 panel ----------------------------------------
     rows = []
     fig_p, axes = plt.subplots(2, 3, figsize=(15, 8.5))
     for (col, short, xlabel, sign), ax in zip(MEASURES, axes.ravel()):
         q = hs6.dropna(subset=[col]).copy()
+        if len(q) < 10:
+            continue
         q["quintile"] = pd.qcut(q[col], 5, labels=False, duplicates="drop") + 1
         g = aggregate(q, "quintile")
         fig, ax1 = plt.subplots(figsize=(8.5, 4.5))
@@ -166,9 +210,10 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
                        note=f"Value-weighted Pearson correlations across {len(x):,} HS6 products with all six measures.")
     print("   corr(PCI, |σ|FGO) =", f"{corr.iloc[0, 1]:.2f}", "| corr(PCI, σBW) =", f"{corr.iloc[0, 2]:.2f}")
 
+    # --- histograms: full distribution of export value / products over each measure ---------------
+    histograms(hs6, G)
+
     # --- ODPY regression ladder (Table A.4 with FGO) ----------------------------------------
-    if scope != "all":
-        return
     odpy = d.groupby(["country_orig", "country_dest", "hs07_6d", "year"], as_index=False).agg(
         total_value=("value", "sum"), val_ext=("val_ext", "sum"), val_dom=("val_dom", "sum"), val_total=("val_total", "sum"))
     odpy = odpy.merge(cls[["hs07_6d", "complexity", "upstreamness", "sigma_fgo_abs"]], on="hs07_6d", how="left")
@@ -187,10 +232,12 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
                (r"Origin $\times$ year FE", "OY"), (r"Destination $\times$ year FE", "DY"), (r"Origin $\times$ dest.\ $\times$ year FE", "ODY")]
     PANELS = [(r"Panel A: MNE$_{total}$ share", "sh_total"), (r"Panel B: MNE$_{ext}$ share", "sh_ext"), (r"Panel C: MNE$_{dom}$ share", "sh_dom")]
     REGS = [("Complexity (PCI)", "complexity"), (r"$|\sigma|$ FGO (per s.d.)", "sigma_fgo_sd"), ("Upstreamness", "upstreamness")]
+    if len(odpy) < 5000:
+        print(f"   [{scope}] too few ODPY cells for the regression ladder ({len(odpy):,}); skipped"); return
     res = {}
     for pi, (plab, dep) in enumerate(PANELS):
         for ci, (tag, fe, _) in enumerate(FE):
-            m = pf.feols(f"{dep} ~ complexity + sigma_fgo_sd + upstreamness | {fe}", data=odpy, weights="total_value", vcov="hetero")
+            m = W.feols(f"{dep} ~ complexity + sigma_fgo_sd + upstreamness | {fe}", data=odpy, weights="total_value", vcov="hetero")
             b, se, p = m.coef(), m.se(), m.pvalue()
             res[(pi, ci)] = ({v: (float(b[v]), float(se[v]), float(p[v])) for _, v in REGS}, int(m._N))
             print(f"   A.4+FGO {dep:8s} {tag}: " + " ".join(f"{v}={float(b[v]):+.4f}{W.stars(float(p[v]))}" for _, v in REGS))
