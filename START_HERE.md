@@ -33,6 +33,7 @@ with the script and data each item needs, is in **`docs/WORKPLAN_working_paper.m
 |---|---|---|
 | 1 | this file | orientation |
 | 2 | `docs/WP_RESULTS_2026-09-07.md` | **what came out** of Volpe's agenda (items 1a–1f, 2): results, caveats, exhibit index — the exhibits themselves are in `output/wp/` |
+| 2a | `docs/WP_extensions_2026-09-07.pdf` | the 95-page compiled document with EVERY new figure, table and regression (Overleaf source + zip in `output/wp/overleaf_WP_extensions*`) |
 | 2b | `docs/WORKPLAN_working_paper.md` | the agenda, mapped to code and data (status column says what is done) |
 | 3 | `CLAUDE.md` | technical spec: every script, every input, every column that matters, the traps |
 | 4 | `stylized_facts/README.md` | the stylized-facts pipeline (Ignacio's code): figure → script → cache |

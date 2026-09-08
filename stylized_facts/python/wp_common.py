@@ -31,6 +31,7 @@ import sys
 from pathlib import Path
 
 import logging
+import re
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -89,9 +90,20 @@ def savefig(fig, name: str, gdir: Path) -> None:
     save_figure(fig, name, gdir, OVERLEAF_WP)
 
 
+def _balance_braces(line: str) -> str:
+    """A footnote line written as `{\\footnotesize ...}} \\\\` carries one closing brace too
+    many (a literal-string slip in some table writers); drop it when the line is unbalanced."""
+    line = re.sub(r"(?<!\\)%", r"\\%", line)     # a bare % inside a fragment is never a comment
+    body = re.sub(r"\\[{}]", "", line)          # ignore escaped braces
+    stripped = line.rstrip()
+    if body.count("}") > body.count("{") and stripped.endswith("}} \\\\"):
+        return stripped[:-4] + " \\\\"
+    return line
+
+
 def write_tex(lines: list[str], path: Path) -> None:
     ensure_dir(path.parent)
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    path.write_text("\n".join(_balance_braces(l) for l in lines) + "\n", encoding="utf-8")
 
 
 def tex_escape(s: str) -> str:
