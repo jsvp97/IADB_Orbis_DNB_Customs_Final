@@ -145,9 +145,14 @@ comparison the document lacks.
 - **Agriculture** (`output/wp/agro/Regressions/`): same pattern, somewhat larger — Panel B
   ln(# MNE firms) 0.405 (ODP+ODY) / 0.357 (+DPY); by presence type (tightest column) 0.13
   HQ-present / 0.23 affiliate-present / 0.35 not present / 0.29 domestic.
-- `reg_wp1e_distance_hq` (Table 2 with the HQ / affiliate / not-present split for foreign
-  and the present / not-present split for domestic MNEs): firm-level, five million rows;
-  see the table in `output/wp/all/Regressions/`.
+- **Distance regressions with the presence split** (`reg_wp1e_distance_hq`, 5.08 M firm ×
+  dest × HS6 × year rows, OxY + DxY + product FE, cluster OD). Baseline ln distance −0.185;
+  attenuation: foreign MNE +0.048, domestic MNE +0.032 (the document's A.8 had +0.046 /
+  +0.054 on the older base). Split: foreign present **through HQ +0.065** ≈ through another
+  affiliate +0.067 > not present +0.042; domestic MNE with a group affiliate in the destination
+  **+0.104**, without +0.026. Presence at the destination — through whichever entity — is
+  what flattens distance; whether the local entity is the parent or a sister affiliate makes
+  no difference (A.9's conclusion, now in the main table).
 
 ## 1f. HS6 products — `tab_wp1f_*`, `fig_wp1f_*`
 
