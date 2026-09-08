@@ -484,8 +484,11 @@ def mne_flags(cube: pd.DataFrame) -> pd.DataFrame:
     return d
 
 
-def top_parents(d: pd.DataFrame, k: int = 8, force: tuple = ("USA", "CHN")) -> list[str]:
-    """Top-k parent countries by KNOWN-parent foreign-MNE value, plus forced codes if present."""
+TOP_K_FIG = 5   # parents shown individually in every figure that splits the foreign bar by home country (2026-09-08)
+
+
+def top_parents(d: pd.DataFrame, k: int = TOP_K_FIG, force: tuple = ()) -> list[str]:
+    """Top-k parent countries by KNOWN-parent foreign-MNE value (plus forced codes if present)."""
     v = d[d["owner_type"] == "ext"].groupby("iso3_parent")["value"].sum().sort_values(ascending=False)
     top = list(v.index[:k])
     for c in force:
@@ -494,15 +497,21 @@ def top_parents(d: pd.DataFrame, k: int = 8, force: tuple = ("USA", "CHN")) -> l
     return top
 
 
-def parent_group(d: pd.DataFrame, top: list[str]) -> pd.Series:
-    """Label for the stacked-bar split: parent code (if in top), Other (known, not top),
-    Unknown (matched, no parent), Domestic, or Local (unmatched)."""
+def parent_group(d: pd.DataFrame, top: list[str], unknown_to_other: bool = True) -> pd.Series:
+    """Label for the stacked-bar split: parent code (if in top), Other (every other foreign MNE,
+    including matched firms with no recorded parent unless unknown_to_other=False), Domestic,
+    or Local (unmatched)."""
     out = pd.Series("Local", index=d.index, dtype="object")
     out[d["owner_type"] == "dom"] = "Domestic"
-    out[d["owner_type"] == "ext_unknown"] = "Unknown"
+    out[d["owner_type"] == "ext_unknown"] = "Other" if unknown_to_other else "Unknown"
     ext = d["owner_type"] == "ext"
     out[ext] = np.where(d.loc[ext, "iso3_parent"].isin(top), d.loc[ext, "iso3_parent"], "Other")
     return out
+
+
+PARENT_GROUPS_NOTE = ("The foreign-MNE bar is split into the five largest parent countries by foreign-MNE export "
+                      "value in the scope and `Other foreign' (all remaining parents, including matched firms with no "
+                      "recorded parent country); domestic MNEs have a parent in the exporting country.")
 
 
 # ---------------------------------------------------------------------

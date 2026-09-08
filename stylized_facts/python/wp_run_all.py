@@ -5,7 +5,7 @@ Prerequisite (once): Stata  src/15_wp_extract_fdpy.do  ->  data/intermediate/wp/
 Then:  python wp_run_all.py            (all steps)
        python wp_run_all.py 1a 1cd     (a subset)
 
-Steps: cube (parent cube + HS6 classifications) · 1a · 1b · 1cd · 1e · 1f · 2
+Steps: cube (parent cube + HS6 classifications) · 0 (Fact-4 reproductions) · 1a · 1b · 1cd · 1e · 1f · 2
 Every step writes to output/wp/<scope>/ and prints the headline numbers to the console;
 the console log is kept in output/logs/wp_run_all.log by the caller.
 """
@@ -19,6 +19,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 STEPS = {
     "cube": None,
+    "0": "wp0_fact4_groups.py",
     "1a": "wp1a_figures_by_parent.py",
     "1b": "wp1b_complexity_variants.py",
     "1cd": "wp1cd_parent_destination.py",

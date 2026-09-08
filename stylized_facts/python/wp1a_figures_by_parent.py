@@ -34,7 +34,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import wp_common as W  # noqa: E402
 
 SCOPES = ["all", "agro", "mining", "manufacturing"]
-TOP_K = 8
+TOP_K = W.TOP_K_FIG
 QLBL = {1: "Q1", 2: "Q2", 3: "Q3", 4: "Q4", 5: "Q5"}
 LALL_4 = {
     "Primary products": "Primary and resource-based",
@@ -139,7 +139,7 @@ def write_share_table(sh: pd.DataFrame, groups: list[str], path: Path, corner: s
     W.write_tex(lines, path)
 
 
-GLABEL = {"Other": "Other foreign", "Unknown": "Foreign, parent unknown", "Domestic": "Domestic MNEs"}
+GLABEL = {"Other": "Other foreign MNEs", "Unknown": "Foreign, parent unknown", "Domestic": "Domestic MNEs"}
 GLABEL_TEX = {"Other": "Other", "Unknown": "Unknown", "Domestic": "Dom."}
 
 
@@ -180,17 +180,70 @@ def parent_share_figure(d: pd.DataFrame, gdir: Path, tdir: Path, scope: str, top
 
 
 # ---------------------------------------------------------------------
+# The document's ORIGINAL Figures 1-3, redrawn on the current base (same geometry as
+# sf1_origin.stacked_origin_bar and sf3_products.grouped_vbar_2def)
+# ---------------------------------------------------------------------
+def originals(d: pd.DataFrame, hs6q: pd.DataFrame, hs6l: pd.DataFrame, G: Path, T: Path) -> None:
+    cross = d.groupby("country_orig").agg(v=("value", "sum"), e=("val_ext", "sum"), m=("val_dom", "sum"))
+    cross["sh_ext"] = cross["e"] / cross["v"]; cross["sh_dom"] = cross["m"] / cross["v"]
+    cross["sh_total"] = cross["sh_ext"] + cross["sh_dom"]
+    sub = cross.sort_values("sh_total", ascending=True)
+    y = np.arange(len(sub))
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.barh(y, sub["sh_ext"], color=W.C_MNE_EXT, edgecolor="white", linewidth=0.6, label="Foreign MNEs")
+    ax.barh(y, sub["sh_dom"], left=sub["sh_ext"], color=W.C_MNE_DOM, edgecolor="white", linewidth=0.6, label="Domestic MNEs")
+    for yi, r in zip(y, sub.itertuples()):
+        if r.sh_ext > 0.05:
+            ax.text(r.sh_ext / 2, yi, f"{r.sh_ext:.2f}", va="center", ha="center", color="white", fontsize=8)
+        if r.sh_dom > 0.04:
+            ax.text(r.sh_ext + r.sh_dom / 2, yi, f"{r.sh_dom:.2f}", va="center", ha="center", color="black", fontsize=8)
+        ax.text(r.sh_total + 0.006, yi, f"{r.sh_total:.2f}", va="center", ha="left", fontsize=8, fontweight="bold")
+    ax.set_yticks(y); ax.set_yticklabels(sub.index)
+    ax.set_xlabel("MNE share in export value (value-weighted)")
+    xmax = max(0.85, sub["sh_total"].max() * 1.12); ax.set_xlim(0, xmax); ax.set_xticks(np.arange(0, xmax + 1e-9, 0.1))
+    ax.legend(frameon=False, fontsize=9, loc="lower right")
+    W.savefig(fig, "fig_wp0_fig1_origin", G)
+    lines = [r"\begin{tabular}{lrrrr}", r"\toprule", r"Origin & Foreign & Domestic & MNE total & Value (\$bn) \\", r"\midrule"]
+    for o, r in sub.sort_values("sh_total", ascending=False).iterrows():
+        lines.append(f"{o} & {r['sh_ext']:.3f} & {r['sh_dom']:.3f} & {r['sh_total']:.3f} & {r['v'] / 1e9:,.1f} \\\\")
+    lines += [r"\bottomrule", r"\end{tabular}"]
+    W.write_tex(lines, T / "tab_wp0_fig1_origin.tex")
+
+    def two_def(g, xlabels, xlabel, fname, ymax=0.8):
+        n = len(g); x = np.arange(n); bw = 0.38
+        fig, ax = plt.subplots(figsize=(8.5, 4.5))
+        ax.bar(x - bw / 2, g["sh_ext"], bw, color=W.C_MNE_EXT, edgecolor=W.C_MNE_EXT, label="Foreign MNEs")
+        ax.bar(x + bw / 2, g["sh_dom"], bw, color=W.C_MNE_DOM, edgecolor="#9e9e9e", linewidth=0.5, label="Domestic MNEs")
+        for xi, r in zip(x, g.itertuples()):
+            ax.text(xi - bw / 2, r.sh_ext + 0.01, f"{r.sh_ext:.2f}", ha="center", fontsize=8)
+            ax.text(xi + bw / 2, r.sh_dom + 0.01, f"{r.sh_dom:.2f}", ha="center", fontsize=8)
+        ax.set_xticks(x); ax.set_xticklabels([xlabels.get(v, str(v)) for v in g.index])
+        ax.set_xlabel(xlabel); ax.set_ylabel("Share in export value (value-weighted)"); ax.set_ylim(0, ymax)
+        ax.legend(frameon=False, fontsize=9, loc="upper left")
+        W.savefig(fig, fname, G)
+
+    def agg2(dd, by):
+        g = dd.groupby(by).agg(v=("value", "sum"), e=("val_ext", "sum"), m=("val_dom", "sum"))
+        g["sh_ext"] = g["e"] / g["v"]; g["sh_dom"] = g["m"] / g["v"]
+        return g
+
+    gq = agg2(d.merge(hs6q, on="hs07_6d", how="inner"), "quintile")
+    two_def(gq, QLBL, "PCI quintile (1 = lowest complexity, 5 = highest)", "fig_wp0_fig2_pci")
+    gl = agg2(d.merge(hs6l, on="hs07_6d", how="inner"), "lall_4").reindex([c for c in LALL_4_ORDER if c in set(hs6l["lall_4"])])
+    two_def(gl, LALL_4_XLBL, "", "fig_wp0_fig3_lall")
+    print("   originals: Fig1 " + ", ".join(f"{o}:{r.sh_ext:.2f}+{r.sh_dom:.2f}" for o, r in sub.sort_values("sh_total", ascending=False).iterrows())
+          + " | Fig2 ext " + " ".join(f"{v:.2f}" for v in gq["sh_ext"]) + " | Fig3 ext " + " ".join(f"{v:.2f}" for v in gl["sh_ext"]))
+
+
+# ---------------------------------------------------------------------
 def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     G, T, R = W.outdirs(scope)
     d = W.scope_filter(W.mne_flags(cube), scope)
     d = d[d["value"] > 0]
     top = W.top_parents(d, TOP_K)
-    groups = top + ["Other", "Unknown", "Domestic"]
+    groups = top + ["Other", "Domestic"]
     d["pgrp"] = W.parent_group(d, top)
-    note_conv = ("Value-weighted; pooled 2006--2022; nine LAC origins (Ecuador excluded). Foreign MNEs have a parent "
-                 "country different from the exporting country; the foreign bar is split by the parent's country "
-                 "(top parents by value, then Other); `Unknown' = matched firms with no recorded parent country "
-                 "(counted as foreign, as in the stylized-facts document). Domestic MNEs have a parent in the exporting country.")
+    note_conv = ("Value-weighted; pooled 2006--2022; nine LAC origins (Ecuador excluded). " + W.PARENT_GROUPS_NOTE)
     print(f"\n=== scope {scope}: {len(d):,} cube rows, ${d['value'].sum() / 1e9:,.1f} bn, top parents {top}")
 
     # --- Figure 1 by parent: origins sorted by total MNE share (as in the document) -------
@@ -221,6 +274,9 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
                  axis_label="Share in export value (value-weighted)", lim=0.9)
     write_share_table(sh3, groups, T / "tab_wp1a_lall_by_parent.tex", "Technology category",
                       "Figure 3 split by parent country. Lall (2000) technology classification, four categories. " + note_conv)
+
+    # --- the document's original Figures 1-3 on the current base ---------------------------------
+    originals(d, q[["hs07_6d", "quintile"]], hs6[["hs07_6d", "lall_4"]].dropna(), G, T)
 
     # --- Figure 4 for the scope ---------------------------------------------------------------
     parent_share_figure(d, G, T, scope)

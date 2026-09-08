@@ -195,6 +195,14 @@ def part_a(cube: pd.DataFrame, scope: str) -> None:
 
     # Fact-5 regressions ---------------------------------------------------------------------------------
     PANELS = [(r"Panel A: all exports ($\ln$)", "ln_total"), (r"Panel B: non-MNE exports ($\ln$)", "ln_nonmne")]
+    # (0) the document's Table 1, reproduced on the current base: intensive (ln # MNE firms) + extensive (any MNE)
+    run_panel_table(g,
+                    [("(1)", ["O", "D", "Y", "P"], ["ln_nmne"]), ("(2)", ["OY", "DY", "P"], ["ln_nmne"]), ("(3)", ["ODP", "ODY"], ["ln_nmne"]),
+                     ("(1)", ["O", "D", "Y", "P"], ["any_mne"]), ("(2)", ["OY", "DY", "P"], ["any_mne"]), ("(3)", ["ODP", "ODY"], ["any_mne"])],
+                    PANELS, [(r"$\ln$(\# MNE firms)", "ln_nmne"), ("Any MNE present", "any_mne")], "od", R / "reg_wp0_table1_repro.tex",
+                    "Origin-destination-product-year cells; dep.\\ var.\\ $\\ln$ exports. Intensive margin: $\\ln$ number of MNE firms (cells with $\\geq 1$ MNE); "
+                    "extensive margin: indicator for any MNE present. Reproduction of the document's Table 1 on the current base.",
+                    col_groups=[(r"Intensive: $\ln$(\# MNE firms)", 3), ("Extensive: any MNE present", 3)])
     ROWS = [(r"$\ln$(\# MNE firms)", "ln_nmne"),
             (r"$\ln$(1 + \# foreign MNEs present through HQ)", "l1_n_hq_present"),
             (r"$\ln$(1 + \# foreign MNEs present through another affiliate)", "l1_n_aff_present"),
@@ -240,10 +248,13 @@ def part_b() -> None:
     ext = (m & ~dom) if W.CONVENTION == "sf" else (m & (par != "") & (par != f["country_orig"]))
     hq_pres = ext & (par == f["country_dest"])
     aff_pres = ext & ~hq_pres & (f["aff"] == 1)
-    groups = {"g_ext": ext, "g_dom": dom,
+    anypres = m & ((f["aff"] == 1) | (par == f["country_dest"]))
+    groups = {"g_mne": m, "g_anypres": anypres, "g_anynotpres": m & ~anypres,
+              "g_ext": ext, "g_dom": dom,
               "g_ext_hqpres": hq_pres, "g_ext_affpres": aff_pres, "g_ext_notpres": ext & ~hq_pres & ~aff_pres,
               "g_dom_pres": dom & (f["aff"] == 1), "g_dom_notpres": dom & (f["aff"] == 0)}
-    GLAB = {"g_ext": "foreign MNE", "g_dom": "domestic MNE", "g_ext_hqpres": "foreign MNE, present through HQ",
+    GLAB = {"g_mne": "MNE", "g_anypres": "MNE, present", "g_anynotpres": "MNE, not present",
+            "g_ext": "foreign MNE", "g_dom": "domestic MNE", "g_ext_hqpres": "foreign MNE, present through HQ",
             "g_ext_affpres": "foreign MNE, present through another affiliate", "g_ext_notpres": "foreign MNE, not present",
             "g_dom_pres": "domestic MNE, group present in destination", "g_dom_notpres": "domestic MNE, not present"}
     for k, s in groups.items():
@@ -252,10 +263,26 @@ def part_b() -> None:
     FE = {"ODYP": ("O + D + Yr + P", "country_orig + country_dest + year + hs07_6d", {"Origin FE", "Destination FE", "Year FE", "Product FE"}),
           "OYDYP": ("OxYr + DxYr + P", "ot + dt + hs07_6d", {r"Origin $\times$ year FE", r"Destination $\times$ year FE", "Product FE"})}
     FE_ORDER_B = ["Origin FE", "Destination FE", "Year FE", r"Origin $\times$ year FE", r"Destination $\times$ year FE", "Product FE"]
-    columns = [("(1)", "ODYP", ["g_ext", "g_dom"]), ("(2)", "OYDYP", ["g_ext", "g_dom"]),
-               ("(3)", "ODYP", ["g_ext_hqpres", "g_ext_affpres", "g_ext_notpres", "g_dom_pres", "g_dom_notpres"]),
-               ("(4)", "OYDYP", ["g_ext_hqpres", "g_ext_affpres", "g_ext_notpres", "g_dom_pres", "g_dom_notpres"])]
-    row_order = ["g_ext", "g_ext_hqpres", "g_ext_affpres", "g_ext_notpres", "g_dom", "g_dom_pres", "g_dom_notpres"]
+    TABLES = [
+        ("reg_wp0_table2_repro.tex",
+         [("(1)", "ODYP", ["g_mne"]), ("(2)", "OYDYP", ["g_mne"]),
+          ("(3)", "ODYP", ["g_anypres", "g_anynotpres"]), ("(4)", "OYDYP", ["g_anypres", "g_anynotpres"])],
+         ["g_mne", "g_anypres", "g_anynotpres"],
+         "Reproduction of the document's Table 2 on the current base: multinationals (foreign or domestic) split by presence at the "
+         "destination (the group has an affiliate there, or the destination is the parent's country)."),
+        ("reg_wp1e_distance_hq.tex",
+         [("(1)", "ODYP", ["g_ext", "g_dom"]), ("(2)", "OYDYP", ["g_ext", "g_dom"]),
+          ("(3)", "ODYP", ["g_ext_hqpres", "g_ext_affpres", "g_ext_notpres", "g_dom_pres", "g_dom_notpres"]),
+          ("(4)", "OYDYP", ["g_ext_hqpres", "g_ext_affpres", "g_ext_notpres", "g_dom_pres", "g_dom_notpres"])],
+         ["g_ext", "g_ext_hqpres", "g_ext_affpres", "g_ext_notpres", "g_dom", "g_dom_pres", "g_dom_notpres"],
+         "Foreign MNEs split by how the group is present at the destination: through its headquarters (the parent's country), "
+         "through another affiliate, or not present; domestic MNEs by whether the group has an affiliate in the destination."),
+    ]
+    for out_name, columns, row_order, tnote in TABLES:
+        distance_table(f, FE, FE_ORDER_B, GLAB, columns, row_order, R / out_name, tnote)
+
+
+def distance_table(f, FE, FE_ORDER_B, GLAB, columns, row_order, out_path, tnote):
     cols = []
     for tag, fk, gs in columns:
         t0 = time.time()
@@ -286,9 +313,9 @@ def part_b() -> None:
             lines.append(f"{fe} & " + " & ".join(r"$\checkmark$" if x else "" for x in pres) + r" \\")
     lines += [r"\hline", "Observations & " + " & ".join(f"{c['n']:,}" for c in cols) + r" \\", r"\hline",
               rf"\multicolumn{{{ncols + 1}}}{{p{{0.95\textwidth}}}}{{\footnotesize Distance and firm exports. Firm$\times$origin$\times$destination$\times$product$\times$year; non-MNE flows the omitted base. "
-              r"Foreign MNEs split by how the group is present at the destination: through its headquarters (the parent's country), through another affiliate, or not present; domestic MNEs by whether the group has an affiliate in the destination. SE clustered at origin-destination. *** p$<$0.01, ** p$<$0.05, * p$<$0.1}} \\",
+              + tnote + r" SE clustered at origin-destination. *** p$<$0.01, ** p$<$0.05, * p$<$0.1}} \\",
               r"\end{tabular}"]
-    W.write_tex(lines, R / "reg_wp1e_distance_hq.tex")
+    W.write_tex(lines, out_path)
 
 
 def main():

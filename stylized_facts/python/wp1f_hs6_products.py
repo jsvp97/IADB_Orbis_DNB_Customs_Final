@@ -57,12 +57,19 @@ def hs6_table(d: pd.DataFrame, cls: pd.DataFrame, top: list[str]) -> pd.DataFram
 
 
 def write_hs6_table(g: pd.DataFrame, path: Path, title_note: str, share_of: pd.Series | None = None) -> None:
-    lines = [r"\begin{tabular}{llrrrrl}", r"\toprule",
-             r"HS6 & Description & Value (\$bn) & Foreign & Domestic & Local & Leading parent (share of foreign) \\", r"\midrule"]
+    """Compact layout: wrapped description column, shares in percent, leading parent code + its share."""
+    lines = [r"\begin{tabular}{@{}l p{6.4cm} r r r r l@{}}", r"\toprule",
+             r"HS6 & Description & \$bn & For. & Dom. & Local & Lead parent \\", r"\midrule"]
     for _, r in g.iterrows():
         lp = f"{r['lead_parent']} ({r['lead_share']:.2f})" if isinstance(r["lead_parent"], str) else "--"
-        lines.append(f"{r['hs07_6d']} & {W.tex_escape(short(r['hs6_desc']))} & {r['total_value'] / 1e9:,.1f} & {r['sh_ext']:.2f} & {r['sh_dom']:.2f} & {r['sh_local']:.2f} & {lp} \\\\")
-    lines += [r"\bottomrule", rf"\multicolumn{{7}}{{p{{0.95\textwidth}}}}{{\footnotesize {title_note} Shares of the product's export value (pooled 2006--2022, nine LAC origins). Foreign = matched firms whose parent is abroad or unknown; Domestic = parent in the exporting country; Local = unmatched.}} \\", r"\end{tabular}"]
+        lines.append(f"{r['hs07_6d']} & {W.tex_escape(short(r['hs6_desc'], 95))} & {r['total_value'] / 1e9:,.1f} & "
+                     f"{100 * r['sh_ext']:.0f} & {100 * r['sh_dom']:.0f} & {100 * r['sh_local']:.0f} & {lp} \\\\")
+    lines += [r"\bottomrule",
+              rf"\multicolumn{{7}}{{p{{0.97\textwidth}}}}{{\footnotesize {title_note} For./Dom./Local = foreign-MNE, domestic-MNE and "
+              r"local-firm shares of the product's export value, percent (pooled 2006--2022, nine LAC origins). Foreign = matched firms whose "
+              r"parent is abroad or unknown; Domestic = parent in the exporting country; Local = unmatched. Lead parent = largest parent country "
+              r"among the product's foreign MNEs and its share of the product's foreign-MNE value.}} \\",
+              r"\end{tabular}"]
     W.write_tex(lines, path)
 
 
@@ -70,7 +77,7 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     G, T, R = W.outdirs(scope)
     d = W.scope_filter(W.mne_flags(cube), scope)
     d = d[d["value"] > 0]
-    top = W.top_parents(d, 8)
+    top = W.top_parents(d)
     g, d = hs6_table(d, cls, top)
     tot = g["total_value"].sum()
     print(f"\n=== scope {scope}: {len(g):,} HS6, ${tot / 1e9:,.1f} bn")
@@ -106,7 +113,7 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     W.savefig(fig, "fig_wp1f_top20_hs6_stacked", G)
 
     # figure: same 20, foreign split by parent ---------------------------------------------------------
-    groups = top + ["Other", "Unknown", "Domestic"]
+    groups = top + ["Other", "Domestic"]
     sub = d[d["hs07_6d"].isin(t20["hs07_6d"])]
     mat = sub.pivot_table(index="hs07_6d", columns="pgrp", values="value", aggfunc="sum", fill_value=0.0)
     mat = mat.reindex(t20["hs07_6d"]).reindex(columns=[c for c in groups if c in mat.columns], fill_value=0.0)
@@ -114,7 +121,7 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     fig, ax = plt.subplots(figsize=(10, 8))
     left = np.zeros(len(mat))
     for i, c in enumerate(mat.columns):
-        kw = dict(color=W.parent_color(c, i), edgecolor="white", linewidth=0.5, label={"Other": "Other foreign", "Unknown": "Foreign, parent unknown", "Domestic": "Domestic MNEs"}.get(c, c))
+        kw = dict(color=W.parent_color(c, i), edgecolor="white", linewidth=0.5, label={"Other": "Other foreign MNEs", "Domestic": "Domestic MNEs"}.get(c, c))
         if c == "Unknown": kw.update(hatch="///", edgecolor="#6b7a99")
         ax.barh(y, mat[c].values, left=left, **kw); left += mat[c].values
     ax.set_yticks(y); ax.set_yticklabels(labels, fontsize=8)

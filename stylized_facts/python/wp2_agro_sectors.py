@@ -111,19 +111,45 @@ def write_split_table(g: pd.DataFrame, label_col: str, hdr: str, path: Path, lea
 
 
 def origin_heatmap(d: pd.DataFrame, by: str, labels: dict, fname: str, gdir: Path, tdir: Path, order=None, min_share=0.01):
-    dd = d.dropna(subset=[by])
-    g = dd.groupby(["country_orig", by]).agg(v=("value", "sum"), e=("val_ext", "sum")).reset_index()
-    g["sh"] = g["e"] / g["v"]
-    tot = dd.groupby(by)["value"].sum(); keep = tot[tot / tot.sum() >= min_share].index
-    mat = g[g[by].isin(keep)].pivot(index="country_orig", columns=by, values="sh")
-    if order: mat = mat.reindex(columns=[c for c in order if c in mat.columns])
-    mat.columns = [labels.get(c, str(c)) if labels else str(c) for c in mat.columns]
+    """Heat map of the foreign-MNE share by origin x sub-sector (sub-sectors with >= min_share of the
+    scope), and a two-panel table: (A) composition of each origin's exports by sub-sector (row %, sums to
+    100) and (B) the foreign-MNE share within each origin x sub-sector cell, with an `All' column."""
+    dd = d.dropna(subset=[by]).copy()
+    dd["lab"] = dd[by].map(lambda c: labels.get(c, str(c)) if labels else str(c))
+    tot = dd.groupby("lab")["value"].sum()
+    cols = [labels.get(c, str(c)) if labels else str(c) for c in order] if order else list(tot.sort_values(ascending=False).index)
+    cols = [c for c in cols if c in tot.index and tot[c] / tot.sum() >= min_share]   # same cut as the heat map
+    g = dd.groupby(["country_orig", "lab"]).agg(v=("value", "sum"), e=("val_ext", "sum")).reset_index()
+    comp = g.pivot(index="country_orig", columns="lab", values="v").reindex(columns=cols).fillna(0.0).sort_index()
+    fsh = (g.pivot(index="country_orig", columns="lab", values="e").reindex(columns=cols) / comp.replace(0, np.nan)).sort_index()
     ovs = dd.groupby("country_orig")[["val_ext", "value"]].sum()
-    ov = (ovs["val_ext"] / ovs["value"]).sort_values(ascending=False)
-    mat = mat.reindex(ov.index)
-    W.heatmap(mat * 100, fname, gdir, cbar_label="foreign-MNE share of export value (%)", fmt="{:.0f}", vmin=0, vmax=100,
+    comp_pct = 100 * comp.div(comp.sum(axis=1), axis=0)
+    all_comp = 100 * comp.sum(axis=0) / comp.values.sum()
+    all_fsh = 100 * g.groupby("lab")["e"].sum().reindex(cols) / g.groupby("lab")["v"].sum().reindex(cols)
+    keep = [c for c in cols if tot[c] / tot.sum() >= min_share]
+    hm = (100 * fsh[keep]).reindex((ovs["val_ext"] / ovs["value"]).sort_values(ascending=False).index)
+    W.heatmap(hm, fname, gdir, cbar_label="foreign-MNE share of export value (%)", fmt="{:.0f}", vmin=0, vmax=100,
               cmap="Blues", xlabel="", ylabel="exporting country")
-    W.write_matrix_tex(mat * 100, tdir / f"tab_{fname[4:]}.tex", fmt="{:.1f}", corner="Origin", note="Foreign-MNE share of export value, percent; sub-sectors with at least 1% of the scope's exports.")
+    ncol = len(cols) + 1
+
+    def row(lab, vals, extra):
+        return W.tex_escape(lab) + " & " + " & ".join("--" if pd.isna(v) else f"{v:.1f}" for v in vals) + f" & {extra:.1f}" + r" \\"
+
+    lines = [rf"\begin{{tabular}}{{l{'r' * ncol}}}", r"\toprule",
+             "Origin & " + " & ".join(W.tex_escape(c) for c in cols) + r" & All \\", r"\midrule",
+             rf"\multicolumn{{{ncol + 1}}}{{l}}{{\textit{{Panel A: composition of the origin's exports in the scope, \% (rows sum to 100)}}}} \\"]
+    for o in comp_pct.index:
+        lines.append(row(o, comp_pct.loc[o].values, 100.0))
+    lines.append(row("All origins", all_comp.values, 100.0))
+    lines += [r"\midrule", rf"\multicolumn{{{ncol + 1}}}{{l}}{{\textit{{Panel B: foreign-MNE share of export value within the cell, \%}}}} \\"]
+    for o in fsh.index:
+        lines.append(row(o, (100 * fsh.loc[o]).values, 100 * ovs.loc[o, "val_ext"] / ovs.loc[o, "value"]))
+    lines.append(row("All origins", all_fsh.values, 100 * ovs["val_ext"].sum() / ovs["value"].sum()))
+    lines += [r"\bottomrule",
+              rf"\multicolumn{{{ncol + 1}}}{{p{{0.95\textwidth}}}}{{\footnotesize Pooled 2006--2022. Panel A: share of each sub-sector in the origin's exports within the scope. "
+              r"Panel B: foreign-MNE share of export value in each origin $\times$ sub-sector cell (`--' = no exports); `All' = the origin's overall foreign-MNE share in the scope. Sub-sectors below 1\% of the scope's exports are omitted, so Panel A rows may sum to slightly less than 100.}} \\",
+              r"\end{tabular}"]
+    W.write_tex(lines, tdir / f"tab_{fname[4:]}.tex")
 
 
 # ---------------------------------------------------------------------
@@ -215,7 +241,7 @@ def agro_subsectors(cube: pd.DataFrame, cls: pd.DataFrame) -> None:
                        note="Foreign-MNE share of export value, percent, by HS section and BEC end use.")
 
     # inputs vs output by parent country (stacked), and top HS6 agro inputs
-    top = W.top_parents(d, 8)
+    top = W.top_parents(d)
     d["pgrp"] = W.parent_group(d, top)
     groups = top + ["Other", "Unknown", "Domestic"]
     for col, stem in (("input_lbl", "inputs"), ("bec_enduse", "bec_enduse"), ("agro_section_lbl", "hs_section")):

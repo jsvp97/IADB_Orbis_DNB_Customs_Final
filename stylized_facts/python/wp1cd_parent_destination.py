@@ -40,8 +40,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import wp_common as W  # noqa: E402
 
 SCOPES = ["all", "agro"]
-TOP_PARENTS = 15
-TOP_DESTS = 15
+TOP_TAB = 10    # parents/destinations shown in the two-way TABLES
+TOP_MAP = 15    # parents/destinations shown in the HEAT MAPS
 
 
 def region_rows(d: pd.DataFrame) -> pd.Series:
@@ -82,34 +82,40 @@ def run_scope(cube: pd.DataFrame, scope: str) -> None:
     d["dest_region"] = d["country_dest"].map(W.classify_region)
     d["row_region"] = region_rows(d)
     note = ("Pooled 2006--2022, nine LAC origins (Ecuador excluded), all destinations. Parent = country of the "
-            "multinational's ultimate parent as recorded (Orbis/D\\&B); rows for domestic MNEs and local exporters "
-            "are given for comparison.")
+            "multinational's ultimate parent as recorded (Orbis/D\\&B).")
+    note_region = note + " Rows for domestic MNEs and local exporters are given for comparison."
     print(f"\n=== scope {scope}: ${d['value'].sum() / 1e9:,.1f} bn")
 
     # --- 1c region x region (all rows) -------------------------------------------------------
     mat_r = two_way(d, d["row_region"], d["dest_region"], ROW_ORDER, W.REGION_ORDER)
-    write_three(mat_r, T, "wp1c_region", "Parent region \\ Destination region", note)
+    write_three(mat_r, T, "wp1c_region", "Parent region / Destination region", note_region)
     rowpct_r = 100 * mat_r.div(mat_r.sum(axis=1), axis=0)
     W.heatmap(rowpct_r, "fig_wp1d_heatmap_region_rowpct", G, cbar_label="% of the row group's export value",
               fmt="{:.0f}", vmin=0, vmax=100, xlabel="destination region", ylabel="parent region of the exporter")
     print("   region row%:\n" + rowpct_r.round(0).to_string())
 
-    # --- 1c country x country: top parents x top destinations (+ Other, Total) ---------------
+    # --- 1c country x country: top-10 parents x top-10 destinations (+ Other, Total) ---------------
     ext = d[d["owner_type"] == "ext"]
     tp = ext.groupby("iso3_parent")["value"].sum().sort_values(ascending=False)
     td = ext.groupby("country_dest")["value"].sum().sort_values(ascending=False)
-    top_p, top_d = list(tp.index[:TOP_PARENTS]), list(td.index[:TOP_DESTS])
-    prow = ext["iso3_parent"].where(ext["iso3_parent"].isin(top_p), "Other parents")
-    dcol = ext["country_dest"].where(ext["country_dest"].isin(top_d), "Other destinations")
-    mat_c = two_way(ext, prow, dcol, top_p + ["Other parents"], top_d + ["Other destinations"])
-    write_three(mat_c, T, "wp1c_country", "Parent \\ Destination",
-                f"Foreign MNEs with a recorded parent country; top {TOP_PARENTS} parents and top {TOP_DESTS} destinations by foreign-MNE export value. " + note)
-    core = mat_c.loc[top_p, top_d]
-    rowpct_c = 100 * core.div(mat_c.loc[top_p].sum(axis=1), axis=0)
+
+    def country_matrix(k):
+        top_p, top_d = list(tp.index[:k]), list(td.index[:k])
+        prow = ext["iso3_parent"].where(ext["iso3_parent"].isin(top_p), "Other parents")
+        dcol = ext["country_dest"].where(ext["country_dest"].isin(top_d), "Other destinations")
+        return top_p, top_d, two_way(ext, prow, dcol, top_p + ["Other parents"], top_d + ["Other destinations"])
+
+    top_p, top_d, mat_c = country_matrix(TOP_TAB)
+    write_three(mat_c, T, "wp1c_country", "Parent / Destination",
+                f"Foreign MNEs with a recorded parent country; top {TOP_TAB} parents and top {TOP_TAB} destinations by foreign-MNE export value. " + note)
+    # heat maps on the 15 x 15 version
+    top_p, top_d, mat_m = country_matrix(TOP_MAP)
+    core = mat_m.loc[top_p, top_d]
+    rowpct_c = 100 * core.div(mat_m.loc[top_p].sum(axis=1), axis=0)
     W.heatmap(rowpct_c, "fig_wp1d_heatmap_country_rowpct", G,
               cbar_label="% of the parent's LAC export value going to the destination", fmt="{:.0f}", vmin=0,
               xlabel="destination country", ylabel="parent country of the MNE")
-    cellpct = 100 * core / mat_c.values.sum()
+    cellpct = 100 * core / mat_m.values.sum()
     W.heatmap(cellpct, "fig_wp1d_heatmap_country_cellpct", G,
               cbar_label="% of all foreign-MNE export value", fmt="{:.1f}", vmin=0, cmap="Blues",
               xlabel="destination country", ylabel="parent country of the MNE", annotate_thresh=0.05)
