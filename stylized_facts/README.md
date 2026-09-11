@@ -68,19 +68,19 @@ python/wp_common.py            paths, CONVENTION switch ("sf" = document / "src"
                                parent cube  data/intermediate/wp/odpy_parent_cube.parquet
                                (origin x dest x HS6 x year x iso3_parent x m_dnb x m_fr; value, n_firms, n_groups,
                                 HQ-in-destination and affiliate-in-destination sub-sums), helpers
-python/wp1a_figures_by_parent.py     item 1a  Figures 1–4 with the foreign bar split by parent country (4 scopes)
+python/wp1a_figures_by_parent.py     item 1a  Figures 1–4 with the foreign bar split by parent country (top-10 parents; 5 scopes)
 python/wp1b_complexity_variants.py   item 1b  Figure 2 for PCI, |σ| FGO 2022, σ BW, upstreamness, ladder, RHCI, Rauch, BEC + A.4 ladder with FGO
 python/wp1cd_parent_destination.py   items 1c/1d  parent x destination two-way tables (value, row %, col %; region and country) + heat maps
 python/wp1e_hq_affiliates.py         item 1e  presence through HQ vs through another affiliate; counts by type; groups vs affiliates; distance regressions
 python/wp1f_hs6_products.py          item 1f  HS6 tables with descriptions, top-20 stacked figures, distribution and Lorenz
-python/wp2_agro_sectors.py           item 2   four-sector comparison; agro sub-classifications (HS section, BEC end use, SITC, NAICS, Lall, inputs)
+python/wp2_agro_sectors.py           item 2   four-sector comparison (incl. Rest); sub-classifications for every sector (HS section, BEC end use, BEC categories, SITC, NAICS, Lall; agro inputs)
 python/wp_run_all.py                 runner:  python wp_run_all.py [cube 1a 1b 1cd 1e 1f 2]
 python/wp_build_overleaf.py          assembles THREE Overleaf projects (output/wp/overleaf_WP_{total,sectors,countries}/),
                                      compiles each with pdflatex and zips them; copies of the PDFs in docs/
 ```
 
 Outputs: `output/wp/<scope>/{Graphs,Tables,Regressions}/` with scope ∈ {all, agro, mining,
-manufacturing, sectors}; the exhibit list with the headline numbers is
+manufacturing, rest, sectors}; the exhibit list with the headline numbers is
 `output/wp/README_WP_OUTPUTS.md` (also copied to `docs/WP_RESULTS_2026-09-07.md`).
 Console logs: `output/logs/wp_*.log`.
 

@@ -54,16 +54,21 @@ def hs6_table(d: pd.DataFrame, cls: pd.DataFrame, top: list[str]) -> pd.DataFram
     g["sh_ext"] = g["val_ext"] / g["total_value"]; g["sh_dom"] = g["val_dom"] / g["total_value"]
     g["sh_local"] = 1 - g["val_total"] / g["total_value"]
     g["lead_share"] = g["lead_value"] / g["val_ext"]
+    miss = g["hs6_desc"].isna()
+    if miss.any():   # later-revision HS codes and national lines are not in the HS 2007 table
+        g.loc[miss, "hs6_desc"] = W.hs6_desc_fallback(g.loc[miss, "hs07_6d"])
     return g, d
 
 
 def write_hs6_table(g: pd.DataFrame, path: Path, title_note: str, share_of: pd.Series | None = None) -> None:
     """Compact layout: wrapped description column, shares in percent, leading parent code + its share."""
+    vfmt = "{:,.2f}" if (len(g) and g["total_value"].max() < 20e9) else "{:,.1f}"   # two decimals when the scope is small (Rest)
     lines = [r"\begin{tabular}{@{}l p{6.4cm} r r r r l@{}}", r"\toprule",
              r"HS6 & Description & \$bn & For. & Dom. & Local & Lead parent \\", r"\midrule"]
     for _, r in g.iterrows():
         lp = f"{r['lead_parent']} ({r['lead_share']:.2f})" if isinstance(r["lead_parent"], str) else "--"
-        lines.append(f"{r['hs07_6d']} & {W.tex_escape(short(r['hs6_desc'], 95))} & {r['total_value'] / 1e9:,.1f} & "
+        desc = W.tex_escape(short(r['hs6_desc'], 95)).replace("/", "/\\allowbreak{}")
+        lines.append(f"{r['hs07_6d']} & {desc} & {vfmt.format(r['total_value'] / 1e9)} & "
                      f"{100 * r['sh_ext']:.0f} & {100 * r['sh_dom']:.0f} & {100 * r['sh_local']:.0f} & {lp} \\\\")
     lines += [r"\bottomrule",
               rf"\multicolumn{{7}}{{p{{0.97\textwidth}}}}{{\footnotesize {title_note} For./Dom./Local = foreign-MNE, domestic-MNE and "
@@ -103,16 +108,16 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     t20 = g.sort_values("total_value", ascending=False).head(20).iloc[::-1]
     labels = [f"{r['hs07_6d']} {short(r['hs6_desc'], 40)}" for _, r in t20.iterrows()]
     y = np.arange(len(t20))
-    fig, ax = plt.subplots(figsize=(10, 8))
+    fig, ax = plt.subplots(figsize=(9, 9.5))
     ax.barh(y, t20["sh_ext"], color=W.C_MNE_EXT, edgecolor="white", label="Foreign MNEs")
     ax.barh(y, t20["sh_dom"], left=t20["sh_ext"], color=W.C_MNE_DOM, edgecolor="white", label="Domestic MNEs")
     ax.barh(y, t20["sh_local"], left=t20["sh_ext"] + t20["sh_dom"], color="#e8e8e8", edgecolor="white", label="Local firms")
     for yi, r in zip(y, t20.itertuples()):
-        if r.sh_ext > 0.06: ax.text(r.sh_ext / 2, yi, f"{r.sh_ext:.2f}", ha="center", va="center", color="white", fontsize=7)
-        ax.text(1.01, yi, f"${r.total_value / 1e9:,.0f}bn", va="center", fontsize=7)
-    ax.set_yticks(y); ax.set_yticklabels(labels, fontsize=8)
-    ax.set_xlim(0, 1.12); ax.set_xlabel("share of the product's export value")
-    ax.legend(frameon=False, fontsize=8, loc="lower right", ncol=3)
+        if r.sh_ext > 0.06: ax.text(r.sh_ext / 2, yi, f"{r.sh_ext:.2f}", ha="center", va="center", color="white", fontsize=8)
+        ax.text(1.01, yi, (f"${r.total_value / 1e9:,.1f}bn" if r.total_value < 20e9 else f"${r.total_value / 1e9:,.0f}bn"), va="center", fontsize=8)
+    ax.set_yticks(y); ax.set_yticklabels(labels, fontsize=9)
+    ax.set_xlim(0, 1.14); ax.set_xlabel("share of the product's export value", fontsize=10)
+    ax.legend(frameon=False, fontsize=9, loc="upper center", bbox_to_anchor=(0.5, -0.07), ncol=3)
     W.savefig(fig, "fig_wp1f_top20_hs6_stacked", G)
 
     # figure: same 20, foreign split by parent ---------------------------------------------------------
@@ -121,15 +126,15 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     mat = sub.pivot_table(index="hs07_6d", columns="pgrp", values="value", aggfunc="sum", fill_value=0.0)
     mat = mat.reindex(t20["hs07_6d"]).reindex(columns=[c for c in groups if c in mat.columns], fill_value=0.0)
     mat = mat.div(t20.set_index("hs07_6d")["total_value"], axis=0)
-    fig, ax = plt.subplots(figsize=(10, 8))
+    fig, ax = plt.subplots(figsize=(9, 9.5))
     left = np.zeros(len(mat))
     for i, c in enumerate(mat.columns):
         kw = dict(color=W.parent_color(c, i), edgecolor="white", linewidth=0.5, label={"Other": "Other foreign MNEs", "Domestic": "Domestic MNEs"}.get(c, c))
         if c == "Unknown": kw.update(hatch="///", edgecolor="#6b7a99")
         ax.barh(y, mat[c].values, left=left, **kw); left += mat[c].values
-    ax.set_yticks(y); ax.set_yticklabels(labels, fontsize=8)
-    ax.set_xlim(0, 1.0); ax.set_xlabel("share of the product's export value (remainder = local firms)")
-    ax.legend(frameon=False, fontsize=7, loc="lower right", ncol=3)
+    ax.set_yticks(y); ax.set_yticklabels(labels, fontsize=9)
+    ax.set_xlim(0, 1.0); ax.set_xlabel("share of the product's export value (remainder = local firms)", fontsize=10)
+    ax.legend(frameon=False, fontsize=8, loc="upper center", bbox_to_anchor=(0.5, -0.07), ncol=4)
     W.savefig(fig, "fig_wp1f_top20_hs6_by_parent", G)
 
     # distribution of the HS6 foreign share, value-weighted -----------------------------------------------
@@ -154,7 +159,7 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     print(f"   {above:.0%} of export value is in HS6 products where foreign MNEs hold > 50%; "
           f"top 30 products = {by_val['total_value'].sum() / tot:.0%} of value")
     W.write_matrix_tex(dist[["sh_value", "sh_n", "n"]].rename(columns={"sh_value": "Share of value", "sh_n": "MNE share of exporting firms", "n": "N HS6"}).astype(float),
-                       T / "tab_wp1f_foreign_share_distribution.tex", fmt="{:.3f}", corner="Foreign share bin (%)",
+                       T / "tab_wp1f_foreign_share_distribution.tex", fmt={"Share of value": "{:.3f}", "MNE share of exporting firms": "{:.3f}", "N HS6": "{:,.0f}"}, corner="Foreign share bin (%)",
                        note="MNE share of exporting firms = matched firm-cells (firm x destination x HS6 x year) over all firm-cells in the bin's products.")
 
     # HS sections by export value (same structure as the HS6 tables) --------------------------------------

@@ -55,6 +55,12 @@ TEX_LABEL = {  # pdflatex-safe versions of the short labels (Greek letters in ma
     "Upstreamness": "Upstreamness", "Quality ladder": "Quality ladder", "RHCI": "RHCI",
 }
 RAUCH_ORDER = ["Differentiated", "Reference-priced", "Homogeneous (exchange)"]
+MIN_HS6_MEASURE = 30   # a measure enters a scope's quintile figures/tables only with >= 30 classified HS6 products
+
+
+def _insufficient(ax, short, n):
+    ax.set_axis_off()
+    ax.text(0.5, 0.5, f"{short}\nnot shown: only {n} HS6 products\nwith this measure in the scope", ha="center", va="center", fontsize=10, color="#555555", transform=ax.transAxes)
 
 
 def hs6_cross_section(d: pd.DataFrame, cls: pd.DataFrame) -> pd.DataFrame:
@@ -95,12 +101,12 @@ def histograms(hs6: pd.DataFrame, G: Path, nbins: int = 25) -> None:
     """For every continuous measure: the distribution of export value across measure bins, stacked
     by owner type (foreign / domestic / local), with the foreign-MNE share of each bin as a line,
     and the number of HS6 products per bin. One figure per measure and a 2x3 panel."""
-    fig_p, axes_p = plt.subplots(2, 3, figsize=(15, 8.5))
+    fig_p, axes_p = plt.subplots(3, 2, figsize=(11, 13))
     tot = hs6["total_value"].sum()
     for (col, short, xlabel, sign), axp in zip(MEASURES, axes_p.ravel()):
         q = hs6.dropna(subset=[col]).copy()
-        if len(q) < 10:
-            continue
+        if len(q) < MIN_HS6_MEASURE:
+            _insufficient(axp, short, len(q)); continue
         lo, hi = q[col].quantile(0.005), q[col].quantile(0.995)
         q[col] = q[col].clip(lo, hi)
         edges = np.linspace(lo, hi, nbins + 1)
@@ -124,8 +130,8 @@ def histograms(hs6: pd.DataFrame, G: Path, nbins: int = 25) -> None:
         ax.legend(frameon=False, fontsize=8, loc="upper right")
         fig.tight_layout()
         W.savefig(fig, f"fig_wp1b_hist_{col}", G)
-        axp.set_title(short, fontsize=11)
-    axes_p[0, 0].legend(frameon=False, fontsize=8, loc="upper right")
+        axp.set_title(short, fontsize=12)
+    axes_p[0, 0].legend(frameon=False, fontsize=9, loc="upper right")
     fig_p.tight_layout()
     W.savefig(fig_p, "fig_wp1b_panel_hist", G)
 
@@ -143,23 +149,24 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
 
     # --- one Figure-2 clone per measure + a 2x3 panel ----------------------------------------
     rows = []
-    fig_p, axes = plt.subplots(2, 3, figsize=(15, 8.5))
+    fig_p, axes = plt.subplots(3, 2, figsize=(11, 13))
     for (col, short, xlabel, sign), ax in zip(MEASURES, axes.ravel()):
         q = hs6.dropna(subset=[col]).copy()
-        if len(q) < 10:
-            continue
+        if len(q) < MIN_HS6_MEASURE:
+            print(f"   {short:18s} only {len(q)} HS6 products with the measure in this scope; not shown")
+            _insufficient(ax, short, len(q)); continue
         q["quintile"] = pd.qcut(q[col], 5, labels=False, duplicates="drop") + 1
         g = aggregate(q, "quintile")
         fig, ax1 = plt.subplots(figsize=(8.5, 4.5))
         vbar_2def(ax1, g, QLBL, xlabel); ax1.legend(frameon=False, fontsize=9, loc="upper left")
         W.savefig(fig, f"fig_wp1b_{col}_quintile", G)
-        vbar_2def(ax, g, QLBL, xlabel, fontsize=7); ax.set_title(short, fontsize=11)
+        vbar_2def(ax, g, QLBL, xlabel, fontsize=9); ax.set_title(short, fontsize=12)
         for _, r in g.iterrows():
             rows.append(dict(measure=short, quintile=int(r["quintile"]), sh_ext=r["sh_ext"], sh_dom=r["sh_dom"],
                              n_hs6=int(r["n_hs6"]), value=r["total_value"]))
         print(f"   {short:18s} foreign share Q1..Q5: " + " ".join(f"{v:.2f}" for v in g["sh_ext"])
               + f"   (expected gradient {sign})")
-    axes[0, 0].legend(frameon=False, fontsize=8, loc="upper left")
+    axes[0, 0].legend(frameon=False, fontsize=9, loc="upper left")
     fig_p.tight_layout()
     W.savefig(fig_p, "fig_wp1b_panel_quintiles", G)
 
@@ -169,12 +176,16 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     lines = [r"\begin{tabular}{lccccc|ccccc}", r"\toprule",
              r" & \multicolumn{5}{c}{Foreign MNE share} & \multicolumn{5}{c}{Domestic MNE share} \\",
              "Measure & " + " & ".join(f"Q{i}" for i in range(1, 6)) + " & " + " & ".join(f"Q{i}" for i in range(1, 6)) + r" \\", r"\midrule"]
-    for m in piv_e.index:
+    def cell(piv, m, i):
+        v = piv.loc[m, i] if (m in piv.index and i in piv.columns) else np.nan
+        return "--" if pd.isna(v) else f"{v:.2f}"
+
+    for m in [mm[1] for mm in MEASURES]:
         lines.append(TEX_LABEL.get(m, W.tex_escape(m)) + " & "
-                     + " & ".join(f"{piv_e.loc[m, i]:.2f}" for i in range(1, 6)) + " & "
-                     + " & ".join(f"{piv_d.loc[m, i]:.2f}" for i in range(1, 6)) + r" \\")
+                     + " & ".join(cell(piv_e, m, i) for i in range(1, 6)) + " & "
+                     + " & ".join(cell(piv_d, m, i) for i in range(1, 6)) + r" \\")
     lines += [r"\bottomrule",
-              r"\multicolumn{11}{p{0.95\textwidth}}{\footnotesize Value-weighted shares of export value within quintile; quintiles over HS6 products (unweighted). "
+              rf"\multicolumn{{11}}{{p{{0.95\textwidth}}}}{{\footnotesize Value-weighted shares of export value within quintile; quintiles over HS6 products (unweighted); `--' = fewer than {MIN_HS6_MEASURE} HS6 products carry the measure in this scope. "
               r"$|\sigma|$ FGO: absolute value of the tariff-based import-demand elasticity of Fontagn\'e, Guimbard and Orefice (2022), HS6 rev. 2007 (non-significant or positive HS6 estimates replaced by the HS4 average by the source); larger = more substitutable. "
               r"$\sigma$ Broda--Weinstein, upstreamness (Antr\`as--Chor), quality ladder (Khandelwal), RHCI (UNCTAD) as in the document's appendix.}} \\",
               r"\end{tabular}"]
@@ -198,16 +209,23 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
 
     # --- correlations across measures (HS6 cross-section, value-weighted) -------------------
     cols = [m[0] for m in MEASURES]
-    x = hs6.dropna(subset=cols)
-    w = x["total_value"].values
-    X = x[cols].values.astype(float)
-    mu = np.average(X, axis=0, weights=w)
-    Xc = X - mu
-    cov = (Xc * w[:, None]).T @ Xc / w.sum()
-    sd = np.sqrt(np.diag(cov))
-    corr = pd.DataFrame(cov / np.outer(sd, sd), index=[TEX_LABEL[m[1]] for m in MEASURES], columns=[TEX_LABEL[m[1]] for m in MEASURES])
+    labs = [TEX_LABEL[m[1]] for m in MEASURES]
+    corr = pd.DataFrame(np.nan, index=labs, columns=labs); nmin, nmax = 10 ** 9, 0
+
+    def wcorr(a, b, w):
+        ma, mb = np.average(a, weights=w), np.average(b, weights=w)
+        cab = np.average((a - ma) * (b - mb), weights=w)
+        return cab / np.sqrt(np.average((a - ma) ** 2, weights=w) * np.average((b - mb) ** 2, weights=w))
+
+    for i, ci in enumerate(cols):
+        for j, cj in enumerate(cols):
+            x = hs6.dropna(subset=[ci, cj])
+            if len(x) < MIN_HS6_MEASURE:
+                continue
+            corr.iloc[i, j] = wcorr(x[ci].values.astype(float), x[cj].values.astype(float), x["total_value"].values)
+            nmin, nmax = min(nmin, len(x)), max(nmax, len(x))
     W.write_matrix_tex(corr, T / "tab_wp1b_measure_corr.tex", fmt="{:.2f}", corner="",
-                       note=f"Value-weighted Pearson correlations across {len(x):,} HS6 products with all six measures.")
+                       note=f"Value-weighted Pearson correlations, pairwise: each cell uses the HS6 products carrying both measures ({nmin:,} to {nmax:,} products; `--' = fewer than {MIN_HS6_MEASURE}).")
     print("   corr(PCI, |σ|FGO) =", f"{corr.iloc[0, 1]:.2f}", "| corr(PCI, σBW) =", f"{corr.iloc[0, 2]:.2f}")
 
     # --- histograms: full distribution of export value / products over each measure ---------------

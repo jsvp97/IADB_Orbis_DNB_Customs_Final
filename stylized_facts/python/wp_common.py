@@ -504,7 +504,7 @@ def parent_group(d: pd.DataFrame, top: list[str], unknown_to_other: bool = True)
     return out
 
 
-PARENT_GROUPS_NOTE = ("The foreign-MNE bar is split into the five largest parent countries by foreign-MNE export "
+PARENT_GROUPS_NOTE = (f"The foreign-MNE bar is split into the {TOP_K_FIG} largest parent countries by foreign-MNE export "
                       "value in the scope and `Other foreign' (all remaining parents, including matched firms with no "
                       "recorded parent country); domestic MNEs have a parent in the exporting country.")
 
@@ -522,14 +522,17 @@ def write_matrix_tex(mat: pd.DataFrame, path: Path, *, fmt: str = "{:.1f}", corn
         lines.append(rf" & \multicolumn{{{len(cols)}}}{{c}}{{{caption_cols}}}" + (" & " if row_total is not None else "") + r" \\")
     hdr = [tex_escape(corner)] + [tex_escape(c) for c in cols] + (["Total"] if row_total is not None else [])
     lines += [" & ".join(hdr) + r" \\", r"\midrule"]
+    def _f(c):
+        return fmt[c] if isinstance(fmt, dict) else fmt
+
     for idx, row in mat.iterrows():
-        cells = ["--" if pd.isna(v) else fmt.format(v) for v in row.values]
+        cells = ["--" if pd.isna(v) else _f(c).format(v) for c, v in zip(cols, row.values)]
         if row_total is not None:
-            cells.append(fmt.format(row_total.loc[idx]))
+            cells.append(_f(cols[0]).format(row_total.loc[idx]))
         lines.append(tex_escape(idx) + " & " + " & ".join(cells) + r" \\")
     if col_total is not None:
         lines.append(r"\midrule")
-        cells = [fmt.format(col_total.loc[c]) for c in cols] + ([fmt.format(col_total.sum() if row_total is None else row_total.sum())] if row_total is not None else [])
+        cells = [_f(c).format(col_total.loc[c]) for c in cols] + ([_f(cols[0]).format(col_total.sum() if row_total is None else row_total.sum())] if row_total is not None else [])
         lines.append("Total & " + " & ".join(cells) + r" \\")
     lines.append(r"\bottomrule")
     if note:
@@ -542,22 +545,25 @@ def heatmap(mat: pd.DataFrame, fname: str, gdir: Path, *, cbar_label: str, fmt: 
             cmap: str = "Blues", vmin: float | None = None, vmax: float | None = None,
             xlabel: str = "", ylabel: str = "", annotate_thresh: float | None = None) -> None:
     """Same construction as Ignacio's sf_explore_dest_by_origin.heatmap (imshow + annotations)."""
-    fig, ax = plt.subplots(figsize=(max(6, 0.62 * mat.shape[1] + 2.5), max(4, 0.42 * mat.shape[0] + 1.8)))
+    import textwrap
+    ncol, nrow = mat.shape[1], mat.shape[0]
+    fig, ax = plt.subplots(figsize=(max(5.5, 0.5 * ncol + 2.6), max(3.6, 0.36 * nrow + 1.9)))
+    afs = 8 if ncol <= 12 else 7   # annotation font
     vals = mat.values.astype(float)
     vmin = np.nanmin(vals) if vmin is None else vmin
     vmax = np.nanmax(vals) if vmax is None else vmax
     im = ax.imshow(vals, aspect="auto", cmap=cmap, vmin=vmin, vmax=vmax)
-    ax.set_xticks(range(mat.shape[1])); ax.set_xticklabels(mat.columns, rotation=45, ha="right")
-    ax.set_yticks(range(mat.shape[0])); ax.set_yticklabels(mat.index)
+    ax.set_xticks(range(ncol)); ax.set_xticklabels([textwrap.fill(str(c), 22) if len(str(c)) > 22 else str(c) for c in mat.columns], rotation=45, ha="right", fontsize=9)
+    ax.set_yticks(range(nrow)); ax.set_yticklabels([textwrap.fill(str(c), 34) if len(str(c)) > 34 else str(c) for c in mat.index], fontsize=9)
     for i in range(mat.shape[0]):
         for j in range(mat.shape[1]):
             v = vals[i, j]
             if np.isnan(v):
-                ax.text(j, i, "—", ha="center", va="center", fontsize=7, color="gray"); continue
+                ax.text(j, i, "—", ha="center", va="center", fontsize=afs, color="gray"); continue
             if annotate_thresh is not None and v < annotate_thresh:
                 continue
             color = "white" if v > vmin + 0.6 * (vmax - vmin) else "black"
-            ax.text(j, i, fmt.format(v), ha="center", va="center", fontsize=7, color=color)
+            ax.text(j, i, fmt.format(v), ha="center", va="center", fontsize=afs, color=color)
     cbar = plt.colorbar(im, ax=ax, fraction=0.03, pad=0.02)
     cbar.set_label(cbar_label, fontsize=9)
     if xlabel: ax.set_xlabel(xlabel)
@@ -585,6 +591,38 @@ def load_income_groups() -> pd.DataFrame:
 
 def fmt_bn(v: float) -> str:
     return f"{v / 1e9:,.1f}"
+
+
+_DESC_CACHE = None
+
+
+def hs6_desc_fallback(codes: pd.Series) -> pd.Series:
+    """Descriptions for codes that are not HS 2007 lines: national/special customs lines (00, 98, 99)
+    and later-revision HS codes, mapped to their HS 2007 counterpart with the UNSD HS2022->HS2007
+    conversion table (data/raw/UNSD_HS2022toHS2007_Conversion.xlsx); last resort = the heading."""
+    global _DESC_CACHE
+    if _DESC_CACHE is None:
+        cls = pd.read_parquet(CLASS_PQ, columns=["hs07_6d", "hs6_desc"]).dropna().drop_duplicates("hs07_6d").set_index("hs07_6d")["hs6_desc"]
+        conv = pd.read_excel(Path(F_HSDESC).parent / "UNSD_HS2022toHS2007_Conversion.xlsx", sheet_name=0, dtype=str)
+        conv.columns = ["h22", "h07"]
+        conv = conv.dropna().drop_duplicates("h22").set_index("h22")["h07"].str.zfill(6)
+        _DESC_CACHE = (cls, conv)
+    cls, conv = _DESC_CACHE
+
+    def one(c):
+        c = str(c)
+        if c in cls.index:
+            return cls[c]
+        if c[:2] in ("00", "98", "99"):
+            return "National / special customs line (no HS description)"
+        h = conv.get(c)
+        if h is not None and h in cls.index:
+            return f"{cls[h]} [later HS revision; HS 2007 line {h}]"
+        same4 = cls[cls.index.str[:4] == c[:4]]
+        if len(same4):
+            return f"Heading {c[:4]} (later HS revision): {same4.iloc[0]}"
+        return f"HS {c} (no description available)"
+    return codes.map(one)
 
 
 __all__ = [n for n in dir() if not n.startswith("_")]

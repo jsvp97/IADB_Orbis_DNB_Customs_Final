@@ -17,6 +17,7 @@ Nothing here is hand-edited; re-run after any wp script is re-run. Every exhibit
 """
 from __future__ import annotations
 
+import re
 import shutil
 import subprocess
 import sys
@@ -50,11 +51,30 @@ def sanitize(text: str) -> str:
 def exists(scope, kind, name): return (SRC / scope / kind / name).exists()
 
 
+NOTE_RE = re.compile(r"^\\multicolumn\{\d+\}\{p\{[0-9.]*\\textwidth\}\}\{\\footnotesize\s*(.*)\}\s*\\\\\s*$")
+
+
+def split_note(text: str):
+    """Remove the table note (a full-width \multicolumn after \bottomrule) from a fragment and return it
+    separately; the builder sets it under the table so it never widens the tabular."""
+    out, note = [], None
+    for line in text.split("\n"):
+        m = NOTE_RE.match(line.strip())
+        if m and note is None:
+            note = m.group(1).strip()
+            while note.endswith("}") and note.count("}") > note.count("{"):
+                note = note[:-1].rstrip()
+        else:
+            out.append(line)
+    return "\n".join(out), note
+
+
 def copy_fragment(scope, kind, name):
     rel = f"{kind}/{scope}/{name}"; dst = DST / rel
     dst.parent.mkdir(parents=True, exist_ok=True)
-    dst.write_text(sanitize((SRC / scope / kind / name).read_text(encoding="utf-8")), encoding="utf-8")
-    return rel[:-4]
+    body, note = split_note(sanitize((SRC / scope / kind / name).read_text(encoding="utf-8")))
+    dst.write_text(body, encoding="utf-8")
+    return rel[:-4], note
 
 
 def copy_fig(scope, name):
@@ -76,16 +96,17 @@ def fig(scope, name, caption, label, width=0.95, note=""):
         return missing("figure", scope, name)
     path = copy_fig(scope, name)
     n = rf"\par\vspace{{2pt}}\parbox{{0.92\textwidth}}{{\footnotesize\textit{{Note:}} {note}}}" if note else ""
-    return (rf"\begin{{figure}}[H]\centering\includegraphics[width={width}\textwidth]{{{path}}}"
+    return (rf"\begin{{figure}}[H]\centering\includegraphics[width={width}\textwidth,height=0.86\textheight,keepaspectratio]{{{path}}}"
             rf"\caption{{{caption}}}\label{{fig:{label}}}{n}\end{{figure}}" "\n")
 
 
 def tab(scope, kind, name, caption, label, size=r"\small"):
     if not exists(scope, kind, name):
         return missing("table", scope, name)
-    path = copy_fragment(scope, kind, name)
+    path, note = copy_fragment(scope, kind, name)
+    n = rf"\par\vspace{{3pt}}\begin{{minipage}}{{0.95\textwidth}}\footnotesize {note}\end{{minipage}}" if note else ""
     return (rf"\begin{{table}}[H]\centering{size}\caption{{{caption}}}\label{{tab:{label}}}"
-            rf"\adjustbox{{max width=\textwidth, max totalheight=0.88\textheight}}{{\input{{{path}}}}}\end{{table}}" "\n")
+            rf"\adjustbox{{max width=\textwidth, max totalheight=0.8\textheight}}{{\input{{{path}}}}}{n}\end{{table}}" "\n")
 
 
 def sec(title, label=None): return f"\n\\section{{{title}}}" + (f"\\label{{sec:{label}}}" if label else "") + "\n"
@@ -116,7 +137,7 @@ def preamble(title, subtitle):
 
 CONVENTIONS = r"""
 \paragraph{Conventions (identical to the note).} Matched = the firm was found in Orbis or D\&B
-(\texttt{\_merge\_DNB\_Orbis}=3); domestic MNE = parent in the exporting country; foreign MNE =
+(\path{_merge_DNB_Orbis}=3); domestic MNE = parent in the exporting country; foreign MNE =
 matched minus domestic, so matched firms with no recorded parent count as foreign; nine origins
 (Ecuador excluded); value-weighted; pooled 2006--2022; navy = foreign, light gray = domestic.
 Wherever the foreign bar is split by home country, the ten largest parent countries (by
@@ -130,14 +151,17 @@ agriculture = HS 01--24; mining \& fuels = HS 25--27 and 71; manufacturing = HS 
 """
 
 DATA_FACTS = r"""
-\paragraph{Same data as the note.} The regressions that do not depend on the parent country
+\paragraph{Same data as the note.} The regressions that depend only on the matched flag
 reproduce the note to the last digit: Table~\ref{tab:t1_repro_all} returns the note's Table~1
-coefficients and observation counts (2.0823 / 2.0685 / 0.9414; extensive 1.4622 / 1.4591 /
-0.6818; Panel B 1.3522 / 1.3393 / 0.2391 and 1.4129 / 1.3958 / 0.1306) and
-Table~\ref{tab:t2_repro_all} the note's Table~2 pooled coefficients ($-0.1639$ / $-0.1848$;
-$0.0461$ / $0.0458$); Figure~\ref{fig:f5_orig_all} gives the note's 56\,\% of value for parents
-with more than 100 affiliates. The base is therefore the same 5.45\,M
-firm--destination--product--year rows. The one field that differs is the \emph{parent country}:
+Panel~A coefficients and every observation count (2.0823 / 2.0685 / 0.9414; extensive 1.4622 /
+1.4591 / 0.6818; N = 1,008,472 \ldots\ 1,137,550) and Table~\ref{tab:t2_repro_all} the note's
+Table~2 pooled coefficients ($-0.1639$ / $-0.1848$; $0.0461$ / $0.0458$; N = 5,081,547 /
+5,081,360); Figure~\ref{fig:f5_orig_all} gives the note's 56\,\% of value for parents with more
+than 100 affiliates. The cells that use the group's affiliate links differ in the third decimal
+only (Table~1 Panel~B 1.3536 vs the note's 1.3522; Table~2 ``present'' 0.0689 vs 0.0673), because
+the current base carries the affiliate and parent links of the 2026-04-21 build. The base is
+therefore the same 5.45\,M firm--destination--product--year rows. The field that differs
+materially is the \emph{parent country}:
 the current base carries a recorded parent for 92\,\% of foreign-MNE export value (script 02 and
 the AI review of unknown parents, merged in the 2026-04-21 build), whereas the note's Figure~4
 was drawn on a copy in which about half of that value had no recorded parent. The parent
@@ -178,9 +202,9 @@ of foreign MNEs into present-through-headquarters vs not, in the presence and di
 regressions (1e); products at HS6 with descriptions (1f). The four sectors are summarised at the
 end; the sector-by-sector version of every exhibit is the companion document
 \emph{WP\_sectors}, and the country-by-country exhibits are in \emph{WP\_countries}. Everything is
-generated by \texttt{stylized\_facts/python/wp\_*.py} in the project repository
-(\texttt{github.com/jsvp97/IADB\_Orbis\_DNB\_Customs\_Final}); the reader's guide is
-\texttt{docs/WP\_RESULTS\_2026-09-07.md}.""") + CONVENTIONS + DATA_FACTS
+generated by \path{stylized_facts/python/wp_*.py} in the project repository
+(\url{https://github.com/jsvp97/IADB_Orbis_DNB_Customs_Final}); the reader's guide is
+\path{docs/WP_RESULTS_2026-09-07.md}.""") + CONVENTIONS + DATA_FACTS
 
 
 def intro_sectors():

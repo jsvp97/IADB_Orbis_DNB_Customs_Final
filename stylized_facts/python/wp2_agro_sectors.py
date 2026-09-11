@@ -93,16 +93,21 @@ def write_split_table(g: pd.DataFrame, label_col: str, hdr: str, path: Path, lea
 
 
 def hbar_2def(g: pd.DataFrame, labels, fname: str, gdir: Path, xmax: float = 1.0):
+    import textwrap
     n = len(g); y = np.arange(n)[::-1]; bh = 0.38
-    fig, ax = plt.subplots(figsize=(9, max(3, 0.5 * n + 1.2)))
+    fig, ax = plt.subplots(figsize=(9, max(3.2, 0.42 * n + 1.6)))
     ax.barh(y + bh / 2, g["sh_ext"], bh, color=W.C_MNE_EXT, label="Foreign MNEs")
     ax.barh(y - bh / 2, g["sh_dom"], bh, color=W.C_MNE_DOM, edgecolor="#9e9e9e", linewidth=0.5, label="Domestic MNEs")
+    vfmt = "${:,.2f}bn" if g["total_value"].max() < 20e9 else "${:,.1f}bn"
     for yi, r in zip(y, g.itertuples()):
-        ax.text(r.sh_ext + 0.006, yi + bh / 2, f"{r.sh_ext:.2f}", va="center", fontsize=7)
-        ax.text(r.sh_dom + 0.006, yi - bh / 2, f"{r.sh_dom:.2f}", va="center", fontsize=7)
-        ax.text(xmax * 0.995, yi, f"${r.total_value / 1e9:,.1f}bn", va="center", ha="right", fontsize=7, color="#555555")
-    ax.set_yticks(y); ax.set_yticklabels([str(l)[:42] for l in labels], fontsize=8); ax.set_xlim(0, xmax)
-    ax.set_xlabel("Share in export value (value-weighted)"); ax.legend(frameon=False, fontsize=8, loc="lower right")
+        ax.text(r.sh_ext + 0.006, yi + bh / 2, f"{r.sh_ext:.2f}", va="center", fontsize=8)
+        ax.text(r.sh_dom + 0.006, yi - bh / 2, f"{r.sh_dom:.2f}", va="center", fontsize=8)
+        ax.text(xmax * 0.995, yi, vfmt.format(r.total_value / 1e9), va="center", ha="right", fontsize=8, color="#333333")
+    ax.set_yticks(y); ax.set_yticklabels([textwrap.fill(str(l), 40) for l in labels], fontsize=9); ax.set_xlim(0, xmax)
+    ax.set_xlabel("Share in export value (value-weighted); right margin = total exports of the row", fontsize=10)
+    h, l = ax.get_legend_handles_labels()
+    fig.legend(h, l, frameon=False, fontsize=9, loc="lower center", ncol=2, bbox_to_anchor=(0.5, 0.0))
+    fig.tight_layout(rect=(0, 0.5 / fig.get_figheight(), 1, 1))   # leave a strip under the x-label for the legend
     W.savefig(fig, fname, gdir)
 
 
@@ -118,25 +123,46 @@ def origin_table_and_heatmap(dd: pd.DataFrame, by: str, fname: str, gdir: Path, 
     all_comp = 100 * comp.sum(axis=0) / comp.values.sum()
     all_fsh = 100 * g.groupby(by)["e"].sum().reindex(cols) / g.groupby(by)["v"].sum().reindex(cols)
     keep = [c for c in cols if tot[c] / tot.sum() >= min_share]
+    wide = len(cols) > 6   # many sub-sectors: sub-sectors on the rows, origins on the columns
     if keep:
         hm = (100 * fsh[keep]).reindex((ovs["val_ext"] / ovs["value"]).sort_values(ascending=False).index)
-        hm.columns = [str(c)[:28] for c in hm.columns]
-        W.heatmap(hm, fname, gdir, cbar_label="foreign-MNE share of export value (%)", fmt="{:.0f}", vmin=0, vmax=100, cmap="Blues", xlabel="", ylabel="exporting country")
-    ncol = len(cols) + 1
+        if wide:
+            W.heatmap(hm.T, fname, gdir, cbar_label="foreign-MNE share of export value (%)", fmt="{:.0f}", vmin=0, vmax=100, cmap="Blues", xlabel="exporting country", ylabel="")
+        else:
+            W.heatmap(hm, fname, gdir, cbar_label="foreign-MNE share of export value (%)", fmt="{:.0f}", vmin=0, vmax=100, cmap="Blues", xlabel="", ylabel="exporting country")
 
     def row(lab, vals, extra):
-        return W.tex_escape(lab) + " & " + " & ".join("--" if pd.isna(v) else f"{v:.1f}" for v in vals) + f" & {extra:.1f}" + r" \\"
+        return W.tex_escape(str(lab)) + " & " + " & ".join("--" if pd.isna(v) else f"{v:.1f}" for v in vals) + f" & {extra:.1f}" + r" \\"
 
-    lines = [rf"\begin{{tabular}}{{l{'r' * ncol}}}", r"\toprule", "Origin & " + " & ".join(W.tex_escape(str(c)[:22]) for c in cols) + r" & All \\", r"\midrule",
-             rf"\multicolumn{{{ncol + 1}}}{{l}}{{\textit{{Panel A: composition of the origin's exports in the scope, \% (rows sum to 100)}}}} \\"]
-    for o in comp_pct.index:
-        lines.append(row(o, comp_pct.loc[o].values, 100.0))
-    lines.append(row("All origins", all_comp.values, 100.0))
-    lines += [r"\midrule", rf"\multicolumn{{{ncol + 1}}}{{l}}{{\textit{{Panel B: foreign-MNE share of export value within the cell, \%}}}} \\"]
-    for o in fsh.index:
-        lines.append(row(o, (100 * fsh.loc[o]).values, 100 * ovs.loc[o, "val_ext"] / ovs.loc[o, "value"]))
-    lines.append(row("All origins", all_fsh.values, 100 * ovs["val_ext"].sum() / ovs["value"].sum()))
-    lines += [r"\bottomrule", rf"\multicolumn{{{ncol + 1}}}{{p{{0.95\textwidth}}}}{{\footnotesize Pooled 2006--2022. Panel A: share of each sub-sector in the origin's exports within the scope. Panel B: foreign-MNE share of export value in each origin $\times$ sub-sector cell (`--' = no exports); `All' = the origin's overall foreign-MNE share in the scope.}} \\", r"\end{tabular}"]
+    fsh_all = 100 * ovs["val_ext"] / ovs["value"]
+    if not wide:
+        ncol = len(cols) + 1
+        lines = [rf"\begin{{tabular}}{{l{'r' * ncol}}}", r"\toprule", "Origin & " + " & ".join(W.tex_escape(str(c)) for c in cols) + r" & All \\", r"\midrule",
+                 rf"\multicolumn{{{ncol + 1}}}{{l}}{{\textit{{Panel A: composition of the origin's exports in the scope, \% (rows sum to 100)}}}} \\"]
+        for o in comp_pct.index:
+            lines.append(row(o, comp_pct.loc[o].values, 100.0))
+        lines.append(row("All origins", all_comp.values, 100.0))
+        lines += [r"\midrule", rf"\multicolumn{{{ncol + 1}}}{{l}}{{\textit{{Panel B: foreign-MNE share of export value within the cell, \%}}}} \\"]
+        for o in fsh.index:
+            lines.append(row(o, (100 * fsh.loc[o]).values, fsh_all.loc[o]))
+        lines.append(row("All origins", all_fsh.values, 100 * ovs["val_ext"].sum() / ovs["value"].sum()))
+        note = ("Pooled 2006--2022. Panel A: share of each sub-sector in the origin's exports within the scope (rows sum to 100). "
+                "Panel B: foreign-MNE share of export value in each origin $\\times$ sub-sector cell (`--' = no exports); `All' = the origin's overall foreign-MNE share in the scope.")
+    else:
+        origins = list(comp_pct.index); ncol = len(origins) + 1
+        lines = [rf"\begin{{tabular}}{{l{'r' * ncol}}}", r"\toprule", "Sub-sector & " + " & ".join(origins) + r" & All \\", r"\midrule",
+                 rf"\multicolumn{{{ncol + 1}}}{{l}}{{\textit{{Panel A: composition of the origin's exports in the scope, \% (columns sum to 100)}}}} \\"]
+        for c in cols:
+            lines.append(row(c, comp_pct[c].values, all_comp.loc[c]))
+        lines.append(row("All sub-sectors", [100.0] * len(origins), 100.0))
+        lines += [r"\midrule", rf"\multicolumn{{{ncol + 1}}}{{l}}{{\textit{{Panel B: foreign-MNE share of export value within the cell, \%}}}} \\"]
+        for c in cols:
+            lines.append(row(c, (100 * fsh[c]).values, all_fsh.loc[c]))
+        lines.append(row("All sub-sectors", fsh_all.reindex(origins).values, 100 * ovs["val_ext"].sum() / ovs["value"].sum()))
+        note = ("Pooled 2006--2022. Sub-sectors on the rows, exporting countries on the columns. Panel A: share of each sub-sector in the origin's exports within the scope (columns sum to 100); "
+                "`All' = the sub-sector's share of the scope's exports. Panel B: foreign-MNE share of export value in each origin $\\times$ sub-sector cell (`--' = no exports); "
+                "`All' = the sub-sector's overall foreign-MNE share; last row = the origin's overall foreign-MNE share in the scope.")
+    lines += [r"\bottomrule", rf"\multicolumn{{{ncol + 1}}}{{p{{0.95\textwidth}}}}{{\footnotesize {note}}} \\", r"\end{tabular}"]
     W.write_tex(lines, tdir / f"tab_{fname[4:]}.tex")
 
 
@@ -193,7 +219,7 @@ def sector_subclassifications(cube: pd.DataFrame, cls: pd.DataFrame, scope: str)
         print(f"   [{scope}] too few rows; skipped"); return
     d = d.merge(cls[["hs07_6d", "bec_enduse", "bec4", "bec4_label", "sitc2", "naics3", "lall2000_category", "agro_input"]], on="hs07_6d", how="left")
     d["hs_section"] = W.hs_section_label(d["hs2"])
-    d["bec4_lab"] = d["bec4"].astype(str).str.cat(d["bec4_label"].astype(str).str.slice(0, 26), sep=" ")
+    d["bec4_lab"] = d["bec4"].astype(str).str.cat(d["bec4_label"].astype(str).str.slice(0, 48), sep=" ")
     d.loc[d["bec4"].isna(), "bec4_lab"] = np.nan
     d["sitc2_lab"] = d["sitc2"].map(lambda c: f"{c} {SITC_DIV.get(c, '')}".strip() if isinstance(c, str) else np.nan)
     d["naics3_lab"] = d["naics3"].map(lambda c: NAICS3.get(c, f"{c}") if isinstance(c, str) else np.nan)
@@ -220,6 +246,8 @@ def sector_subclassifications(cube: pd.DataFrame, cls: pd.DataFrame, scope: str)
         print(f"   {hdr:28s}: " + "; ".join(f"{str(r[col])[:28]} ext {r['sh_ext']:.2f}/dom {r['sh_dom']:.2f} ({100 * r['sh_of_scope']:.0f}%)" for _, r in g.head(6).iterrows()))
     # cross: HS section x BEC end use
     dd = d.dropna(subset=["bec_enduse"])
+    if len(dd) == 0 or dd["value"].sum() <= 0:
+        print(f"   [{scope}] no BEC-classified value; cross tables skipped"); return
     m = pd.crosstab(dd["hs_section"], dd["bec_enduse"], values=dd["value"], aggfunc="sum").fillna(0.0)
     m = m.reindex([s for s in W.HS_SECTION_ORDER if s in m.index]).reindex(columns=[c for c in W.ENDUSE_ORDER if c in m.columns])
     e = pd.crosstab(dd["hs_section"], dd["bec_enduse"], values=dd["val_ext"], aggfunc="sum").reindex_like(m)
@@ -228,10 +256,11 @@ def sector_subclassifications(cube: pd.DataFrame, cls: pd.DataFrame, scope: str)
     if scope == "agro":
         inp = d[d["agro_input"] == 1].groupby("hs07_6d").agg(value=("value", "sum"), e=("val_ext", "sum"), m=("val_dom", "sum")).sort_values("value", ascending=False).head(20)
         inp = inp.join(cls.set_index("hs07_6d")["hs6_desc"])
-        lines = [r"\begin{tabular}{l p{7cm} r r r}", r"\toprule", r"HS6 & Description & \$bn & Foreign & Domestic \\", r"\midrule"]
+        inp["hs6_desc"] = inp["hs6_desc"].where(inp["hs6_desc"].notna(), W.hs6_desc_fallback(pd.Series(inp.index, index=inp.index)))
+        lines = [r"\begin{tabular}{@{}l p{7.5cm} r r r@{}}", r"\toprule", r"HS6 & Description & \$bn & Foreign (\%) & Domestic (\%) \\", r"\midrule"]
         for h, r in inp.iterrows():
-            lines.append(f"{h} & {W.tex_escape(str(r['hs6_desc'])[:60])} & {r['value'] / 1e9:,.2f} & {r['e'] / r['value']:.2f} & {r['m'] / r['value']:.2f} \\\\")
-        lines += [r"\bottomrule", r"\multicolumn{5}{p{0.9\textwidth}}{\footnotesize Top-20 HS6 lines flagged as agricultural inputs (fertilisers, agrochemicals, seeds for sowing, animal feed, agricultural machinery, live animals).}} \\", r"\end{tabular}"]
+            lines.append(f"{h} & {W.tex_escape(str(r['hs6_desc']))} & {r['value'] / 1e9:,.2f} & {100 * r['e'] / r['value']:.0f} & {100 * r['m'] / r['value']:.0f} \\\\")
+        lines += [r"\bottomrule", r"\multicolumn{5}{p{0.9\textwidth}}{\footnotesize Top-20 HS6 lines flagged as agricultural inputs (fertilisers, agrochemicals, seeds for sowing, animal feed, agricultural machinery, live animals); Foreign / Domestic = MNE shares of the line's export value, percent.} \\", r"\end{tabular}"]
         W.write_tex(lines, T / "tab_wp2_top_inputs_hs6.tex")
 
 
