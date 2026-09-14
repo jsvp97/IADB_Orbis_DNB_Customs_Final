@@ -327,6 +327,8 @@ def fact2_body(sc: str, L: list, tag: str, P: str) -> None:
     L.append(tab(sc, "Tables", "tab_wp1b_quintile_shares.tex", f"{P}Foreign and domestic MNE shares by quintile, six sophistication measures", f"quint_{tag}"))
     L.append(tab(sc, "Tables", "tab_wp1b_measure_corr.tex", f"{P}Correlations across sophistication measures (HS6, value-weighted)", f"corr_{tag}"))
     L.append(tab(sc, "Tables", "tab_wp1b_rauch.tex", f"{P}MNE shares by Rauch (1999) class", f"rauch_{tag}"))
+    L.append(tab(sc, "Tables", "tab_wp1b_rauch2.tex", f"{P}MNE shares by Rauch (1999) class, two classes: differentiated vs non-differentiated (reference-priced + homogeneous)", f"rauch2_{tag}"))
+    L.append(fig(sc, "fig_wp1b_rauch2", f"{P}Foreign vs domestic MNE shares of export value: differentiated vs non-differentiated products (Rauch 1999; non-differentiated = reference-priced + homogeneous).", f"f_rauch2_{tag}", 0.7))
     L.append(tab(sc, "Tables", "tab_wp1b_bec.tex", f"{P}MNE shares by BEC end use", f"bec_{tag}"))
     L.append(tab(sc, "Regressions", "reg_wp1b_odpy_fgo.tex", f"{P}Note's Table A.4 ladder with the FGO elasticity added (ODPY cells, MNE value share)", f"reg_fgo_{tag}"))
 

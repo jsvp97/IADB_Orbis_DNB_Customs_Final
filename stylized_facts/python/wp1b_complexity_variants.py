@@ -55,6 +55,7 @@ TEX_LABEL = {  # pdflatex-safe versions of the short labels (Greek letters in ma
     "Upstreamness": "Upstreamness", "Quality ladder": "Quality ladder", "RHCI": "RHCI",
 }
 RAUCH_ORDER = ["Differentiated", "Reference-priced", "Homogeneous (exchange)"]
+RAUCH2_ORDER = ["Differentiated", "Non-differentiated"]   # reference-priced + homogeneous pooled (2026-09-14)
 MIN_HS6_MEASURE = 30   # a measure enters a scope's quintile figures/tables only with >= 30 classified HS6 products
 
 
@@ -70,6 +71,8 @@ def hs6_cross_section(d: pd.DataFrame, cls: pd.DataFrame) -> pd.DataFrame:
                     on="hs07_6d", how="left")
     for k in ("ext", "dom", "total"):
         hs6[f"sh_{k}"] = hs6[f"val_{k}"] / hs6["total_value"]
+    hs6["rauch2"] = hs6["rauch"].map({"Differentiated": "Differentiated", "Reference-priced": "Non-differentiated",
+                                      "Homogeneous (exchange)": "Non-differentiated"})
     return hs6
 
 
@@ -193,6 +196,7 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
 
     # --- categorical: Rauch and BEC end use ------------------------------------------------
     for col, order, fname, hdr in (("rauch", RAUCH_ORDER, "rauch", "Rauch (1999) class"),
+                                   ("rauch2", RAUCH2_ORDER, "rauch2", "Rauch (1999): differentiated vs non-differentiated"),
                                    ("bec_enduse", W.ENDUSE_ORDER, "bec", "BEC end use")):
         g = aggregate(hs6, col, order)
         if len(g) == 0:
