@@ -465,3 +465,25 @@ and in the "sectors side by side" block at the start of WP_sectors (192 pp.).
   `docs/WP_revision_interna_2026-09-18.docx`; the 09-14 copy is parked in `output/wp/_superseded/`.
 - PDFs renamed to 2026-09-18 (44 / 192 / 55 pp.); 2026-09-14 PDFs removed from git. Zero LaTeX errors or
   overfull boxes; no text below 5 pt in the new exhibits.
+- **Second pass the same day (Sebastián's request).** (i) The review keeps ONLY the renumbering — the twelve
+  appended references to the new exhibits were removed; a paragraph-by-paragraph diff against Sebastián's copy
+  shows differences in exhibit numbers only, plus two factual fixes verified against the cube: the non-US
+  parents carrying LAC exports to China are GBR (21.8 % of the value), LIE (4.1), PAN (3.6) and CAN (3.1) — AUS
+  is ninth with 1.1 %, and PAN's shipments are 58 % pulp, so "(GBR, LIE, PAN, AUS: mineras)" became "(GBR, LIE,
+  PAN, CAN: minerales de cobre y hierro, cátodos de cobre y celulosa)"; and DEU / JPN / NLD ship 32 / 45 / 27 %
+  to Brazil, so "32–45 %" became "27–45 %". Every other number the review cites was recomputed
+  (`scratch/verify_review.py`) and matches: US-parent $238.9bn = 23.3 % of known-parent foreign value, 10.0 %
+  of all; sector leaders; HS-section home shares (textiles 27 % / 76 %, instruments 19 % / 72 %); home shares by
+  origin (DOM 70.0, SLV 66.6, CRI 47.1, CHL 31.2, COL 15.4, PER 8.7, ARG 3.9, PRY 0.4, URY 0.4); Table 13 rows;
+  the 92–97 % of DEU / JPN / NLD exports to Brazil that leave from Argentina; CAN home share = 94 % gold;
+  presence shares; Figure-1 numbers by sector; parent shares by sector; network-size and HHI numbers; PCI
+  quintiles; mining = 208 HS6 (192 with a PCI, 40 Rauch-differentiated). HKG-parent exports to China are 0.00 %,
+  so "Chinese parents 0.3 %" needs no Hong Kong caveat. EU-27 = strict 27-member list (checked against
+  `W.EU_CODES`, which adds 27 non-EU European codes and must not be used for the EU).
+- **`WP_draft`** (`python wp_build_overleaf.py draft` → `output/wp/overleaf_WP_draft/`, `docs/WP_draft_2026-09-18.pdf`,
+  40 pp.): the working-paper draft for Christian — only the exhibits the review marks MOSTRAR in the main text
+  (Facts 1–6, Products, Sectors with one or two sub-classification tables each) and APOYO / APÉNDICE in the
+  appendix, in the review's order; clean captions; a short "Data" paragraph instead of the reading guide; the
+  fragment notes lose their "reproduction of the note's Table" phrases (`DRAFT_MODE`). No table of contents,
+  no "draft for internal review" date line. The draft has its own exhibit numbering (the review's numbers are
+  WP_total's).
