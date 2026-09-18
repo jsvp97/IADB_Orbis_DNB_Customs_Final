@@ -74,7 +74,10 @@ python/wp1cd_parent_destination.py   items 1c/1d  parent x destination two-way t
 python/wp1e_hq_affiliates.py         item 1e  presence through HQ vs through another affiliate; counts by type; groups vs affiliates; distance regressions
 python/wp1f_hs6_products.py          item 1f  HS6 tables with descriptions, top-20 stacked figures, distribution and Lorenz
 python/wp2_agro_sectors.py           item 2   four-sector comparison (incl. Rest); sub-classifications for every sector (HS section, BEC end use, BEC categories, SITC, NAICS, Lall; agro inputs)
-python/wp_run_all.py                 runner:  python wp_run_all.py [cube 1a 1b 1cd 1e 1f 2]
+python/wp3_usa_destinations.py       rev. 6   the destination side of Fact 3: who carries the exports that reach the USA / China / EU-27 (by origin, by sector);
+                                     what US-parent MNEs ship home (HS6); US-parent share origin x sector; home share by parent x sector;
+                                     Facts 5 and 6 in one four-column table each (read from wp1e's fragments -- run after 1e)
+python/wp_run_all.py                 runner:  python wp_run_all.py [cube 0 1a 1b 1cd 1e 1f 2 3]
 python/wp_build_overleaf.py          assembles THREE Overleaf projects (output/wp/overleaf_WP_{total,sectors,countries}/),
                                      compiles each with pdflatex and zips them; copies of the PDFs in docs/
 ```

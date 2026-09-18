@@ -33,8 +33,8 @@ with the script and data each item needs, is in **`docs/WORKPLAN_working_paper.m
 |---|---|---|
 | 1 | this file | orientation |
 | 2 | `docs/WP_RESULTS_2026-09-07.md` | **what came out** of Volpe's agenda (items 1a–1f, 2): results, caveats, exhibit index — the exhibits themselves are in `output/wp/` |
-| 2a | `docs/WP_total_2026-09-14.pdf`, `docs/WP_sectors_2026-09-14.pdf`, `docs/WP_countries_2026-09-14.pdf` | the three compiled documents for the coauthors (all goods / four sectors / nine origins) with EVERY figure, table and regression; Overleaf sources + zips in `output/wp/overleaf_WP_{total,sectors,countries}*`; rebuilt by `stylized_facts/python/wp_build_overleaf.py` |
-| 2a' | `docs/WP_revision_interna_2026-09-14.docx` | internal review (Spanish) of the three documents: exhibit by exhibit, what is worth showing Christian and why; the US-parent story; the proposed minimal set of 12 exhibits |
+| 2a | `docs/WP_total_2026-09-18.pdf`, `docs/WP_sectors_2026-09-18.pdf`, `docs/WP_countries_2026-09-18.pdf` | the three compiled documents for the coauthors (all goods / four sectors / nine origins) with EVERY figure, table and regression; rev. 6 adds the destination side of Fact 3 (who carries exports to the USA / China / EU-27; what US MNEs ship home) and the cross-sector summaries; Overleaf sources + zips in `output/wp/overleaf_WP_{total,sectors,countries}*`; rebuilt by `stylized_facts/python/wp_build_overleaf.py` |
+| 2a' | `docs/WP_revision_interna_2026-09-18.docx` | internal review (Spanish, edited by Sebastián) of the three documents: exhibit by exhibit, what is worth showing Christian and why; the US-parent story; the proposed minimal set of 12 exhibits. Exhibit numbers = WP_total 2026-09-18 |
 | 2b | `docs/WORKPLAN_working_paper.md` | the agenda, mapped to code and data (status column says what is done) |
 | 3 | `CLAUDE.md` | technical spec: every script, every input, every column that matters, the traps |
 | 4 | `stylized_facts/README.md` | the stylized-facts pipeline (Ignacio's code): figure → script → cache |

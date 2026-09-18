@@ -413,3 +413,55 @@ observations stay blank (mining and rest decompositions).
   carries the exports to the USA" numbers were computed ad hoc from the cube for the review (scratch script
   `usa_story*.py`; not yet a pipeline exhibit — candidate new figure).
 - PDFs renamed to 2026-09-14 (36 / 174 / 55 pp.).
+
+## Revision 6 — 2026-09-18 (the destination side of Fact 3; cross-sector summaries; review renumbered)
+
+New script `wp3_usa_destinations.py` (step `3` of `wp_run_all.py`, after `1e`; ~2 min from the cached cube).
+It turns Fact 3 around — of the value that REACHES a destination, who moves it — and collects the exhibits
+that compare the four sectors side by side. Everything the internal review computed ad hoc is now in the
+pipeline. WP_total numbers below (2026-09-18 build, 44 pp.); the sector versions sit in each sector's Fact 3
+and in the "sectors side by side" block at the start of WP_sectors (192 pp.).
+
+- **US-parent share of exports, origin × sector** (`fig/tab_wp3_us_share_origin_sector`; Figure 4 / Table 1,
+  Fact 1): CRI 30 % of all exports (42 % of manufacturing), PRY 30 % (35 % of agriculture), SLV 28 % (40 % of
+  mining, 35 % of manufacturing), DOM 17 % (26 % manufacturing), COL 12 %, ARG 8 %, PER 8 %, URY 5 %, CHL 3 %;
+  pooled 10 % (agriculture 8, mining 10, manufacturing 12). Replaces three sector figures for this question.
+- **Home share by parent, total and by sector** (`fig/tab_wp3_home_share_by_parent_sectors`; Figure 20 /
+  Table 17, Fact 3): USA 22 % (agriculture 7, mining 12.5, manufacturing 41); CAN 20 % (mining 26); BRA 19 %
+  (mining 34, manufacturing 22); DEU 8 %; JPN 9 % (agriculture 33 % on $6.9bn); GBR 0.6 %, LIE 0 %, CHE 0.3 %,
+  NLD 2 %, PAN 1 %; all known-parent foreign MNEs 9 % (5 / 8 / 13). Bars on < $1bn are hatched.
+- **Who carries the exports to the USA** (`fig_wp3_to_usa_carriers_total_manuf`, Figure 21; Tables 18–19):
+  of $440bn, US-parent MNEs 12.1 %, other foreign MNEs 23.1 %, domestic MNEs 24.4 % (Colombian oil), local
+  firms 40.4 %. Manufacturing ($156bn): 24.6 / 26.6 / 6.7 / 42.1. By origin, US-parent share (all goods →
+  manufacturing): SLV 40 → 47 %, CRI 37 → 54 %, DOM 25 → 31 %, CHL 6 → 7, COL 6 → 9, PRY 6 → 1, ARG 5 → 7,
+  PER 4 → 6, URY 0 → 1. Agriculture to the USA: US-parent 3.9 %, local 58 %; mining: domestic 52 %.
+- **Who carries the exports to the eight largest markets** (`fig/tab_wp3_dest_carriers`; Figure 22 /
+  Table 20; EU-27 pooled, strict 27-member list — `W.EU_CODES` is all of Europe and must not be used for this):
+  China $332bn: parent-in-destination 0.3 %, US-parent 7.3 %, other foreign 44.2 %, domestic 14.5 %; EU-27
+  $316bn: EU-parent 8.3 %, US-parent 8.6 %; Brazil $196bn: 2.8 / 9.5 / 46.2; Japan $78bn: 4.0 / 11.5 / 49.3;
+  Canada $61bn: CAN-parent 25.9 %; Korea $59bn: 0.1 / 8.5 / 44.1. Only the USA and Canada buy from LAC
+  through their own multinationals.
+- **What US-parent MNEs ship home** (`tab_wp3_us_home_products`, `fig_wp3_us_home_products`; Table 21 /
+  Figure 23): top-15 HS6 by US-parent value to the USA with (i) the share of the parent's exports of the
+  line that goes to the USA and (ii) the US-parent share of everything LAC exports of the line to the USA:
+  T-shirts 610910 $5.9bn (84 % home; 52 % of LAC→USA), catheters 901839 $5.1bn (73 %; 83 %), crude oil
+  270900 $4.9bn (24 %; 5 %), medical instruments 901890 $3.6bn (69 %; 43 %), coal 270112 (9 %; 48 %),
+  integrated circuits 854231 (28 %; 95 %), tyres 401110 (93 %; 63 %), molybdenum 261390 (99 %; 79 %),
+  cotton socks 611595 (100 %; 93 %), men's underpants 610711 (87 %; 86 %), brassieres 621210 (98 %; 77 %),
+  pineapples (66 %; 20 %), cigars (100 %; 16 %), copper cathodes (24 %; 3 %), leather footwear (70 %; 71 %).
+  All 15 lines = $53bn = 22 % of US-parent LAC exports, 12 % of LAC→USA. Companion `tab_wp3_to_usa_top_products`
+  (Table 22): the 15 largest LAC→USA lines and who carries them (crude oil $92bn: 81 % domestic, 5 % US-parent;
+  gold $30bn 74 % local; copper cathodes 60 % local; coffee 53 % local; bananas 58 % local).
+- **Fact 5 in one table** (`tab_wp3_fact5_summary`, Table 31) and **Fact 6 in one table**
+  (`tab_wp3_fact6_summary`, Table 34): four columns (all goods, agriculture, mining, manufacturing), rows
+  foreign / domestic, both FE sets, Panels A and B for Fact 5. Read from the `reg_wp1e_*` fragments of each
+  scope (no re-estimation), so they match the full tables to the digit: Fact 5 foreign 1.213 / 1.295 / 1.130 /
+  1.164 vs domestic 0.438 / 0.523 / 0.317 (n.s.) / 0.383; Fact 6 base −0.165 / −0.214 / −0.093 (n.s.) /
+  −0.151, × foreign 0.049 / 0.037 / 0.057 / 0.052, × domestic 0.032 / 0.019 / 0.071 / 0.039.
+- **Renumbering.** Every WP_total number after Figure 3 / before Table 1 shifts (figures 4–18 → +1, 19–26 → +5;
+  tables 1–15 → +1, 16–23 → +7, 24–25 → +8, 26–39 → +9). The internal review (edited by Sebastián on 09-18) was
+  renumbered by label with `scratch/renumber_docx.py` (56 paragraphs; only exhibit numbers changed, plus the
+  numbers of the new exhibits appended where the text already described them) and saved as
+  `docs/WP_revision_interna_2026-09-18.docx`; the 09-14 copy is parked in `output/wp/_superseded/`.
+- PDFs renamed to 2026-09-18 (44 / 192 / 55 pp.); 2026-09-14 PDFs removed from git. Zero LaTeX errors or
+  overfull boxes; no text below 5 pt in the new exhibits.

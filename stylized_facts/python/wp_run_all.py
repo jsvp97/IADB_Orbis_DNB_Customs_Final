@@ -5,7 +5,7 @@ Prerequisite (once): Stata  src/15_wp_extract_fdpy.do  ->  data/intermediate/wp/
 Then:  python wp_run_all.py            (all steps)
        python wp_run_all.py 1a 1cd     (a subset)
 
-Steps: cube (parent cube + HS6 classifications) · 0 (Fact-4 reproductions) · 1a · 1b · 1cd · 1e · 1f · 2
+Steps: cube (parent cube + HS6 classifications) · 0 (Fact-4 reproductions) · 1a · 1b · 1cd · 1e · 1f · 2 · 3 (after 1e)
 Every step writes to output/wp/<scope>/ and prints the headline numbers to the console;
 the console log is kept in output/logs/wp_run_all.log by the caller.
 """
@@ -26,6 +26,7 @@ STEPS = {
     "1e": "wp1e_hq_affiliates.py",
     "1f": "wp1f_hs6_products.py",
     "2": "wp2_agro_sectors.py",
+    "3": "wp3_usa_destinations.py",   # revision 6: destination side of Fact 3 + cross-sector summaries (reads wp1e's fragments)
 }
 
 if __name__ == "__main__":
