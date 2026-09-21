@@ -58,38 +58,78 @@ def region_rows(d: pd.DataFrame) -> pd.Series:
 ROW_ORDER = W.REGION_ORDER + ["Foreign MNE, parent unknown", "Domestic MNEs", "Local firms (unmatched)"]
 
 
-def two_way(d: pd.DataFrame, row: pd.Series, col: pd.Series, row_order=None, col_order=None):
-    mat = pd.crosstab(row, col, values=d["value"], aggfunc="sum").fillna(0.0)
+def two_way(d: pd.DataFrame, row: pd.Series, col: pd.Series, row_order=None, col_order=None, value: str = "value"):
+    mat = pd.crosstab(row, col, values=d[value], aggfunc="sum").fillna(0.0)
     if row_order: mat = mat.reindex([r for r in row_order if r in mat.index])
     if col_order: mat = mat.reindex(columns=[c for c in col_order if c in mat.columns])
     return mat
 
 
-def write_three(mat: pd.DataFrame, T: Path, stem: str, corner: str, note: str) -> None:
+def write_three(mat: pd.DataFrame, T: Path, stem: str, corner: str, note: str, mat_yr: pd.DataFrame | None = None) -> None:
     rt, ct = mat.sum(axis=1), mat.sum(axis=0)
-    W.write_matrix_tex(mat / 1e9, T / f"tab_{stem}_value.tex", fmt="{:,.1f}", corner=corner,
-                       row_total=rt / 1e9, col_total=ct / 1e9, note="Export value, USD bn. " + note)
+    my = mat_yr.reindex(index=mat.index, columns=mat.columns).fillna(0.0) if mat_yr is not None else mat
+    W.write_matrix_tex(my / 1e9, T / f"tab_{stem}_value.tex", fmt="{:,.1f}", corner=corner,
+                       row_total=my.sum(axis=1) / 1e9, col_total=my.sum(axis=0) / 1e9, note=f"Export value, USD bn per year. {W.VAL_NOTE} " + note)
     W.write_matrix_tex(100 * mat.div(rt, axis=0), T / f"tab_{stem}_rowpct.tex", fmt="{:.1f}", corner=corner,
                        row_total=pd.Series(100.0, index=mat.index), note="Row percentages: destination mix of each row group. " + note)
     W.write_matrix_tex(100 * mat.div(ct, axis=1), T / f"tab_{stem}_colpct.tex", fmt="{:.1f}", corner=corner,
                        col_total=pd.Series(100.0, index=mat.columns), note="Column percentages: who supplies each destination. " + note)
 
 
-def home_share_figure(ext: pd.DataFrame, parents: list, fname: str, G: Path, origin_label: str) -> pd.DataFrame:
-    home = ext.assign(home=(ext["country_dest"] == ext["iso3_parent"]).astype(int) * ext["value"])
-    hs = home.groupby("iso3_parent").agg(value=("value", "sum"), home=("home", "sum"))
+def home_share_figure(ext: pd.DataFrame, parents: list, fname: str, G: Path, origin_label: str, parent_col: str = "iso3_parent",
+                      home_flag: pd.Series | None = None) -> pd.DataFrame:
+    """Bars = share of each parent's exports shipped to the parent's own country. No dollar values on the figure
+    (revision 7); `home_flag` lets the caller define `home` for consolidated parents."""
+    hf = home_flag if home_flag is not None else (ext["country_dest"] == ext[parent_col])
+    home = ext.assign(home=hf.astype(int) * ext["value"])
+    hs = home.groupby(parent_col).agg(value=("value", "sum"), home=("home", "sum"))
     hs = hs.reindex([p for p in parents if p in hs.index]); hs["share"] = hs["home"] / hs["value"]
     fig, ax = plt.subplots(figsize=(8, 5.5))
     y = np.arange(len(hs))[::-1]
     ax.barh(y, hs["share"], color=W.C_MNE_EXT)
     for yi, (i, r) in zip(y, hs.iterrows()):
-        ax.text(r["share"] + 0.005, yi, f"{r['share'] * 100:.1f}%  (${r['value'] / 1e9:,.1f}bn)", va="center", fontsize=8)
-    ax.set_yticks(y); ax.set_yticklabels(hs.index)
-    ax.set_xlim(0, max(0.5, float(hs["share"].max()) * 1.35 if len(hs) else 0.5))
+        ax.text(r["share"] + 0.005, yi, f"{r['share'] * 100:.1f}%", va="center", fontsize=9)
+    ax.set_yticks(y); ax.set_yticklabels(hs.index, fontsize=9)
+    ax.set_xlim(0, max(0.5, float(hs["share"].max()) * 1.2 if len(hs) else 0.5))
     ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"{v * 100:.0f}%"))
     ax.set_xlabel(f"share of the parent's export value from {origin_label} shipped to the parent's own country")
+    for s in ("top", "right"):
+        ax.spines[s].set_visible(False)
     W.savefig(fig, fname, G)
     return home
+
+
+def home_share_consolidated(ext: pd.DataFrame, G: Path, T: Path, k: int = TOP_TAB) -> None:
+    """Revision 7: the home-share figure with parents CONSOLIDATED -- dependencies folded into their sovereign
+    (Bermuda, Cayman, BVI, Jersey ... -> GBR; Curacao, Aruba -> NLD; Puerto Rico -> USA; Hong Kong, Macao -> CHN) and the
+    stand-alone havens / conduits (LIE, CHE, LUX, PAN, BHS, ...) pooled into one group whose `home' is any of them."""
+    e = ext.assign(pc=W.consolidate_parent(ext["iso3_parent"]))
+    dest_c = W.consolidate_parent(e["country_dest"])
+    home = e["pc"] == dest_c
+    top = list(e.groupby("pc")["value"].sum().sort_values(ascending=False).index[:k])
+    if W.HAVEN_GROUP_LABEL not in top:
+        top.append(W.HAVEN_GROUP_LABEL)
+    h = home_share_figure(e, top, "fig_wp1d_home_share_by_parent_consolidated", G, "LAC", parent_col="pc", home_flag=home)
+    hs = h.groupby("pc").agg(value=("value", "sum"), value_yr=("value_yr", "sum"), home=("home", "sum")).reindex(top)
+    hs["share"] = 100 * hs["home"] / hs["value"]
+    lines = [r"\begin{tabular}{lrr}", r"\toprule", rf"Consolidated parent & Home share (\%) & Exports ({W.VAL_HDR}) \\", r"\midrule"]
+    for p, r in hs.iterrows():
+        lines.append(f"{W.tex_escape(p)} & {r['share']:.1f} & {r['value_yr'] / 1e9:,.1f} \\\\")
+    dep = ", ".join(f"{c}$\\to${s}" for c, s in sorted(W.HAVEN_SOVEREIGN.items(), key=lambda x: (x[1], x[0])))
+    lines += [r"\bottomrule", rf"\multicolumn{{3}}{{p{{0.95\textwidth}}}}{{\footnotesize Parents consolidated: dependencies and overseas territories folded into their sovereign ({dep}); "
+              rf"the stand-alone tax havens and conduit jurisdictions ({', '.join(sorted(W.HAVEN_STANDALONE))}) pooled into `{W.tex_escape(W.HAVEN_GROUP_LABEL)}', whose home shipments are those to any of them. {W.VAL_NOTE}}} \\", r"\end{tabular}"]
+    W.write_tex(lines, T / "tab_wp1d_home_share_by_parent_consolidated.tex")
+    print("   consolidated home shares: " + ", ".join(f"{p} {r['share']:.1f}%" for p, r in hs.head(8).iterrows()))
+
+
+def parent_x_parentdest(ext: pd.DataFrame, top_p: list, T: Path, note: str) -> None:
+    """Revision 7: top-10 parents x the SAME ten countries as destinations (row %), so the diagonal is the home share."""
+    dcol = ext["country_dest"].where(ext["country_dest"].isin(top_p), "Other destinations")
+    prow = ext["iso3_parent"].where(ext["iso3_parent"].isin(top_p), "Other parents")
+    mat = two_way(ext, prow, dcol, top_p + ["Other parents"], top_p + ["Other destinations"])
+    W.write_matrix_tex(100 * mat.div(mat.sum(axis=1), axis=0), T / "tab_wp1c_parent_x_parentdest_rowpct.tex", fmt="{:.1f}",
+                       corner="Parent / Destination", row_total=pd.Series(100.0, index=mat.index),
+                       note="Row percentages: destination mix of each parent's exports, with the ten parent countries themselves as the destination columns, so the diagonal is the share shipped to the parent's own country. " + note)
 
 
 def run_scope(cube: pd.DataFrame, scope: str) -> None:
@@ -105,7 +145,8 @@ def run_scope(cube: pd.DataFrame, scope: str) -> None:
 
     # --- 1c region x region (all rows) -------------------------------------------------------
     mat_r = two_way(d, d["row_region"], d["dest_region"], ROW_ORDER, W.REGION_ORDER)
-    write_three(mat_r, T, "wp1c_region", "Parent region / Destination region", note_region)
+    write_three(mat_r, T, "wp1c_region", "Parent region / Destination region", note_region,
+                mat_yr=two_way(d, d["row_region"], d["dest_region"], ROW_ORDER, W.REGION_ORDER, value="value_yr"))
     rowpct_r = 100 * mat_r.div(mat_r.sum(axis=1), axis=0)
     W.heatmap(rowpct_r, "fig_wp1d_heatmap_region_rowpct", G, cbar_label="% of the row group's export value",
               fmt="{:.0f}", vmin=0, vmax=100, xlabel="destination region", ylabel="parent region of the exporter")
@@ -116,15 +157,18 @@ def run_scope(cube: pd.DataFrame, scope: str) -> None:
     tp = ext.groupby("iso3_parent")["value"].sum().sort_values(ascending=False)
     td = ext.groupby("country_dest")["value"].sum().sort_values(ascending=False)
 
-    def country_matrix(k):
+    def country_matrix(k, value="value"):
         top_p, top_d = list(tp.index[:k]), list(td.index[:k])
         prow = ext["iso3_parent"].where(ext["iso3_parent"].isin(top_p), "Other parents")
         dcol = ext["country_dest"].where(ext["country_dest"].isin(top_d), "Other destinations")
-        return top_p, top_d, two_way(ext, prow, dcol, top_p + ["Other parents"], top_d + ["Other destinations"])
+        return top_p, top_d, two_way(ext, prow, dcol, top_p + ["Other parents"], top_d + ["Other destinations"], value=value)
 
     top_p, top_d, mat_c = country_matrix(TOP_TAB)
     write_three(mat_c, T, "wp1c_country", "Parent / Destination",
-                f"Foreign MNEs with a recorded parent country; top {TOP_TAB} parents and top {TOP_TAB} destinations by foreign-MNE export value. " + note)
+                f"Foreign MNEs with a recorded parent country; top {TOP_TAB} parents and top {TOP_TAB} destinations by foreign-MNE export value. " + note,
+                mat_yr=country_matrix(TOP_TAB, "value_yr")[2])
+    parent_x_parentdest(ext, top_p, T, f"Foreign MNEs with a recorded parent country; top {TOP_TAB} parents by foreign-MNE export value. " + note)
+    home_share_consolidated(ext, G, T)
     # heat maps on the 15 x 15 version
     top_p, top_d, mat_m = country_matrix(TOP_MAP)
     core = mat_m.loc[top_p, top_d]
@@ -162,15 +206,17 @@ def run_scope(cube: pd.DataFrame, scope: str) -> None:
     for o in sorted(d["country_orig"].unique()):
         dd = d[d["country_orig"] == o]
         m = two_way(dd, dd["row_region"], dd["dest_region"], ROW_ORDER, W.REGION_ORDER)
+        my = two_way(dd, dd["row_region"], dd["dest_region"], ROW_ORDER, W.REGION_ORDER, value="value_yr")
         W.write_matrix_tex(100 * m.div(m.sum(axis=1), axis=0), T / f"tab_wp1c_byorigin_{o}.tex", fmt="{:.1f}",
-                           corner=f"{o}: parent region \\ destination", row_total=m.sum(axis=1) / 1e9,
-                           note=f"Exports from {o}; row percentages; last column = row total in USD bn. " + note)
+                           corner=f"{o}: parent region \\ destination", row_total=my.sum(axis=1) / 1e9,
+                           note=f"Exports from {o}; row percentages; last column = row total in USD bn per year ({W.YEARS_BY_ORIGIN.get(o, '')}). " + note)
     # compact origin x destination-region for foreign MNEs vs locals (for the text)
     for grp, sel in (("foreign", d["owner_type"].isin(["ext", "ext_unknown"])), ("local", d["owner_type"] == "local")):
         m = two_way(d[sel], d.loc[sel, "country_orig"], d.loc[sel, "dest_region"], None, W.REGION_ORDER)
+        my = two_way(d[sel], d.loc[sel, "country_orig"], d.loc[sel, "dest_region"], None, W.REGION_ORDER, value="value_yr")
         W.write_matrix_tex(100 * m.div(m.sum(axis=1), axis=0), T / f"tab_wp1c_origin_x_destregion_{grp}.tex", fmt="{:.1f}",
-                           corner="Origin \\ Destination region", row_total=m.sum(axis=1) / 1e9,
-                           note=f"{'Foreign-MNE' if grp == 'foreign' else 'Local (unmatched) firms'} exports; row percentages; last column = row total, USD bn.")
+                           corner="Origin \\ Destination region", row_total=my.sum(axis=1) / 1e9,
+                           note=f"{'Foreign-MNE' if grp == 'foreign' else 'Local (unmatched) firms'} exports; row percentages; last column = row total, USD bn per year. {W.VAL_NOTE}")
 
 
 def main():

@@ -243,7 +243,9 @@ BEC4_ENDUSE = {
     "112": "Consumption", "122": "Consumption", "522": "Consumption", "61": "Consumption",
     "62": "Consumption", "63": "Consumption",
     "41": "Capital", "521": "Capital",
-    "321": "Mixed (motor spirit)", "51": "Mixed (passenger cars)", "7": "n.e.s.",
+    # revision 7 (Volpe): three end-use classes only -- motor spirit and goods n.e.s. (in the data: HS 27 fuels)
+    # go with the industrial supplies, passenger cars with consumption
+    "321": "Intermediate", "51": "Consumption", "7": "Intermediate",
 }
 BEC4_LABEL = {
     "111": "Food & bev., primary, for industry", "112": "Food & bev., primary, for households",
@@ -255,7 +257,7 @@ BEC4_LABEL = {
     "53": "Parts of transport equipment", "61": "Consumer goods, durable",
     "62": "Consumer goods, semi-durable", "63": "Consumer goods, non-durable", "7": "Goods n.e.s.",
 }
-ENDUSE_ORDER = ["Intermediate", "Consumption", "Capital", "Mixed (motor spirit)", "Mixed (passenger cars)", "n.e.s."]
+ENDUSE_ORDER = ["Intermediate", "Consumption", "Capital"]
 
 # Agro INPUTS (Volpe: "insumos agro") -- hand-made HS 2007 flag, cross-checked against BEC end use
 AGRO_INPUT_HS2 = {31}                                         # fertilizers
@@ -338,7 +340,7 @@ def build_classifications(force: bool = False) -> pd.DataFrame:
     bec["SITC3"] = bec["SITC3"].astype(str).str.strip()
     sitc = bec.drop_duplicates("hs07_6d")[["hs07_6d", "SITC3", "BEC5"]]
     bec4 = modal[["hs07_6d", "BEC4"]].merge(sitc, on="hs07_6d", how="left").rename(columns={"BEC4": "bec4", "SITC3": "sitc3_unsd", "BEC5": "bec5"})
-    bec4["bec_enduse"] = bec4["bec4"].map(BEC4_ENDUSE).fillna("n.e.s.")
+    bec4["bec_enduse"] = bec4["bec4"].map(BEC4_ENDUSE)          # unmapped BEC codes stay NaN (none in the data)
     bec4["bec4_label"] = bec4["bec4"].map(BEC4_LABEL).fillna(bec4["bec4"])
 
     # SITC Rev.3 from the WITS text concordance (codes are 3-5 digits with leading zeros preserved;
@@ -476,7 +478,40 @@ def mne_flags(cube: pd.DataFrame) -> pd.DataFrame:
         d["val_ext"] = d["value"] * (d["owner_type"] == "ext")
     d["val_ext_known"] = d["value"] * (d["owner_type"] == "ext")
     d["val_ext_unknown"] = d["value"] * (d["owner_type"] == "ext_unknown")
+    # annual averages (revision 7): each origin's value divided by the number of years it is observed, so that a
+    # sum over rows is the region's average annual flow. Shares keep using the pooled `value` columns.
+    ny = d.groupby("country_orig")["year"].transform("nunique").astype(float)
+    for c in ("value", "val_total", "val_ext", "val_dom"):
+        d[f"{c}_yr"] = d[c] / ny
     return d
+
+
+YEARS_BY_ORIGIN = {"ARG": "2011--2019", "CHL": "2009--2022", "COL": "2010--2021", "CRI": "2010--2019", "DOM": "2012--2019",
+                   "PER": "2010--2019", "PRY": "2012--2020", "SLV": "2006--2018", "URY": "2010--2019"}
+VAL_HDR = r"\$bn/yr"      # column header for annual-average values
+VAL_NOTE = ("Dollar values are annual averages: each origin's pooled value divided by the number of years it is observed "
+            "(ARG 2011--2019, CHL 2009--2022, COL 2010--2021, CRI 2010--2019, DOM 2012--2019, PER 2010--2019, PRY 2012--2020, "
+            "SLV 2006--2018, URY 2010--2019); shares are computed on the pooled values.")
+
+# OECD members (38) -- used to split the foreign bar into OECD- and non-OECD-parent multinationals (revision 7)
+OECD_CODES = {"AUS", "AUT", "BEL", "CAN", "CHL", "COL", "CRI", "CZE", "DNK", "EST", "FIN", "FRA", "DEU", "GRC", "HUN", "ISL",
+              "IRL", "ISR", "ITA", "JPN", "KOR", "LVA", "LTU", "LUX", "MEX", "NLD", "NZL", "NOR", "POL", "PRT", "SVK", "SVN",
+              "ESP", "SWE", "CHE", "TUR", "GBR", "USA"}
+
+# Tax havens and conduit jurisdictions (revision 7). Dependencies are consolidated into their sovereign; the
+# stand-alone havens are pooled into one group when parents are consolidated.
+HAVEN_SOVEREIGN = {**{c: "GBR" for c in ("AIA", "BMU", "VGB", "CYM", "GIB", "GGY", "IMN", "JEY", "MSR", "TCA", "FLK", "SHN")},
+                   **{c: "NLD" for c in ("ABW", "CUW", "SXM", "BES", "ANT")}, **{c: "USA" for c in ("PRI", "VIR", "GUM", "ASM")},
+                   **{c: "CHN" for c in ("HKG", "MAC")}, **{c: "FRA" for c in ("MCO",)}}
+HAVEN_STANDALONE = {"LIE", "CHE", "LUX", "PAN", "BHS", "BRB", "BLZ", "CYP", "MLT", "MUS", "SYC", "MHL", "LBR", "VUT", "WSM",
+                    "AND", "SMR", "ARE", "SGP", "IRL"}
+HAVEN_GROUP_LABEL = "Tax havens & conduits"
+
+
+def consolidate_parent(code: pd.Series) -> pd.Series:
+    """Parent country with dependencies folded into their sovereign and stand-alone havens pooled."""
+    out = code.map(HAVEN_SOVEREIGN).fillna(code)
+    return out.where(~out.isin(HAVEN_STANDALONE), HAVEN_GROUP_LABEL)
 
 
 TOP_K_FIG = 10  # parents shown individually in every figure/table that splits the foreign bar by home country (2026-09-08, rev. 3)

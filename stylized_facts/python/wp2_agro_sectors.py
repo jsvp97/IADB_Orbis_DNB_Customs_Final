@@ -57,7 +57,8 @@ def agg(d: pd.DataFrame, by: str, order=None, min_share=MIN_SHARE_TABLE, other_l
     if len(small) > 1:
         dd[by] = dd[by].where(~dd[by].isin(small), other_label)
     g = dd.groupby(by, as_index=False).agg(total_value=("value", "sum"), val_ext=("val_ext", "sum"), val_dom=("val_dom", "sum"),
-                                           val_total=("val_total", "sum"), n_hs6=("hs07_6d", "nunique"))
+                                           val_total=("val_total", "sum"), n_hs6=("hs07_6d", "nunique"),
+                                           total_value_yr=("value_yr", "sum"), val_total_yr=("val_total_yr", "sum"))
     for k in ("ext", "dom", "total"):
         g[f"sh_{k}"] = g[f"val_{k}"] / g["total_value"]
     g["sh_of_scope"] = g["total_value"] / g["total_value"].sum()
@@ -83,12 +84,12 @@ def lead_parents(dd: pd.DataFrame, by: str, k: int = 3) -> pd.Series:
 def write_split_table(g: pd.DataFrame, label_col: str, hdr: str, path: Path, leads: pd.Series, note: str) -> None:
     """Total exports | MNE exports | % foreign | % domestic | leading parents (top 3)."""
     lines = [r"\begin{tabular}{@{}l r r r r l@{}}", r"\toprule",
-             f"{hdr} & Total exports (\\$bn) & MNE exports (\\$bn) & Foreign (\\%) & Domestic (\\%) & Leading parents (share of foreign) \\\\", r"\midrule"]
+             f"{hdr} & Total exports ({W.VAL_HDR}) & MNE exports ({W.VAL_HDR}) & Foreign (\\%) & Domestic (\\%) & Leading parents (share of foreign) \\\\", r"\midrule"]
     for _, r in g.iterrows():
-        lines.append(f"{W.tex_escape(r[label_col])} & {r['total_value'] / 1e9:,.1f} & {r['val_total'] / 1e9:,.1f} & {100 * r['sh_ext']:.1f} & {100 * r['sh_dom']:.1f} & {leads.get(r[label_col], '--')} \\\\")
+        lines.append(f"{W.tex_escape(r[label_col])} & {r['total_value_yr'] / 1e9:,.1f} & {r['val_total_yr'] / 1e9:,.1f} & {100 * r['sh_ext']:.1f} & {100 * r['sh_dom']:.1f} & {leads.get(r[label_col], '--')} \\\\")
     tv, tm = g["total_value"].sum(), g["val_total"].sum()
-    lines += [r"\midrule", f"All & {tv / 1e9:,.1f} & {tm / 1e9:,.1f} & {100 * g['val_ext'].sum() / tv:.1f} & {100 * g['val_dom'].sum() / tv:.1f} & \\\\",
-              r"\bottomrule", rf"\multicolumn{{6}}{{p{{0.95\textwidth}}}}{{\footnotesize {note} Foreign / Domestic = share of the row's export value; leading parents = the three largest parent countries among the row's foreign MNEs with their share of the row's foreign-MNE value.}} \\", r"\end{tabular}"]
+    lines += [r"\midrule", f"All & {g['total_value_yr'].sum() / 1e9:,.1f} & {g['val_total_yr'].sum() / 1e9:,.1f} & {100 * g['val_ext'].sum() / tv:.1f} & {100 * g['val_dom'].sum() / tv:.1f} & \\\\",
+              r"\bottomrule", rf"\multicolumn{{6}}{{p{{0.95\textwidth}}}}{{\footnotesize {note} Foreign / Domestic = share of the row's export value; leading parents = the three largest parent countries among the row's foreign MNEs with their share of the row's foreign-MNE value. {W.VAL_NOTE}}} \\", r"\end{tabular}"]
     W.write_tex(lines, path)
 
 
@@ -98,13 +99,11 @@ def hbar_2def(g: pd.DataFrame, labels, fname: str, gdir: Path, xmax: float = 1.0
     fig, ax = plt.subplots(figsize=(9, max(3.2, 0.42 * n + 1.6)))
     ax.barh(y + bh / 2, g["sh_ext"], bh, color=W.C_MNE_EXT, label="Foreign MNEs")
     ax.barh(y - bh / 2, g["sh_dom"], bh, color=W.C_MNE_DOM, edgecolor="#9e9e9e", linewidth=0.5, label="Domestic MNEs")
-    vfmt = "${:,.2f}bn" if g["total_value"].max() < 20e9 else "${:,.1f}bn"
     for yi, r in zip(y, g.itertuples()):
         ax.text(r.sh_ext + 0.006, yi + bh / 2, f"{r.sh_ext:.2f}", va="center", fontsize=8)
         ax.text(r.sh_dom + 0.006, yi - bh / 2, f"{r.sh_dom:.2f}", va="center", fontsize=8)
-        ax.text(xmax * 0.995, yi, vfmt.format(r.total_value / 1e9), va="center", ha="right", fontsize=8, color="#333333")
     ax.set_yticks(y); ax.set_yticklabels([textwrap.fill(str(l), 40) for l in labels], fontsize=9); ax.set_xlim(0, xmax)
-    ax.set_xlabel("Share in export value (value-weighted); right margin = total exports of the row", fontsize=10)
+    ax.set_xlabel("Share in export value (value-weighted); rows ordered by export value", fontsize=10)
     h, l = ax.get_legend_handles_labels()
     fig.legend(h, l, frameon=False, fontsize=9, loc="lower center", ncol=2, bbox_to_anchor=(0.5, 0.0))
     fig.tight_layout(rect=(0, 0.5 / fig.get_figheight(), 1, 1))   # leave a strip under the x-label for the legend
@@ -191,8 +190,9 @@ def four_sectors(cube: pd.DataFrame, fdpy_naics: pd.DataFrame | None) -> None:
     dd["dest_region"] = dd["country_dest"].map(W.classify_region)
     e = dd[dd["owner_type"].isin(["ext", "ext_unknown"])]
     m = pd.crosstab(e["sector4"], e["dest_region"], values=e["value"], aggfunc="sum").fillna(0.0).reindex(W.SECTOR_ORDER).reindex(columns=W.REGION_ORDER, fill_value=0.0)
+    my = pd.crosstab(e["sector4"], e["dest_region"], values=e["value_yr"], aggfunc="sum").fillna(0.0).reindex(W.SECTOR_ORDER).reindex(columns=W.REGION_ORDER, fill_value=0.0)
     W.write_matrix_tex(100 * m.div(m.sum(axis=1), axis=0), T / "tab_wp2_sector_x_destregion_foreign.tex", fmt="{:.1f}", corner="Sector / Destination region",
-                       row_total=m.sum(axis=1) / 1e9, note="Foreign-MNE exports: destination mix of each sector, row percentages; last column = row total, USD bn.")
+                       row_total=my.sum(axis=1) / 1e9, note=f"Foreign-MNE exports: destination mix of each sector, row percentages; last column = row total, USD bn per year. {W.VAL_NOTE}")
     print("\n=== four sectors:\n" + g[["sector4", "total_value", "val_total", "sh_ext", "sh_dom", "n_hs6"]].to_string())
     if fdpy_naics is not None:
         f = fdpy_naics[(~fdpy_naics["country_orig"].isin(W.excluded_origins())) & (fdpy_naics["value_fob"] > 0)]
@@ -251,16 +251,17 @@ def sector_subclassifications(cube: pd.DataFrame, cls: pd.DataFrame, scope: str)
     m = pd.crosstab(dd["hs_section"], dd["bec_enduse"], values=dd["value"], aggfunc="sum").fillna(0.0)
     m = m.reindex([s for s in W.HS_SECTION_ORDER if s in m.index]).reindex(columns=[c for c in W.ENDUSE_ORDER if c in m.columns])
     e = pd.crosstab(dd["hs_section"], dd["bec_enduse"], values=dd["val_ext"], aggfunc="sum").reindex_like(m)
-    W.write_matrix_tex(m / 1e9, T / "tab_wp2_section_x_enduse_value.tex", fmt="{:,.1f}", corner="HS section / BEC end use", row_total=m.sum(axis=1) / 1e9, col_total=m.sum(axis=0) / 1e9, note="Export value, USD bn. " + note)
+    my = pd.crosstab(dd["hs_section"], dd["bec_enduse"], values=dd["value_yr"], aggfunc="sum").reindex_like(m).fillna(0.0)
+    W.write_matrix_tex(my / 1e9, T / "tab_wp2_section_x_enduse_value.tex", fmt="{:,.1f}", corner="HS section / BEC end use", row_total=my.sum(axis=1) / 1e9, col_total=my.sum(axis=0) / 1e9, note=f"Export value, USD bn per year. {W.VAL_NOTE} " + note)
     W.write_matrix_tex(100 * e / m.replace(0, np.nan), T / "tab_wp2_section_x_enduse_foreignshare.tex", fmt="{:.1f}", corner="HS section / BEC end use", note="Foreign-MNE share of export value, percent. " + note)
     if scope == "agro":
-        inp = d[d["agro_input"] == 1].groupby("hs07_6d").agg(value=("value", "sum"), e=("val_ext", "sum"), m=("val_dom", "sum")).sort_values("value", ascending=False).head(20)
+        inp = d[d["agro_input"] == 1].groupby("hs07_6d").agg(value=("value", "sum"), value_yr=("value_yr", "sum"), e=("val_ext", "sum"), m=("val_dom", "sum")).sort_values("value", ascending=False).head(20)
         inp = inp.join(cls.set_index("hs07_6d")["hs6_desc"])
         inp["hs6_desc"] = inp["hs6_desc"].where(inp["hs6_desc"].notna(), W.hs6_desc_fallback(pd.Series(inp.index, index=inp.index)))
-        lines = [r"\begin{tabular}{@{}l p{7.5cm} r r r@{}}", r"\toprule", r"HS6 & Description & \$bn & Foreign (\%) & Domestic (\%) \\", r"\midrule"]
+        lines = [r"\begin{tabular}{@{}l p{7.5cm} r r r@{}}", r"\toprule", rf"HS6 & Description & {W.VAL_HDR} & Foreign (\%) & Domestic (\%) \\", r"\midrule"]
         for h, r in inp.iterrows():
-            lines.append(f"{h} & {W.tex_escape(str(r['hs6_desc']))} & {r['value'] / 1e9:,.2f} & {100 * r['e'] / r['value']:.0f} & {100 * r['m'] / r['value']:.0f} \\\\")
-        lines += [r"\bottomrule", r"\multicolumn{5}{p{0.9\textwidth}}{\footnotesize Top-20 HS6 lines flagged as agricultural inputs (fertilisers, agrochemicals, seeds for sowing, animal feed, agricultural machinery, live animals); Foreign / Domestic = MNE shares of the line's export value, percent.} \\", r"\end{tabular}"]
+            lines.append(f"{h} & {W.tex_escape(str(r['hs6_desc']))} & {r['value_yr'] / 1e9:,.2f} & {100 * r['e'] / r['value']:.0f} & {100 * r['m'] / r['value']:.0f} \\\\")
+        lines += [r"\bottomrule", rf"\multicolumn{{5}}{{p{{0.9\textwidth}}}}{{\footnotesize Top-20 HS6 lines flagged as agricultural inputs (fertilisers, agrochemicals, seeds for sowing, animal feed, agricultural machinery, live animals); Foreign / Domestic = MNE shares of the line's export value, percent. {W.VAL_NOTE}}} \\", r"\end{tabular}"]
         W.write_tex(lines, T / "tab_wp2_top_inputs_hs6.tex")
 
 

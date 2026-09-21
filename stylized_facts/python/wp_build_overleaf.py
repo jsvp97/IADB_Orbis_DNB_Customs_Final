@@ -262,6 +262,9 @@ def fact_block(sc: str, L: list, tag: str, with_originals=True) -> None:
         L.append(fig("sectors", "fig_wp3_us_share_origin_sector", "Share of each origin's export value moved by multinationals with a US parent, all goods and by sector.", "f1_us_ox_sector", 1.0,
                      "Share of the cell's export value (all destinations); origins sorted by the all-goods share. Sector versions of Figure~\\ref{fig:f1_parent_all} are in \\emph{WP\\_sectors}; this figure replaces them for the US-parent question."))
         L.append(tab("sectors", "Tables", "tab_wp3_us_share_origin_sector.tex", "US-parent MNE share of exports and US-parent export value, by origin and sector", "us_ox_sector"))
+        L.append(fig(sc, "fig_wp3_us_three_shares_total", "Exports of the nine origins: share going to the USA, share carried by US-parent MNEs, and both (same denominator: total exports; revision 7).", "us3_total", 0.6))
+        L.append(fig(sc, "fig_wp3_us_three_shares_origin", "The same three shares by origin.", "us3_origin", 1.0))
+        L.append(tab(sc, "Tables", "tab_wp3_us_three_shares.tex", "Exports going to the USA, carried by US-parent MNEs, and both, as shares of total exports: all origins and by origin", "us3_tab"))
     # ---------------- Fact 2
     L.append(sec("Fact 2 --- Foreign multinationals specialize in complex products, domestic ones in primary goods", f"f2_{tag}"))
     if not exists(sc, "Graphs", "fig_wp0_fig2_pci.pdf"):
@@ -288,6 +291,9 @@ exhibits have no content here."""))
     L.append(fig(sc, "fig_wp1d_heatmap_country_rowpct", f"{P}Top-15 parents $\\times$ top-15 destinations: \\% of the parent's export value going to each destination.", f"1d_row_{tag}", 1.0))
     L.append(fig(sc, "fig_wp1d_heatmap_country_cellpct", f"{P}Top-15 parents $\\times$ top-15 destinations: cell share of all foreign-MNE export value (\\%).", f"1d_cell_{tag}", 1.0))
     L.append(fig(sc, "fig_wp1d_home_share_by_parent", f"{P}Share of each parent's export value shipped to the parent's own country.", f"1d_home_{tag}", 0.85))
+    L.append(tab(sc, "Tables", "tab_wp1c_parent_x_parentdest_rowpct.tex", f"{P}Top-10 parents $\\times$ the same ten countries as destinations (row \\%): the diagonal is the home share (revision 7)", f"1c_pxp_{tag}"))
+    L.append(fig(sc, "fig_wp1d_home_share_by_parent_consolidated", f"{P}Home share with parents consolidated: dependencies folded into their sovereign, stand-alone tax havens and conduits pooled (revision 7).", f"1d_home_cons_{tag}", 0.85))
+    L.append(tab(sc, "Tables", "tab_wp1d_home_share_by_parent_consolidated.tex", f"{P}Home share by consolidated parent (numbers behind the figure)", f"1d_home_cons_tab_{tag}"))
     if sc == "all":
         L.append(fig("sectors", "fig_wp3_home_share_by_parent_sectors", "Share of each parent's export value shipped to the parent's own country: all goods and the three sectors, top-10 parents.", "1d_home_sectors", 0.95,
                      "Hatched bars: the parent exports less than \\$1bn in the sector, so the share is fragile; the parent's exports in each scope are in parentheses."))
@@ -369,6 +375,7 @@ def fact2_body(sc: str, L: list, tag: str, P: str) -> None:
     L.append(sub("Variant: split by the multinational's home country (item 1a)"))
     L.append(fig(sc, "fig_wp1a_pci_by_parent", f"{P}Figure 2 with the foreign bar split by parent country.", f"f2_parent_{tag}", 0.92))
     L.append(fig(sc, "fig_wp1a_lall_by_parent", f"{P}Figure 3 with the foreign bar split by parent country.", f"f3_parent_{tag}", 0.92))
+    L.append(fig(sc, "fig_wp1a_pci_lall_by_oecd", f"{P}Figures 2 (Panel A) and 3 (Panel B) with the foreign bar split into OECD-parent and non-OECD-parent multinationals (revision 7).", f"f23_oecd_{tag}", 1.0))
     L.append(sub("Variant: other measures of product sophistication; substitution elasticities (item 1b)"))
     L.append(fig(sc, "fig_wp1b_panel_quintiles", f"{P}Figure 2 redrawn for six sophistication measures (foreign navy, domestic gray; quintiles over the scope's HS6 products).", f"f2_panel_{tag}", 1.0))
     L.append(fig(sc, "fig_wp1b_sigma_fgo_abs_quintile", f"{P}Figure 2 with $|\\sigma|$ from Fontagn\\'e, Guimbard and Orefice (2022) in place of the PCI.", f"f2_fgo_{tag}", 0.78))
@@ -382,6 +389,7 @@ def fact2_body(sc: str, L: list, tag: str, P: str) -> None:
     L.append(fig(sc, "fig_wp1b_rauch2", f"{P}Foreign vs domestic MNE shares of export value: differentiated vs non-differentiated products (Rauch 1999; non-differentiated = reference-priced + homogeneous).", f"f_rauch2_{tag}", 0.7))
     L.append(tab(sc, "Tables", "tab_wp1b_bec.tex", f"{P}MNE shares by BEC end use", f"bec_{tag}"))
     L.append(tab(sc, "Regressions", "reg_wp1b_odpy_fgo.tex", f"{P}Note's Table A.4 ladder with the FGO elasticity added (ODPY cells, MNE value share)", f"reg_fgo_{tag}"))
+    L.append(tab(sc, "Regressions", "reg_wp1b_odpy_measures.tex", f"{P}Product sophistication and MNE shares: PCI, Lall categories and Rauch classes, each in a separate regression (revision 7)", f"reg_meas_{tag}", size=r"\footnotesize"))
 
 
 def numbers_appendix(sc: str, L: list, tag: str) -> None:
@@ -503,111 +511,114 @@ recorded parent country count as foreign); unmatched exporters are \emph{local} 
 and pooled over 2006--2022. Sectors: agriculture = HS 01--24; mining and fuels = HS 25--27 and 71; manufacturing =
 HS 28--97 excluding 71. Where the foreign bar is split by the parent's country, the ten largest parent countries
 are shown individually and every other foreign multinational is pooled. Regressions use plain logarithms and
-cluster standard errors at origin--destination.
+cluster standard errors at origin--destination. Dollar values are annual averages: each origin's pooled
+value divided by the number of years it is observed (Argentina 2011--2019, Chile 2009--2022, Colombia
+2010--2021, Costa Rica 2010--2019, Dominican Republic 2012--2019, Peru 2010--2019, Paraguay 2012--2020,
+El Salvador 2006--2018, Uruguay 2010--2019).
 """
 
 
+MAIN, APP = "[Main text]", "[Appendix]"
+
+
+def panel_fig(items, caption, label, width=0.48, note=""):
+    """One figure with lettered panels (A, B, C ...), each an existing graph. `items` = [(scope, name, panel title)]."""
+    parts = []
+    for k, (scope, name, title) in enumerate(items):
+        if not exists(scope, "Graphs", f"{name}.pdf"):
+            return missing("figure", scope, name)
+        path = copy_fig(scope, name)
+        parts.append(rf"\begin{{minipage}}[t]{{{width}\textwidth}}\centering\textbf{{Panel {chr(65 + k)}. {title}}}\\[2pt]"
+                     rf"\includegraphics[width=\linewidth,height=0.42\textheight,keepaspectratio]{{{path}}}\end{{minipage}}")
+    sep = r"\hfill" if width <= 0.5 else r"\\[8pt]"
+    n = rf"\par\vspace{{2pt}}\parbox{{0.92\textwidth}}{{\footnotesize\textit{{Note:}} {note}}}" if note else ""
+    return rf"\begin{{figure}}[H]\centering" + sep.join(parts) + rf"\caption{{{caption}}}\label{{fig:{label}}}{n}\end{{figure}}" + "\n"
+
+
 def build_draft() -> Path:
-    """The working-paper draft: only the exhibits the internal review marks MOSTRAR (main text) and
-    APOYO / APENDICE (appendix), in the review's order, with clean captions and no reading guide."""
+    """The working-paper draft for the coauthors (revision 7). Every exhibit keeps the order of the 2026-09-18 draft
+    and carries a tag in its caption -- [Main text] or [Appendix] -- following Volpe's list; exhibits he dropped are
+    gone. Dollar values are annual averages; figures carry no dollar values."""
     L = [preamble("Multinational Firms and Trade in Latin America", "Six stylized facts --- working paper draft",
                   datestr=date.today().strftime("%B %Y"), toc=False)]
     L.append(DRAFT_DATA)
     A, M, MI, S = "all", "manufacturing", "mining", "sectors"
     # ---- Fact 1
     L.append(sec("Fact 1 --- Multinational corporations account for a large share of export values across countries"))
-    L.append(fig(A, "fig_wp0_fig1_origin", "MNE share of export value by origin: foreign and domestic multinationals.", "d_f1", 0.8))
-    L.append(fig(A, "fig_wp1a_origin_by_parent", "MNE share of export value by origin, foreign bar split by the parent's country (top 10, other foreign, domestic).", "d_f1_parent", 0.92))
-    for sc, lab in (("agro", "Agriculture"), (M, "Manufacturing"), (MI, "Mining and fuels")):
-        L.append(fig(sc, "fig_wp0_fig1_origin", f"{lab}: MNE share of export value by origin, foreign and domestic.", f"d_f1_{sc}", 0.8))
-    L.append(tab(S, "Tables", "tab_wp2_four_sectors.tex", "The four sectors: total and MNE exports, foreign and domestic shares, leading parents", "d_sectors"))
-    L.append(fig(S, "fig_wp2_four_sectors", "Foreign and domestic MNE shares of export value by sector.", "d_sectors_fig", 0.95))
-    L.append(tab(S, "Tables", "tab_wp2_origin_x_sector.tex", "Composition of each origin's exports by sector (Panel A) and foreign-MNE share within origin $\\times$ sector (Panel B)", "d_ox"))
+    L.append(fig(A, "fig_wp0_fig1_origin", f"{MAIN} MNE share of export value by origin: foreign and domestic multinationals.", "d_f1", 0.8))
+    L.append(fig(A, "fig_wp1a_origin_by_parent", f"{APP} MNE share of export value by origin, foreign bar split by the parent's country (top 10, other foreign, domestic).", "d_f1_parent", 0.92))
+    L.append(fig(S, "fig_wp3_fig1_by_sector_panels", f"{APP} MNE share of export value by origin within each sector: foreign and domestic multinationals (Panel A agriculture, Panel B manufacturing, Panel C mining and fuels).", "d_f1_sectors", 1.0))
+    L.append(tab(S, "Tables", "tab_wp2_four_sectors.tex", f"{APP} The four sectors: total and MNE exports, foreign and domestic shares, leading parents", "d_sectors"))
     L.append(sub("The United States"))
-    L.append(fig(S, "fig_wp3_us_share_origin_sector", "Share of each origin's export value moved by multinationals with a US parent, all goods and by sector.", "d_us_ox", 1.0))
-    L.append(tab(S, "Tables", "tab_wp3_us_share_origin_sector.tex", "US-parent MNE share of exports and US-parent export value, by origin and sector", "d_us_ox_tab"))
+    L.append(fig(A, "fig_wp3_us_three_shares_total", f"{MAIN} Exports of the nine origins: share going to the United States, share carried by US-parent MNEs, and share carried by US-parent MNEs and going to the United States (same denominator: total exports).", "d_us3_total", 0.6))
+    L.append(fig(A, "fig_wp3_us_three_shares_origin", f"{MAIN} The same three shares by origin (denominator: the origin's total exports).", "d_us3_origin", 1.0))
+    L.append(tab(A, "Tables", "tab_wp3_us_three_shares.tex", f"{MAIN} Exports going to the United States, carried by US-parent MNEs, and both, as shares of total exports: all origins and by origin", "d_us3_tab"))
     # ---- Fact 2
     L.append(sec("Fact 2 --- Foreign multinationals specialize in complex products, domestic ones in primary goods"))
-    L.append(fig(A, "fig_wp0_fig2_pci", "MNE share of export value by quintile of the Product Complexity Index (Q1 = least complex).", "d_f2", 0.78))
-    L.append(fig(A, "fig_wp0_fig3_lall", "MNE share of export value by Lall (2000) technology category.", "d_f3", 0.78))
-    L.append(fig(A, "fig_wp1a_pci_by_parent", "MNE share by PCI quintile, foreign bar split by the parent's country.", "d_f2_parent", 0.92))
-    L.append(fig(A, "fig_wp1a_lall_by_parent", "MNE share by Lall category, foreign bar split by the parent's country.", "d_f3_parent", 0.92))
-    L.append(tab(A, "Tables", "tab_wp1b_rauch.tex", "MNE shares by Rauch (1999) class", "d_rauch"))
-    L.append(tab(A, "Tables", "tab_wp1b_rauch2.tex", "MNE shares: differentiated vs non-differentiated products (Rauch 1999; non-differentiated = reference-priced + homogeneous)", "d_rauch2"))
-    L.append(fig(A, "fig_wp1b_rauch2", "Foreign vs domestic MNE shares of export value: differentiated vs non-differentiated products.", "d_rauch2_fig", 0.7))
-    L.append(tab(A, "Tables", "tab_wp1b_bec.tex", "MNE shares by BEC end use", "d_bec"))
-    L.append(tab(A, "Regressions", "reg_wp1b_odpy_fgo.tex", "Product sophistication and MNE shares: PCI, substitution elasticity and upstreamness (origin--destination--product--year cells)", "d_ladder"))
+    L.append(panel_fig([(A, "fig_wp0_fig2_pci", "By quintile of the Product Complexity Index (Q1 = least complex)"), (A, "fig_wp0_fig3_lall", "By Lall (2000) technology category")],
+                       f"{MAIN} MNE share of export value by product sophistication: foreign and domestic multinationals.", "d_f2f3", width=0.72))
+    L.append(fig(A, "fig_wp1a_pci_lall_by_oecd", f"{MAIN} MNE share by PCI quintile (Panel A) and Lall category (Panel B), foreign bar split into OECD-parent and non-OECD-parent multinationals.", "d_f2_oecd", 1.0,
+                 "OECD = the 38 member countries; matched firms with no recorded parent country are counted with the non-OECD parents."))
+    L.append(fig(A, "fig_wp1b_rauch", f"{APP} Foreign vs domestic MNE shares of export value by Rauch (1999) class: differentiated, reference-priced, homogeneous.", "d_rauch3", 0.7))
+    L.append(tab(A, "Tables", "tab_wp1b_rauch2.tex", f"{MAIN} MNE shares: differentiated vs non-differentiated products (Rauch 1999; non-differentiated = reference-priced + homogeneous)", "d_rauch2"))
+    L.append(fig(A, "fig_wp1b_rauch2", f"{MAIN} Foreign vs domestic MNE shares of export value: differentiated vs non-differentiated products.", "d_rauch2_fig", 0.7))
+    L.append(tab(A, "Tables", "tab_wp1b_bec.tex", f"{MAIN} MNE shares by BEC end use: intermediate, consumption and capital goods", "d_bec"))
+    L.append(tab(A, "Regressions", "reg_wp1b_odpy_measures.tex", f"{MAIN} Product sophistication and MNE shares: PCI, Lall categories and Rauch classes, each in a separate regression (origin--destination--product--year cells)", "d_ladder", size=r"\footnotesize"))
     L.append(sub("Within manufacturing"))
-    L.append(fig(M, "fig_wp0_fig2_pci", "Manufacturing: MNE share of export value by PCI quintile (quintiles over manufacturing HS6 products).", "d_f2_manuf", 0.78))
-    L.append(tab(M, "Tables", "tab_wp1b_rauch2.tex", "Manufacturing: MNE shares, differentiated vs non-differentiated products", "d_rauch2_manuf"))
-    L.append(fig(M, "fig_wp1b_rauch2", "Manufacturing: foreign vs domestic MNE shares, differentiated vs non-differentiated products.", "d_rauch2_manuf_fig", 0.7))
+    L.append(fig(M, "fig_wp0_fig2_pci", f"{APP} Manufacturing: MNE share of export value by PCI quintile (quintiles over manufacturing HS6 products).", "d_f2_manuf", 0.78))
+    L.append(fig(M, "fig_wp1b_rauch", f"{MAIN} Manufacturing: foreign vs domestic MNE shares by Rauch (1999) class: differentiated, reference-priced, homogeneous.", "d_rauch3_manuf", 0.7))
+    L.append(fig(M, "fig_wp1b_rauch2", f"{MAIN} Manufacturing: foreign vs domestic MNE shares, differentiated vs non-differentiated products.", "d_rauch2_manuf_fig", 0.7))
     # ---- Fact 3
     L.append(sec("Fact 3 --- Multinational corporations from a small set of countries dominate exports"))
-    L.append(fig(A, "fig_wp1a_parent_share", "Foreign-MNE export value by the parent's country, top 15 and other.", "d_f4", 0.78))
-    L.append(tab(A, "Tables", "tab_wp1a_parent_share.tex", "Foreign-MNE export value by parent country", "d_f4_tab"))
-    L.append(tab(A, "Tables", "tab_wp1c_country_rowpct.tex", "Top-10 parents $\\times$ top-10 destinations: destination mix of each parent's exports (row \\%)", "d_pxd"))
-    L.append(fig(A, "fig_wp1d_home_share_by_parent", "Share of each parent's export value shipped to the parent's own country.", "d_home", 0.85))
-    L.append(fig(S, "fig_wp3_home_share_by_parent_sectors", "Share of each parent's export value shipped to the parent's own country: all goods and the three sectors.", "d_home_sectors", 0.95,
-                 "Hatched bars: the parent exports less than \\$1bn in the sector; the parent's exports in each scope are in parentheses."))
-    L.append(tab(S, "Tables", "tab_wp3_home_share_by_parent_sectors.tex", "Home share by parent, all goods and by sector", "d_home_sectors_tab", size=r"\footnotesize"))
+    L.append(fig(A, "fig_wp1a_parent_share", f"{MAIN} Foreign-MNE export value by the parent's country, top 15 and other.", "d_f4", 0.78))
+    L.append(tab(A, "Tables", "tab_wp1c_country_rowpct.tex", f"{MAIN} Top-10 parents $\\times$ top-10 destinations: destination mix of each parent's exports (row \\%)", "d_pxd"))
+    L.append(tab(A, "Tables", "tab_wp1c_parent_x_parentdest_rowpct.tex", f"{MAIN} Top-10 parents $\\times$ the same ten countries as destinations (row \\%): the diagonal is the share shipped to the parent's own country", "d_pxp"))
+    L.append(fig(A, "fig_wp1d_home_share_by_parent", f"{APP} Share of each parent's export value shipped to the parent's own country, parents as recorded.", "d_home", 0.85))
+    L.append(fig(A, "fig_wp1d_home_share_by_parent_consolidated", f"{APP} Share of each parent's export value shipped to the parent's own country, parents consolidated: dependencies folded into their sovereign (Bermuda, Cayman, BVI, Jersey, \\ldots\\ $\\to$ GBR; Cura\\c{{c}}ao, Aruba $\\to$ NLD; Puerto Rico $\\to$ USA; Hong Kong, Macao $\\to$ CHN) and the stand-alone tax havens and conduits (LIE, CHE, LUX, PAN, \\ldots) pooled.", "d_home_cons", 0.85))
+    L.append(fig(S, "fig_wp3_home_share_by_parent_sectors", f"{APP} Share of each parent's export value shipped to the parent's own country: all goods and the three sectors, top-10 parents.", "d_home_sectors", 0.95,
+                 "Hatched bars: the parent's pooled exports in the sector are below \\$1bn, so the share is fragile."))
     L.append(sub("The United States"))
-    L.append(fig(S, "fig_wp3_to_usa_carriers_total_manuf", "Exports to the United States by origin: share moved by US-parent MNEs, other foreign MNEs, domestic MNEs and local firms --- all goods (left) and manufacturing (right).", "d_to_usa", 1.0))
-    L.append(tab(S, "Tables", "tab_wp3_to_usa_carriers_by_sector.tex", "Exports to the United States by sector: who carries them (\\%)", "d_to_usa_sector"))
-    L.append(fig(A, "fig_wp3_dest_carriers", "The largest destination markets (EU-27 pooled): share of the value reaching each one moved by MNEs with a parent in the destination, US-parent MNEs, other foreign MNEs, domestic MNEs and local firms.", "d_dest", 0.95))
-    L.append(tab(A, "Tables", "tab_wp3_dest_carriers.tex", "The largest destination markets: who carries the exports that reach them (\\%)", "d_dest_tab", size=r"\footnotesize"))
-    L.append(tab(A, "Tables", "tab_wp3_us_home_products.tex", "What US-parent MNEs ship to the United States: top-15 HS6 lines, and the US-parent share of everything the nine origins export of the line to the USA", "d_us_prod", size=r"\footnotesize"))
-    L.append(fig(A, "fig_wp3_us_home_products", "US-parent MNEs' share of the nine origins' exports to the United States, for the 15 lines they ship home in the largest value.", "d_us_prod_fig", 0.95))
-    for o in ("DOM", "SLV", "CRI"):
-        L.append(fig(A, f"fig_wp1d_home_share_by_parent_{o}", f"{o}: share of each parent's export value from {o} shipped to the parent's own country (top-10 parents).", f"d_home_{o}", 0.75))
+    L.append(fig(S, "fig_wp3_to_usa_carriers_total_manuf", f"{APP} Exports to the United States by origin: share moved by US-parent MNEs, other foreign MNEs, domestic MNEs and local firms --- all goods (left) and manufacturing (right).", "d_to_usa", 1.0,
+                 "Denominator: the origin's exports to the United States (not its total exports, which is the denominator of the three-share table above)."))
+    L.append(tab(S, "Tables", "tab_wp3_to_usa_carriers_by_sector.tex", f"{APP} Exports to the United States by sector: who carries them (\\%)", "d_to_usa_sector"))
+    L.append(fig(A, "fig_wp3_dest_carriers", f"{MAIN} The largest destination markets (EU-27 pooled): share of the value reaching each one moved by MNEs with a parent in the destination, by US-, EU-27- and CAN-parent MNEs (when the destination is not their home), other foreign MNEs, domestic MNEs and local firms.", "d_dest", 1.0,
+                 "EU-27 = the 27 member states; the United Kingdom is a separate destination and a separate parent country."))
     # ---- Fact 4
     L.append(sec("Fact 4 --- A small set of large multinational groups accounts for the bulk of exports"))
-    L.append(fig(A, "fig_wp0_fig5_network", "Foreign-MNE export value and number of parents by size of the group's global affiliate network.", "d_f5", 0.7))
-    L.append(tab(A, "Tables", "tab_wp0_fig5_network.tex", "Export value and parents by global affiliate-network size", "d_f5_tab"))
+    L.append(fig(A, "fig_wp0_fig5_network", f"{MAIN} Foreign-MNE export value and number of parents by size of the group's global affiliate network.", "d_f5", 0.7))
+    L.append(tab(A, "Tables", "tab_wp0_fig5_network.tex", f"{APP} Parents and foreign-MNE export value by global affiliate-network size", "d_f5_tab"))
     # ---- Fact 5
     L.append(sec("Fact 5 --- Greater multinational presence is associated with higher trade volumes"))
-    L.append(tab(A, "Regressions", "reg_wp0_table1_repro.tex", "Multinational presence and trade volume: intensive and extensive margins", "d_t1"))
-    L.append(tab(A, "Tables", "tab_wp1e_presence_shares.tex", "MNE export value by origin: domestic share, and foreign-MNE value by the group's presence at the destination", "d_pres"))
-    L.append(tab(A, "Regressions", "reg_wp1e_counts.tex", "Intensive margin: ln(\\# MNE firms) decomposed into foreign / domestic and foreign through HQ / not through HQ", "d_counts"))
-    L.append(tab(S, "Tables", "tab_wp3_fact5_summary.tex", "Fact 5 by sector: ln(\\# foreign MNEs) and ln(\\# domestic MNEs), all goods and the three sectors", "d_f5sum"))
+    L.append(tab(A, "Regressions", "reg_wp0_table1_repro.tex", f"{MAIN} Multinational presence and trade volume: intensive and extensive margins", "d_t1"))
+    L.append(tab(A, "Tables", "tab_wp1e_presence_shares.tex", f"{APP} MNE export value by origin: domestic share, and foreign-MNE value by the group's presence at the destination", "d_pres"))
+    L.append(tab(A, "Regressions", "reg_wp1e_counts.tex", f"{MAIN} Intensive margin: ln(\\# MNE firms) decomposed into foreign / domestic and foreign through HQ / not through HQ", "d_counts"))
+    L.append(tab(A, "Regressions", "reg_wp1e_extensive.tex", f"{MAIN} Extensive margin: presence indicators decomposed into foreign / domestic and foreign through HQ / not through HQ", "d_ext"))
+    L.append(tab(S, "Tables", "tab_wp3_fact5_summary.tex", f"{APP} Fact 5 by sector, intensive margin: number of foreign and of domestic MNEs in the cell, all goods and the three sectors", "d_f5sum"))
+    L.append(tab(S, "Tables", "tab_wp3_fact5ext_summary.tex", f"{APP} Fact 5 by sector, extensive margin: presence of foreign and of domestic MNEs in the cell, all goods and the three sectors", "d_f5extsum"))
     # ---- Fact 6
     L.append(sec("Fact 6 --- Distance is a weaker barrier to trade for multinational corporations"))
-    L.append(tab(A, "Regressions", "reg_wp0_table2_repro.tex", "Distance and firm exports: multinationals split by presence at the destination", "d_t2"))
-    L.append(tab(A, "Regressions", "reg_wp1e_distance_hq.tex", "Distance and firm exports: foreign / domestic, then foreign through HQ / not through HQ", "d_dist"))
-    L.append(tab(S, "Tables", "tab_wp3_fact6_summary.tex", "Fact 6 by sector: distance elasticity and its attenuation for foreign and domestic MNEs", "d_f6sum"))
+    L.append(tab(A, "Regressions", "reg_wp0_table2_repro.tex", f"{MAIN} Distance and firm exports: multinationals split by presence at the destination", "d_t2"))
+    L.append(tab(A, "Regressions", "reg_wp1e_distance_hq.tex", f"{MAIN} Distance and firm exports: foreign / domestic, then foreign through HQ / not through HQ", "d_dist"))
+    L.append(tab(S, "Tables", "tab_wp3_fact6_summary.tex", f"{APP} Fact 6 by sector: distance elasticity and its attenuation for foreign and domestic MNEs", "d_f6sum"))
     # ---- HS6
     L.append(sec("Products"))
-    L.append(fig(A, "fig_wp1f_top20_hs6_stacked", "Top-20 HS6 products by export value: foreign MNE, domestic MNE and local shares.", "d_hs6", 1.0))
-    L.append(fig(A, "fig_wp1f_top20_hs6_by_parent", "Top-20 HS6 products: foreign bar split by the parent's country (remainder = local firms).", "d_hs6_parent", 1.0))
-    L.append(tab(A, "Tables", "tab_wp1f_hs_sections.tex", "HS sections by export value: MNE shares and leading parent", "d_sections", size=r"\footnotesize"))
-    # ---- sector sub-classifications (one or two per sector)
+    L.append(fig(A, "fig_wp1f_top20_hs6_stacked", f"{MAIN} Top-20 HS6 products by export value: foreign MNE, domestic MNE and local shares.", "d_hs6", 1.0))
+    L.append(fig(A, "fig_wp1f_top20_hs6_by_parent", f"{MAIN} Top-20 HS6 products: foreign bar split by the parent's country (remainder = local firms).", "d_hs6_parent", 1.0))
+    L.append(tab(A, "Tables", "tab_wp1f_hs_sections.tex", f"{MAIN} HS sections by export value: MNE shares and leading parent", "d_sections", size=r"\footnotesize"))
+    # ---- sector sub-classifications
     L.append(sec("Sectors"))
     for sc, stem, title in (("agro", "sitc2", "Agriculture by SITC Rev.\\,3 division"), (M, "hs_section", "Manufacturing by HS section"),
                             (M, "bec_enduse", "Manufacturing by BEC end use"), (MI, "bec_enduse", "Mining and fuels by BEC end use")):
-        L.append(tab(sc, "Tables", f"tab_wp2_{stem}.tex", f"{title}: total and MNE exports, shares, leading parents", f"d_2_{sc}_{stem}", size=r"\footnotesize"))
-    # ---- appendix: the APOYO / APENDICE exhibits
-    L.append(r"\appendix" + "\n" + sec("Appendix"))
-    L.append(fig(A, "fig_wp1b_panel_quintiles", "MNE shares by quintile for six product-sophistication measures.", "d_a_panel", 1.0))
-    L.append(tab(A, "Tables", "tab_wp1b_quintile_shares.tex", "Foreign and domestic MNE shares by quintile, six sophistication measures", "d_a_quint"))
-    L.append(tab(A, "Tables", "tab_wp1c_region_rowpct.tex", "Parent region $\\times$ destination region: destination mix of each group (row \\%)", "d_a_reg"))
-    L.append(tab(A, "Tables", "tab_wp1c_country_value.tex", "Top-10 parents $\\times$ top-10 destinations, export value (USD bn)", "d_a_pxd_val"))
-    L.append(tab(A, "Tables", "tab_wp1c_country_colpct.tex", "Top-10 parents $\\times$ top-10 destinations: who supplies each destination (column \\%)", "d_a_pxd_col"))
-    L.append(tab(A, "Tables", "tab_wp1c_origin_x_destregion_foreign.tex", "Foreign-MNE exports: destination region by origin (row \\%)", "d_a_odr_f"))
-    L.append(tab(A, "Tables", "tab_wp1c_origin_x_destregion_local.tex", "Local firms: destination region by origin (row \\%)", "d_a_odr_l"))
-    L.append(fig(A, "fig_wp1d_heatmap_country_rowpct", "Top-15 parents $\\times$ top-15 destinations: \\% of the parent's export value going to each destination.", "d_a_hm_row", 1.0))
-    L.append(fig(A, "fig_wp1d_heatmap_country_cellpct", "Top-15 parents $\\times$ top-15 destinations: cell share of all foreign-MNE export value (\\%).", "d_a_hm_cell", 1.0))
-    L.append(tab(A, "Tables", "tab_wp3_to_usa_carriers.tex", "Exports to the United States by origin, all goods: who carries them (\\%)", "d_a_to_usa"))
-    L.append(tab(A, "Tables", "tab_wp3_to_usa_top_products.tex", "The 15 largest export lines to the United States: who carries them (\\%)", "d_a_to_usa_prod", size=r"\footnotesize"))
-    L.append(fig(A, "fig_wp0_fig6_hhi", "Product-level export concentration: counting affiliates separately vs grouping them by parent.", "d_a_hhi", 0.9))
-    L.append(tab(A, "Tables", "tab_wp0_fig6_hhi.tex", "HHI, top-exporter share and effective number of exporters", "d_a_hhi_tab"))
-    L.append(tab(A, "Regressions", "reg_wp1e_extensive.tex", "Extensive margin: presence dummies decomposed into foreign / domestic and foreign through HQ / not through HQ", "d_a_ext"))
-    L.append(fig(A, "fig_wp1f_foreign_share_distribution", "Distribution of the HS6 foreign-MNE share: share of export value and MNE share of exporting firms, by bin.", "d_a_dist", 0.85))
-    L.append(tab(A, "Tables", "tab_wp1f_foreign_share_distribution.tex", "Distribution of the HS6 foreign share, numbers", "d_a_dist_tab"))
-    L.append(fig(A, "fig_wp1f_lorenz_foreign", "Concentration of exports across HS6 products: foreign-MNE exports vs all exports.", "d_a_lorenz", 0.6))
-    for stem, cap in (("by_value", "Top 30 HS6 products by export value"), ("by_foreign_value", "Top 30 HS6 products by foreign-MNE export value"),
-                      ("by_foreign_share", "HS6 products ($\\geq$ \\$500m) with the highest foreign-MNE share"), ("by_domestic_share", "HS6 products ($\\geq$ \\$500m) with the highest domestic-MNE share")):
-        L.append(tab(A, "Tables", f"tab_wp1f_top_hs6_{stem}.tex", cap, f"d_a_{stem}", size=r"\footnotesize"))
-    L.append(tab(A, "Tables", "tab_wp0_fig1_origin.tex", "Figure 1 numbers (foreign, domestic, total)", "d_a_f1n"))
-    L.append(tab(A, "Tables", "tab_wp1a_origin_by_parent.tex", "Figure 2 numbers", "d_a_f1pn"))
+        L.append(tab(sc, "Tables", f"tab_wp2_{stem}.tex", f"{MAIN} {title}: total and MNE exports, shares, leading parents", f"d_2_{sc}_{stem}", size=r"\footnotesize"))
+    L.append(tab(A, "Tables", "tab_wp3_us_home_products.tex", f"{APP} What US-parent MNEs ship to the United States: top-15 HS6 lines, the US-parent share of everything the nine origins export of the line to the USA, and the main origins", "d_us_prod", size=r"\footnotesize"))
+    # ---- the exhibits that were already in the appendix and stay
+    L.append(sec("Appendix"))
+    L.append(tab(A, "Tables", "tab_wp1c_region_rowpct.tex", f"{APP} Parent region $\\times$ destination region: destination mix of each group (row \\%)", "d_a_reg"))
+    L.append(fig(A, "fig_wp1d_heatmap_country_rowpct", f"{APP} Top-15 parents $\\times$ top-15 destinations: \\% of the parent's export value going to each destination.", "d_a_hm_row", 1.0))
+    L.append(fig(A, "fig_wp1f_foreign_share_distribution", f"{APP} Distribution of the HS6 foreign-MNE share: share of export value and MNE share of exporting firms, by bin.", "d_a_dist", 0.85))
+    L.append(tab(A, "Tables", "tab_wp1f_foreign_share_distribution.tex", f"{APP} Distribution of the HS6 foreign share, numbers", "d_a_dist_tab"))
+    L.append(tab(A, "Tables", "tab_wp0_fig1_origin.tex", f"{APP} Figure 1 numbers (foreign, domestic, total)", "d_a_f1n"))
+    L.append(tab(A, "Tables", "tab_wp1a_origin_by_parent.tex", f"{APP} Figure 2 numbers", "d_a_f1pn"))
     L.append(r"\end{document}" + "\n")
     return write_main(L)
 

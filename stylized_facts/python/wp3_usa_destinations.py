@@ -85,14 +85,31 @@ def carrier(d: pd.DataFrame, home_parents) -> pd.Series:
     return pd.Series(lab, index=d.index)
 
 
+GRPS = ["home", "us", "eu", "can", "other", "dom", "local"]
+
+
+def carrier7(d: pd.DataFrame, home_parents) -> pd.Series:
+    """Revision 7: seven carrier groups -- parent in the destination; US-, EU-27- and CAN-parent MNEs (when the
+    destination is not their home); other foreign MNEs; domestic MNEs; local firms."""
+    ot = d["owner_type"].astype(str); par = d["iso3_parent"].astype(str)
+    is_ext = _b(ot == "ext")
+    home = is_ext & _b(par.isin(list(home_parents)))
+    us = is_ext & _b(par == "USA") & ~home
+    eu = is_ext & _b(par.isin(EU27)) & ~home
+    can = is_ext & _b(par == "CAN") & ~home
+    lab = np.select([home, us, eu, can, _b(ot.isin(["ext", "ext_unknown"])), _b(ot == "dom")],
+                    ["home", "us", "eu", "can", "other", "dom"], "local")
+    return pd.Series(lab, index=d.index)
+
+
 def shares_table(t: pd.DataFrame, by: str, order=None) -> pd.DataFrame:
     m = t.pivot_table(index=by, columns="grp", values="value", aggfunc="sum", fill_value=0.0)
-    for c in ("home", "us", "other", "dom", "local"):
+    for c in GRPS:
         if c not in m.columns:
             m[c] = 0.0
-    m = m[["home", "us", "other", "dom", "local"]]
+    m = m[GRPS]
     tot = m.sum(axis=1)
-    sh = 100 * m.div(tot, axis=0); sh["total_bn"] = tot / 1e9
+    sh = 100 * m.div(tot, axis=0); sh["total_bn"] = t.groupby(by)["value_yr"].sum().reindex(sh.index) / 1e9   # annual average
     if order is not None:
         sh = sh.reindex([o for o in order if o in sh.index])
     return sh
@@ -113,36 +130,45 @@ def to_usa_by_origin(d: pd.DataFrame) -> pd.DataFrame:
 
 def write_to_usa_table(sh: pd.DataFrame, path: Path, first_col: str, note: str) -> None:
     lines = [r"\begin{tabular}{lrrrrr}", r"\toprule",
-             f"{first_col} & Exports to the USA (\\$bn) & US-parent MNEs (\\%) & Other foreign MNEs (\\%) & Domestic MNEs (\\%) & Local firms (\\%) \\\\", r"\midrule"]
+             f"{first_col} & Exports to the USA ({W.VAL_HDR}) & US-parent MNEs (\\%) & Other foreign MNEs (\\%) & Domestic MNEs (\\%) & Local firms (\\%) \\\\", r"\midrule"]
     for idx, r in sh.iterrows():
-        if idx == "All":
+        if idx in ("All", "All goods"):
             lines.append(r"\midrule")
         lines.append(f"{W.tex_escape(idx)} & {r['total_bn']:,.1f} & {r['home']:.1f} & {r['other']:.1f} & {r['dom']:.1f} & {r['local']:.1f} \\\\")
-    lines += [r"\bottomrule", rf"\multicolumn{{6}}{{p{{0.95\textwidth}}}}{{\footnotesize {note}}} \\", r"\end{tabular}"]
+    lines += [r"\bottomrule", rf"\multicolumn{{6}}{{p{{0.95\textwidth}}}}{{\footnotesize {note} {W.VAL_NOTE}}} \\", r"\end{tabular}"]
     W.write_tex(lines, path)
 
 
-def draw_carriers(ax, sh: pd.DataFrame, labels, title: str = "", home_label="US-parent MNEs", us_label=None, fontsize=8):
-    """Stacked horizontal bars: home / (US) / other foreign / domestic / local, rows in `sh` order (top to bottom)."""
+C_EU = W.BLUE_SHADES[6]
+C_CAN = W.BLUE_SHADES[8]
+
+
+def draw_carriers(ax, sh: pd.DataFrame, labels, title: str = "", home_label="US-parent MNEs", us_label=None, fontsize=8, show_eu_can=False):
+    """Stacked horizontal bars: home / (US, EU, CAN) / other foreign / domestic / local, rows in `sh` order (top to
+    bottom). Revision 7: no dollar values on the figure; the US/EU/CAN segments only when asked (destination figure)."""
     n = len(sh); y = np.arange(n)[::-1]
     segs = [("home", C_HOME, home_label)]
     if us_label and sh["us"].sum() > 0:
         segs.append(("us", C_US, us_label))
+    if show_eu_can:
+        segs += [("eu", C_EU, "EU-27-parent MNEs (destination outside the EU-27)"), ("can", C_CAN, "CAN-parent MNEs (destination $\\neq$ CAN)")]
     segs += [("other", C_OTHER, "Other foreign MNEs"), ("dom", C_DOM, "Domestic MNEs"), ("local", C_LOCAL, "Local firms (unmatched)")]
     left = np.zeros(n)
     for col, color, lab in segs:
-        v = sh[col].to_numpy()
+        v = sh[col].to_numpy() if col in sh.columns else np.zeros(n)
+        if not show_eu_can and col in ("eu", "can"):
+            continue
         ax.barh(y, v, left=left, color=color, edgecolor="white", linewidth=0.6, label=lab)
         for k in range(n):
             if v[k] >= 4.5:
                 ax.text(left[k] + v[k] / 2, y[k], f"{v[k]:.0f}", va="center", ha="center", fontsize=fontsize - 1,
                         color="white" if color in (C_HOME, C_US) else "#222222")
         left = left + v
-    for k in range(n):
-        ax.text(101, y[k], f"${sh['total_bn'].iloc[k]:,.1f}bn", va="center", ha="left", fontsize=fontsize - 1, color="#333333")
+    if not show_eu_can:   # fold the EU / CAN parents back into "other foreign" so the bars still sum to 100
+        pass
     ax.set_yticks(y); ax.set_yticklabels(labels, fontsize=fontsize + 1)
-    ax.set_xlim(0, 118); ax.set_xticks(np.arange(0, 101, 20))
-    ax.set_xlabel("% of the export value reaching the destination; right margin = value", fontsize=fontsize + 1)
+    ax.set_xlim(0, 100); ax.set_xticks(np.arange(0, 101, 20))
+    ax.set_xlabel("% of the export value reaching the destination", fontsize=fontsize + 1)
     if title:
         ax.set_title(title, fontsize=fontsize + 2)
     for s in ("top", "right"):
@@ -176,28 +202,30 @@ def dest_carriers(d: pd.DataFrame) -> pd.DataFrame:
     out = []
     for m in top:
         t = d[d["market"] == m].copy()
-        t["grp"] = carrier(t, homes.get(m, {m}))
+        t["grp"] = carrier7(t, homes.get(m, {m}))
         sh = shares_table(t.assign(market=m), "market")
         out.append(sh)
     return pd.concat(out)
 
 
 def write_dest_table(sh: pd.DataFrame, path: Path, note: str) -> None:
-    lines = [r"\begin{tabular}{lrrrrrr}", r"\toprule",
-             r"Destination & " + " & ".join([r"\multicolumn{1}{p{1.6cm}}{\raggedright Exports (\$bn)}", r"\multicolumn{1}{p{2.6cm}}{\raggedright MNEs with parent in the destination (\%)}", r"\multicolumn{1}{p{1.8cm}}{\raggedright US-parent MNEs (\%)}", r"\multicolumn{1}{p{1.8cm}}{\raggedright Other foreign MNEs (\%)}", r"\multicolumn{1}{p{1.8cm}}{\raggedright Domestic MNEs (\%)}", r"\multicolumn{1}{p{1.8cm}}{\raggedright Local firms (\%)}"]) + r" \\", r"\midrule"]
+    H = lambda w, t: rf"\multicolumn{{1}}{{p{{{w}cm}}}}{{\raggedright {t}}}"
+    lines = [r"\begin{tabular}{lrrrrrrrr}", r"\toprule",
+             r"Destination & " + " & ".join([H(1.5, rf"Exports ({W.VAL_HDR})"), H(2.2, r"MNEs with parent in the destination (\%)"), H(1.6, r"US-parent MNEs (\%)"),
+                                             H(1.6, r"EU-27-parent MNEs (\%)"), H(1.6, r"CAN-parent MNEs (\%)"), H(1.6, r"Other foreign MNEs (\%)"), H(1.6, r"Domestic MNEs (\%)"), H(1.5, r"Local firms (\%)")]) + r" \\", r"\midrule"]
     for idx, r in sh.iterrows():
-        us = "--" if idx == "USA" else f"{r['us']:.1f}"
-        lines.append(f"{W.tex_escape(idx)} & {r['total_bn']:,.1f} & {r['home']:.1f} & {us} & {r['other']:.1f} & {r['dom']:.1f} & {r['local']:.1f} \\\\")
-    lines += [r"\bottomrule", rf"\multicolumn{{7}}{{p{{0.95\textwidth}}}}{{\footnotesize {note}}} \\", r"\end{tabular}"]
+        us = "--" if idx == "USA" else f"{r['us']:.1f}"; eu = "--" if idx == "EU-27" else f"{r['eu']:.1f}"; ca = "--" if idx == "CAN" else f"{r['can']:.1f}"
+        lines.append(f"{W.tex_escape(idx)} & {r['total_bn']:,.1f} & {r['home']:.1f} & {us} & {eu} & {ca} & {r['other']:.1f} & {r['dom']:.1f} & {r['local']:.1f} \\\\")
+    lines += [r"\bottomrule", rf"\multicolumn{{9}}{{p{{0.95\textwidth}}}}{{\footnotesize {note} {W.VAL_NOTE}}} \\", r"\end{tabular}"]
     W.write_tex(lines, path)
 
 
 def fig_dest(sh: pd.DataFrame, fname: str, G: Path) -> None:
-    fig, ax = plt.subplots(figsize=(8.5, 0.5 * len(sh) + 2.1))
-    draw_carriers(ax, sh, list(sh.index), home_label="MNEs with parent in the destination", us_label="US-parent MNEs (destination $\\neq$ USA)", fontsize=9)
+    fig, ax = plt.subplots(figsize=(9, 0.55 * len(sh) + 2.4))
+    draw_carriers(ax, sh, list(sh.index), home_label="MNEs with parent in the destination", us_label="US-parent MNEs (destination $\\neq$ USA)", fontsize=9, show_eu_can=True)
     h, l = ax.get_legend_handles_labels()
-    fig.legend(h, l, frameon=False, fontsize=8, loc="lower center", ncol=3, bbox_to_anchor=(0.5, 0.0))
-    fig.tight_layout(rect=(0, 0.75 / fig.get_figheight(), 1, 1))
+    fig.legend(h, l, frameon=False, fontsize=8.5, loc="lower center", ncol=2, bbox_to_anchor=(0.5, 0.0))
+    fig.tight_layout(rect=(0, 1.1 / fig.get_figheight(), 1, 1))
     W.savefig(fig, fname, G)
 
 
@@ -226,25 +254,35 @@ def us_home_products(d: pd.DataFrame, T: Path, G: Path) -> None:
     lac_usa = tu.groupby("hs07_6d")["value"].sum()                      # everything LAC ships of the line to the USA
     top = ph.index[:N_PROD]
     desc = _desc(top)
-    rows = pd.DataFrame({"v_home": ph.loc[top] / 1e9, "sh_of_us_home": 100 * ph.loc[top] / ph.sum(),
-                         "home_share": 100 * ph.loc[top] / pall.reindex(top), "lac_usa": lac_usa.reindex(top) / 1e9,
+    ph_yr = us_home.groupby("hs07_6d")["value_yr"].sum(); lac_usa_yr = tu.groupby("hs07_6d")["value_yr"].sum()
+    # the three main origins of the US-parent shipments of the line to the USA (share of the line's US-parent home value)
+    by_o = us_home[us_home["hs07_6d"].isin(top)].groupby(["hs07_6d", "country_orig"])["value"].sum()
+    origins = {}
+    for h in top:
+        s = (by_o.loc[h] / by_o.loc[h].sum()).sort_values(ascending=False).head(3)
+        origins[h] = ", ".join(f"{o} {100 * v:.0f}\\%" for o, v in s.items())
+    rows = pd.DataFrame({"v_home": ph_yr.reindex(top) / 1e9, "sh_of_us_home": 100 * ph.loc[top] / ph.sum(),
+                         "home_share": 100 * ph.loc[top] / pall.reindex(top), "lac_usa": lac_usa_yr.reindex(top) / 1e9,
                          "us_share_of_lac_usa": 100 * ph.loc[top] / lac_usa.reindex(top)})
-    lines = [r"\begin{tabular}{llrrrrr}", r"\toprule",
-             r"HS6 & Description & " + " & ".join([r"\multicolumn{1}{p{2.0cm}}{\raggedright US-parent exports to the USA (\$bn)}", r"\multicolumn{1}{p{2.0cm}}{\raggedright \% of all US-parent exports to the USA}", r"\multicolumn{1}{p{2.4cm}}{\raggedright \% of US-parent exports of the line going to the USA}", r"\multicolumn{1}{p{2.2cm}}{\raggedright All LAC exports of the line to the USA (\$bn)}", r"\multicolumn{1}{p{2.6cm}}{\raggedright US-parent share of LAC exports of the line to the USA (\%)}"]) + r" \\", r"\midrule"]
+    H = lambda w, t: rf"\multicolumn{{1}}{{p{{{w}cm}}}}{{\raggedright {t}}}"
+    lines = [r"\begin{tabular}{llrrrrrl}", r"\toprule",
+             r"HS6 & Description & " + " & ".join([H(1.7, rf"US-parent exports to the USA ({W.VAL_HDR})"), H(1.7, r"\% of all US-parent exports to the USA"), H(2.0, r"\% of US-parent exports of the line going to the USA"),
+                                                    H(1.9, rf"All LAC exports of the line to the USA ({W.VAL_HDR})"), H(2.2, r"US-parent share of LAC exports of the line to the USA (\%)"), H(2.6, r"Main origins of the US-parent shipments (\% of the line)")]) + r" \\", r"\midrule"]
     for h, r in rows.iterrows():
-        lines.append(f"{h} & {W.tex_escape(desc[h])} & {r['v_home']:.2f} & {r['sh_of_us_home']:.1f} & {r['home_share']:.0f} & {r['lac_usa']:.2f} & {r['us_share_of_lac_usa']:.0f} \\\\")
-    lines += [r"\midrule", f"All lines & & {ph.sum() / 1e9:,.1f} & 100.0 & {100 * ph.sum() / pall.sum():.0f} & {lac_usa.sum() / 1e9:,.1f} & {100 * ph.sum() / lac_usa.sum():.0f} \\\\", r"\bottomrule",
-              rf"\multicolumn{{7}}{{p{{0.95\textwidth}}}}{{\footnotesize Top {N_PROD} HS6 lines by the value US-parent multinationals export from the nine origins to the United States. "
-              r"Column 5 = of what US-parent MNEs export of the line from LAC (all destinations), the share shipped to the USA; column 7 = of what all firms in the nine origins export of the line to the USA, the share moved by US-parent MNEs. " + NOTE_BASE + "} \\\\", r"\end{tabular}"]
+        lines.append(f"{h} & {W.tex_escape(desc[h])} & {r['v_home']:.2f} & {r['sh_of_us_home']:.1f} & {r['home_share']:.0f} & {r['lac_usa']:.2f} & {r['us_share_of_lac_usa']:.0f} & {origins[h]} \\\\")
+    lines += [r"\midrule", f"All lines & & {ph_yr.sum() / 1e9:,.1f} & 100.0 & {100 * ph.sum() / pall.sum():.0f} & {lac_usa_yr.sum() / 1e9:,.1f} & {100 * ph.sum() / lac_usa.sum():.0f} & \\\\", r"\bottomrule",
+              rf"\multicolumn{{8}}{{p{{0.95\textwidth}}}}{{\footnotesize Top {N_PROD} HS6 lines by the value US-parent multinationals export from the nine origins to the United States. "
+              r"Column 5 = of what US-parent MNEs export of the line from LAC (all destinations), the share shipped to the USA; column 7 = of what all firms in the nine origins export of the line to the USA, the share moved by US-parent MNEs; "
+              r"last column = the three origins with the largest US-parent shipments of the line to the USA and their share of those shipments. " + NOTE_BASE + " " + W.VAL_NOTE + "} \\\\", r"\end{tabular}"]
     W.write_tex(lines, T / "tab_wp3_us_home_products.tex")
     # figure: US-parent share of LAC -> USA exports of the line
     fig, ax = plt.subplots(figsize=(9, 0.42 * len(rows) + 1.8))
     y = np.arange(len(rows))[::-1]
     ax.barh(y, rows["us_share_of_lac_usa"], color=C_HOME)
     for yi, (h, r) in zip(y, rows.iterrows()):
-        ax.text(r["us_share_of_lac_usa"] + 1, yi, f"{r['us_share_of_lac_usa']:.0f}%  (US-parent to USA \${r['v_home']:.1f}bn of \${r['lac_usa']:.1f}bn)", va="center", fontsize=7.5)
+        ax.text(r["us_share_of_lac_usa"] + 1, yi, f"{r['us_share_of_lac_usa']:.0f}%", va="center", fontsize=8)
     ax.set_yticks(y); ax.set_yticklabels([f"{h} {desc[h][:44]}" for h in rows.index], fontsize=8)
-    ax.set_xlim(0, 135); ax.set_xticks(np.arange(0, 101, 20))
+    ax.set_xlim(0, 105); ax.set_xticks(np.arange(0, 101, 20))
     ax.set_xlabel("US-parent MNEs' share of everything the nine origins export of the line to the USA (%)", fontsize=9)
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
@@ -259,12 +297,12 @@ def us_home_products(d: pd.DataFrame, T: Path, G: Path) -> None:
     for c in ("home", "other", "dom", "local"):
         if c not in m.columns:
             m[c] = 0.0
-    m = m.reindex(top2); tot = m.sum(axis=1); sh = 100 * m.div(tot, axis=0)
+    m = m.reindex(top2); tot = m.sum(axis=1); sh = 100 * m.div(tot, axis=0); tot_yr = lac_usa_yr.reindex(top2)
     lines = [r"\begin{tabular}{llrrrrr}", r"\toprule",
-             r"HS6 & Description & " + " & ".join([r"\multicolumn{1}{p{2.0cm}}{\raggedright LAC exports to the USA (\$bn)}", r"\multicolumn{1}{p{1.8cm}}{\raggedright US-parent MNEs (\%)}", r"\multicolumn{1}{p{1.8cm}}{\raggedright Other foreign MNEs (\%)}", r"\multicolumn{1}{p{1.8cm}}{\raggedright Domestic MNEs (\%)}", r"\multicolumn{1}{p{1.8cm}}{\raggedright Local firms (\%)}"]) + r" \\", r"\midrule"]
+             r"HS6 & Description & " + " & ".join([rf"\multicolumn{{1}}{{p{{2.0cm}}}}{{\raggedright LAC exports to the USA ({W.VAL_HDR})}}", r"\multicolumn{1}{p{1.8cm}}{\raggedright US-parent MNEs (\%)}", r"\multicolumn{1}{p{1.8cm}}{\raggedright Other foreign MNEs (\%)}", r"\multicolumn{1}{p{1.8cm}}{\raggedright Domestic MNEs (\%)}", r"\multicolumn{1}{p{1.8cm}}{\raggedright Local firms (\%)}"]) + r" \\", r"\midrule"]
     for h in top2:
-        lines.append(f"{h} & {W.tex_escape(desc2[h])} & {tot[h] / 1e9:,.2f} & {sh.loc[h, 'home']:.0f} & {sh.loc[h, 'other']:.0f} & {sh.loc[h, 'dom']:.0f} & {sh.loc[h, 'local']:.0f} \\\\")
-    lines += [r"\bottomrule", rf"\multicolumn{{7}}{{p{{0.95\textwidth}}}}{{\footnotesize Top {N_PROD} HS6 lines by the value the nine origins export to the United States, and the share of each line moved by each type of exporter. " + NOTE_BASE + "} \\\\", r"\end{tabular}"]
+        lines.append(f"{h} & {W.tex_escape(desc2[h])} & {tot_yr[h] / 1e9:,.2f} & {sh.loc[h, 'home']:.0f} & {sh.loc[h, 'other']:.0f} & {sh.loc[h, 'dom']:.0f} & {sh.loc[h, 'local']:.0f} \\\\")
+    lines += [r"\bottomrule", rf"\multicolumn{{7}}{{p{{0.95\textwidth}}}}{{\footnotesize Top {N_PROD} HS6 lines by the value the nine origins export to the United States, and the share of each line moved by each type of exporter. " + NOTE_BASE + " " + W.VAL_NOTE + "} \\\\", r"\end{tabular}"]
     W.write_tex(lines, T / "tab_wp3_to_usa_top_products.tex")
 
 
@@ -288,10 +326,64 @@ def run_scope(cube: pd.DataFrame, scope: str) -> None:
         print("   too little exported to the USA; to-USA exhibits skipped")
     if d["value"].sum() >= 5e9:
         sd = dest_carriers(d)
-        write_dest_table(sd, T / "tab_wp3_dest_carriers.tex", f"{S}. The {N_DEST} largest destination markets (EU-27 pooled) and the share of the value reaching each one moved by each type of exporter. `Parent in the destination': the exporter's ultimate parent is in the destination country (for the EU-27, in any member state); for the USA this group is the US-parent MNEs and the US-parent column is left blank. " + NOTE_BASE)
+        write_dest_table(sd, T / "tab_wp3_dest_carriers.tex", f"{S}. The {N_DEST} largest destination markets (EU-27 = the 27 member states, pooled; the United Kingdom is not included) and the share of the value reaching each one moved by each type of exporter. `Parent in the destination': the exporter's ultimate parent is in the destination country (for the EU-27, in any member state); the US-, EU-27- and CAN-parent columns count those parents when the destination is not their home (blank on their own row, where they are the `parent in the destination'). " + NOTE_BASE)
         fig_dest(sd, "fig_wp3_dest_carriers", G)
-        print("   destinations: " + "; ".join(f"{m} ${r['total_bn']:,.0f}bn home {r['home']:.0f}% US {r['us']:.0f}% other {r['other']:.0f}% dom {r['dom']:.0f}%" for m, r in sd.iterrows()))
+        print("   destinations: " + "; ".join(f"{m} ${r['total_bn']:,.0f}bn/yr home {r['home']:.0f}% US {r['us']:.0f}% EU {r['eu']:.0f}% CAN {r['can']:.0f}% other {r['other']:.0f}% dom {r['dom']:.0f}%" for m, r in sd.iterrows()))
     us_home_products(d, T, G)
+    if scope == "all":
+        us_three_shares(d, T, G)
+
+
+def us_three_shares(d: pd.DataFrame, T: Path, G: Path) -> None:
+    """Revision 7 (Volpe): three shares with the SAME denominator (the origin's total exports): (1) exports going to the
+    USA; (2) exports carried by US-parent MNEs (any destination); (3) exports carried by US-parent MNEs AND going to the
+    USA. One table (All + nine origins) and two figures (total; by origin)."""
+    us = (d["owner_type"] == "ext") & (d["iso3_parent"] == "USA"); to_us = d["country_dest"] == "USA"
+    def shares(sel):
+        t = d.loc[sel, "value"].sum()
+        return pd.Series({"to_usa": 100 * d.loc[sel & to_us, "value"].sum() / t, "by_us": 100 * d.loc[sel & us, "value"].sum() / t,
+                          "by_us_to_usa": 100 * d.loc[sel & us & to_us, "value"].sum() / t, "total_yr": d.loc[sel, "value_yr"].sum() / 1e9})
+    rows = {"All": shares(pd.Series(True, index=d.index))}
+    for o in sorted(d["country_orig"].unique()):
+        rows[o] = shares(d["country_orig"] == o)
+    tab = pd.DataFrame(rows).T
+    order = ["All"] + list(tab.drop("All").sort_values("by_us_to_usa", ascending=False).index)
+    tab = tab.reindex(order)
+    lines = [r"\begin{tabular}{lrrrr}", r"\toprule",
+             r"Origin & \% of exports going to the USA & \% of exports carried by US-parent MNEs & \% of exports carried by US-parent MNEs and going to the USA & " + rf"Total exports ({W.VAL_HDR}) \\", r"\midrule"]
+    for o, r in tab.iterrows():
+        lines.append(f"{o} & {r['to_usa']:.1f} & {r['by_us']:.1f} & {r['by_us_to_usa']:.1f} & {r['total_yr']:,.1f} \\\\")
+        if o == "All":
+            lines.append(r"\midrule")
+    lines += [r"\bottomrule", rf"\multicolumn{{5}}{{p{{0.95\textwidth}}}}{{\footnotesize All three shares have the same denominator, the origin's total exports (all firms, all destinations). Column 2: value shipped to the United States by any firm. Column 3: value exported by multinationals whose recorded ultimate parent is in the United States, to any destination. Column 4: the intersection, US-parent MNEs shipping to the United States. Origins sorted by column 4. {NOTE_BASE} {W.VAL_NOTE}}} \\", r"\end{tabular}"]
+    W.write_tex(lines, T / "tab_wp3_us_three_shares.tex")
+    LAB = ["Going to the USA", "Carried by US-parent MNEs", "Carried by US-parent MNEs\nand going to the USA"]
+    COL = [W.BLUE_SHADES[7], W.BLUE_SHADES[4], W.BLUE_SHADES[0]]
+    # (a) total
+    fig, ax = plt.subplots(figsize=(6.5, 4.2)); r = tab.loc["All"]; v = [r["to_usa"], r["by_us"], r["by_us_to_usa"]]
+    ax.bar(range(3), v, 0.6, color=COL)
+    for i, vi in enumerate(v):
+        ax.text(i, vi + 0.4, f"{vi:.1f}%", ha="center", fontsize=10)
+    ax.set_xticks(range(3)); ax.set_xticklabels(LAB, fontsize=9); ax.set_ylabel("% of the nine origins' total exports", fontsize=10)
+    ax.set_ylim(0, max(v) * 1.2)
+    for s in ("top", "right"):
+        ax.spines[s].set_visible(False)
+    fig.tight_layout(); W.savefig(fig, "fig_wp3_us_three_shares_total", G)
+    # (b) by origin
+    n = len(tab); x = np.arange(n); bw = 0.27
+    fig, ax = plt.subplots(figsize=(11, 5))
+    for i, (c, lab, col) in enumerate(zip(["to_usa", "by_us", "by_us_to_usa"], LAB, COL)):
+        v = tab[c].to_numpy(); ax.bar(x + (i - 1) * bw, v, bw, color=col, label=lab.replace("\n", " "))
+        for xi, vi in zip(x, v):
+            ax.text(xi + (i - 1) * bw, vi + 0.5, f"{vi:.0f}", ha="center", fontsize=8)
+    ax.set_xticks(x); ax.set_xticklabels(order, fontsize=11); ax.tick_params(axis="y", labelsize=10)
+    ax.set_ylabel("% of the origin's total exports", fontsize=11); ax.set_ylim(0, float(tab[["to_usa", "by_us", "by_us_to_usa"]].to_numpy().max()) * 1.18)
+    ax.axvline(0.5, color="#999999", linewidth=0.6, linestyle=":")
+    ax.legend(frameon=False, fontsize=10, ncol=3, loc="upper right")
+    for s in ("top", "right"):
+        ax.spines[s].set_visible(False)
+    fig.tight_layout(); W.savefig(fig, "fig_wp3_us_three_shares_origin", G)
+    print("\n=== US three shares (%):\n" + tab.round(1).to_string())
 
 
 # ---------------------------------------------------------------------
@@ -320,6 +412,28 @@ def cross_sector(cube: pd.DataFrame) -> None:
     fig.tight_layout(rect=(0, 0.7 / fig.get_figheight(), 1, 1))
     W.savefig(fig, "fig_wp3_to_usa_carriers_total_manuf", G)
 
+    # (a2) revision 7: Figure 1 within each sector as ONE three-panel figure (fonts sized for a full-width figure)
+    fig, axes = plt.subplots(1, 3, figsize=(11.5, 5.0))
+    for ax, (s, lab) in zip(axes, (("Agriculture", "Panel A. Agriculture"), ("Manufacturing", "Panel B. Manufacturing"), ("Mining & fuels", "Panel C. Mining and fuels"))):
+        ds = d[d["sector4"] == s]
+        g = ds.groupby("country_orig").agg(v=("value", "sum"), e=("val_ext", "sum"), m=("val_dom", "sum"))
+        g["sh_ext"] = g["e"] / g["v"]; g["sh_dom"] = g["m"] / g["v"]; g["sh_total"] = g["sh_ext"] + g["sh_dom"]
+        g = g.sort_values("sh_total"); y = np.arange(len(g))
+        ax.barh(y, g["sh_ext"], color=W.C_MNE_EXT, edgecolor="white", linewidth=0.6, label="Foreign MNEs")
+        ax.barh(y, g["sh_dom"], left=g["sh_ext"], color=W.C_MNE_DOM, edgecolor="white", linewidth=0.6, label="Domestic MNEs")
+        for yi, r in zip(y, g.itertuples()):
+            if r.sh_ext > 0.09: ax.text(r.sh_ext / 2, yi, f"{r.sh_ext:.2f}", va="center", ha="center", color="white", fontsize=10)
+            if r.sh_dom > 0.08: ax.text(r.sh_ext + r.sh_dom / 2, yi, f"{r.sh_dom:.2f}", va="center", ha="center", fontsize=10)
+            ax.text(r.sh_total + 0.01, yi, f"{r.sh_total:.2f}", va="center", ha="left", fontsize=10.5, fontweight="bold")
+        ax.set_yticks(y); ax.set_yticklabels(g.index, fontsize=12); ax.tick_params(axis="x", labelsize=11)
+        ax.set_xlim(0, 1.0); ax.set_title(lab, fontsize=13); ax.set_xlabel("MNE share in export value", fontsize=11)
+        for sp_ in ("top", "right"):
+            ax.spines[sp_].set_visible(False)
+    h, l = axes[0].get_legend_handles_labels()
+    fig.legend(h, l, frameon=False, fontsize=11, loc="lower center", ncol=2, bbox_to_anchor=(0.5, 0.0))
+    fig.tight_layout(rect=(0, 0.08, 1, 1))
+    W.savefig(fig, "fig_wp3_fig1_by_sector_panels", G)
+
     # (b) US-parent share of exports, origin x sector -----------------------------------------------
     cols = [c for c, _ in SECTOR_COLS]
     tot = d.groupby(["country_orig", "sector4"])["value"].sum().unstack("sector4")
@@ -328,17 +442,19 @@ def cross_sector(cube: pd.DataFrame) -> None:
     tot.loc["All"] = tot.sum(axis=0); usv.loc["All"] = usv.sum(axis=0)
     lab = {"all": "All goods", "agro": "Agriculture", "mining": "Mining & fuels", "manufacturing": "Manufacturing"}
     share = pd.DataFrame({c: 100 * usv[lab[c]] / tot[lab[c]] for c in cols})
-    value = pd.DataFrame({c: usv[lab[c]] / 1e9 for c in cols})
+    usv_yr = d[us].groupby(["country_orig", "sector4"])["value_yr"].sum().unstack("sector4").reindex(tot.index).fillna(0.0)
+    usv_yr["All goods"] = usv_yr.sum(axis=1); usv_yr.loc["All"] = usv_yr.sum(axis=0)
+    value = pd.DataFrame({c: usv_yr[lab[c]] / 1e9 for c in cols})
     order = list(share.drop("All").sort_values("all", ascending=False).index) + ["All"]
     share, value = share.reindex(order), value.reindex(order)
     lines = [r"\begin{tabular}{lrrrrrrrr}", r"\toprule",
-             r" & \multicolumn{4}{c}{US-parent MNE share of the cell's exports (\%)} & \multicolumn{4}{c}{US-parent MNE exports (\$bn)} \\",
+             rf" & \multicolumn{{4}}{{c}}{{US-parent MNE share of the cell's exports (\%)}} & \multicolumn{{4}}{{c}}{{US-parent MNE exports ({W.VAL_HDR})}} \\",
              "Origin & " + " & ".join(l for _, l in SECTOR_COLS) + " & " + " & ".join(l for _, l in SECTOR_COLS) + r" \\", r"\midrule"]
     for o in order:
         if o == "All":
             lines.append(r"\midrule")
         lines.append(f"{o} & " + " & ".join(f"{share.loc[o, c]:.1f}" if tot.loc[o, lab[c]] > 0 else "--" for c in cols) + " & " + " & ".join(f"{value.loc[o, c]:,.1f}" for c in cols) + r" \\")
-    lines += [r"\bottomrule", r"\multicolumn{9}{p{0.95\textwidth}}{\footnotesize Share of each origin's export value (all destinations) moved by multinationals whose recorded ultimate parent is in the United States, all goods and by sector; origins sorted by the all-goods share. Sectors as in the conventions (rest not shown, included in all goods). " + NOTE_BASE + r"} \\", r"\end{tabular}"]
+    lines += [r"\bottomrule", r"\multicolumn{9}{p{0.95\textwidth}}{\footnotesize Share of each origin's export value (all destinations) moved by multinationals whose recorded ultimate parent is in the United States, all goods and by sector; origins sorted by the all-goods share. Sectors as in the conventions (rest not shown, included in all goods). " + NOTE_BASE + " " + W.VAL_NOTE + r"} \\", r"\end{tabular}"]
     W.write_tex(lines, T / "tab_wp3_us_share_origin_sector.tex")
     n = len(order); x = np.arange(n); bw = 0.2
     fig, ax = plt.subplots(figsize=(11, 5.6))
@@ -363,22 +479,23 @@ def cross_sector(cube: pd.DataFrame) -> None:
     ext = d[d["owner_type"] == "ext"].copy()
     ext["home"] = (ext["country_dest"] == ext["iso3_parent"]).astype(float) * ext["value"]
     top = W.top_parents(d, W.TOP_K_FIG)
-    hs, hv = {}, {}
+    hs, hv, hv_yr = {}, {}, {}
     for c in cols:
         e = ext if c == "all" else ext[ext["sector4"] == SECTOR_OF_COL[c]]
-        g = e.groupby("iso3_parent").agg(value=("value", "sum"), home=("home", "sum")).reindex(top)
-        hs[c] = 100 * g["home"] / g["value"]; hv[c] = g["value"] / 1e9
-        allk = e.groupby("iso3_parent").agg(value=("value", "sum"), home=("home", "sum")).sum()
+        g = e.groupby("iso3_parent").agg(value=("value", "sum"), home=("home", "sum"), value_yr=("value_yr", "sum")).reindex(top)
+        hs[c] = 100 * g["home"] / g["value"]; hv[c] = g["value"] / 1e9; hv_yr[c] = g["value_yr"] / 1e9
+        allk = e.groupby("iso3_parent").agg(value=("value", "sum"), home=("home", "sum"), value_yr=("value_yr", "sum")).sum()
         hs[c]["All known-parent foreign MNEs"] = 100 * allk["home"] / allk["value"]; hv[c]["All known-parent foreign MNEs"] = allk["value"] / 1e9
-    hs, hv = pd.DataFrame(hs), pd.DataFrame(hv)
+        hv_yr[c]["All known-parent foreign MNEs"] = allk["value_yr"] / 1e9
+    hs, hv, hv_yr = pd.DataFrame(hs), pd.DataFrame(hv), pd.DataFrame(hv_yr)
     lines = [r"\begin{tabular}{lrrrrrrrr}", r"\toprule",
-             r" & \multicolumn{4}{c}{\% of the parent's LAC exports shipped to the parent's own country} & \multicolumn{4}{c}{Parent's LAC exports (\$bn)} \\",
+             rf" & \multicolumn{{4}}{{c}}{{\% of the parent's LAC exports shipped to the parent's own country}} & \multicolumn{{4}}{{c}}{{Parent's LAC exports ({W.VAL_HDR})}} \\",
              "Parent & " + " & ".join(l for _, l in SECTOR_COLS) + " & " + " & ".join(l for _, l in SECTOR_COLS) + r" \\", r"\midrule"]
     for p in hs.index:
         if p == "All known-parent foreign MNEs":
             lines.append(r"\midrule")
-        lines.append(f"{W.tex_escape(p)} & " + " & ".join("--" if not np.isfinite(hs.loc[p, c]) else f"{hs.loc[p, c]:.1f}" for c in cols) + " & " + " & ".join("--" if not np.isfinite(hv.loc[p, c]) else f"{hv.loc[p, c]:,.1f}" for c in cols) + r" \\")
-    lines += [r"\bottomrule", rf"\multicolumn{{9}}{{p{{0.95\textwidth}}}}{{\footnotesize Top-{W.TOP_K_FIG} parent countries by foreign-MNE export value (all goods). Home share = value the parent's affiliates export from the nine origins to the parent's country, over everything they export from the nine origins, all goods and within each sector. Shares computed on less than \${MIN_PARENT_SECTOR_BN:.0f}bn of exports are fragile (see the value columns). Pooled 2006--2022; foreign MNEs with a recorded parent country.}} \\", r"\end{tabular}"]
+        lines.append(f"{W.tex_escape(p)} & " + " & ".join("--" if not np.isfinite(hs.loc[p, c]) else f"{hs.loc[p, c]:.1f}" for c in cols) + " & " + " & ".join("--" if not np.isfinite(hv_yr.loc[p, c]) else f"{hv_yr.loc[p, c]:,.1f}" for c in cols) + r" \\")
+    lines += [r"\bottomrule", rf"\multicolumn{{9}}{{p{{0.95\textwidth}}}}{{\footnotesize Top-{W.TOP_K_FIG} parent countries by foreign-MNE export value (all goods). Home share = value the parent's affiliates export from the nine origins to the parent's country, over everything they export from the nine origins, all goods and within each sector. Shares computed on less than \${MIN_PARENT_SECTOR_BN:.0f}bn of pooled exports are fragile (hatched in the figure). Pooled 2006--2022; foreign MNEs with a recorded parent country. {W.VAL_NOTE}}} \\", r"\end{tabular}"]
     W.write_tex(lines, T / "tab_wp3_home_share_by_parent_sectors.tex")
     parents = list(hs.index); n = len(parents); y = np.arange(n)[::-1]; bh = 0.2
     fig, ax = plt.subplots(figsize=(9, 0.95 * n + 1.6))
@@ -387,15 +504,15 @@ def cross_sector(cube: pd.DataFrame) -> None:
         yy = y + (1.5 - i) * bh
         ax.barh(yy, np.nan_to_num(v), bh, color=SECTOR_COLORS[c], edgecolor="#1f3864", linewidth=0.4, label=l.replace("\\&", "&"))
         ax.barh(yy[small], np.nan_to_num(v)[small], bh, color="white", edgecolor="#1f3864", linewidth=0.4, hatch="////")
-        for yi, vi, vv in zip(yy, v, hv[c].to_numpy()):
+        for yi, vi in zip(yy, v):
             if np.isfinite(vi):
-                ax.text(vi + 0.6, yi, f"{vi:.0f}%  (${vv:,.1f}bn)", va="center", fontsize=8, color="#333333")
+                ax.text(vi + 0.6, yi, f"{vi:.0f}%", va="center", fontsize=8, color="#333333")
     ax.set_yticks(y); ax.set_yticklabels([p.replace("All known-parent foreign MNEs", "All foreign MNEs\n(known parent)") for p in parents], fontsize=11); ax.tick_params(axis="x", labelsize=10)
-    ax.set_xlim(0, max(30, float(np.nanmax(hs.to_numpy())) * 1.45)); ax.set_xlabel("% of the parent's export value from LAC shipped to the parent's own country; in parentheses the parent's exports in the scope", fontsize=8.5)
+    ax.set_xlim(0, max(30, float(np.nanmax(hs.to_numpy())) * 1.2)); ax.set_xlabel("% of the parent's export value from LAC shipped to the parent's own country", fontsize=9)
     ax.axhline(0.5, color="#999999", linewidth=0.6, linestyle=":")
     h, l = ax.get_legend_handles_labels()
     from matplotlib.patches import Patch
-    h.append(Patch(facecolor="white", edgecolor="#1f3864", hatch="////")); l.append(f"< ${MIN_PARENT_SECTOR_BN:.0f}bn in the sector (fragile)")
+    h.append(Patch(facecolor="white", edgecolor="#1f3864", hatch="////")); l.append(f"< ${MIN_PARENT_SECTOR_BN:.0f}bn pooled exports in the sector (fragile)")
     fig.legend(h, l, frameon=False, fontsize=9.5, loc="lower center", ncol=5, bbox_to_anchor=(0.5, 0.0))
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
@@ -404,7 +521,7 @@ def cross_sector(cube: pd.DataFrame) -> None:
     print("\n=== home share by parent x sector (%):\n" + hs.round(1).to_string())
 
     # (d) Facts 5 and 6: one table each, four columns ------------------------------------------------
-    fact5_summary(T); fact6_summary(T)
+    fact5_summary(T); fact5_summary(T, "extensive"); fact6_summary(T)
 
 
 # ---------------------------------------------------------------------
@@ -446,29 +563,41 @@ def _cell(coef, se, key, j):
     return c[j], (s[j] if j < len(s) else "")
 
 
-def fact5_summary(T: Path) -> None:
-    frags = {c: parse_fragment(W.WP_OUT / c / "Regressions" / "reg_wp1e_counts.tex") for c, _ in SECTOR_COLS}
-    ROWS = [(r"$\ln$(\# foreign MNEs)", "Foreign MNEs"), (r"$\ln$(\# domestic MNEs)", "Domestic MNEs")]
-    SPECS = [(2, r"Origin $\times$ year, destination $\times$ year and product FE (column (3) of the full table)"),
-             (3, r"Origin $\times$ destination $\times$ product and origin $\times$ destination $\times$ year FE (column (4))")]
+def fact5_summary(T: Path, margin: str = "intensive") -> None:
+    """Fact 5 by sector in one table. margin='intensive': ln(# foreign) and ln(# domestic MNEs) from reg_wp1e_counts;
+    margin='extensive': the presence dummies from reg_wp1e_extensive (revision 7: clearer titles + extensive twin)."""
+    frag = "reg_wp1e_counts.tex" if margin == "intensive" else "reg_wp1e_extensive.tex"
+    frags = {c: parse_fragment(W.WP_OUT / c / "Regressions" / frag) for c, _ in SECTOR_COLS}
+    if margin == "intensive":
+        ROWS = [(r"$\ln$(\# foreign MNEs)", r"Number of foreign MNEs in the cell ($\ln$)"), (r"$\ln$(\# domestic MNEs)", r"Number of domestic MNEs in the cell ($\ln$)")]
+    else:
+        ROWS = [("Any foreign MNE", "At least one foreign MNE in the cell (0/1)"), ("Any domestic MNE", "At least one domestic MNE in the cell (0/1)")]
+    SPECS = [(2, r"Fixed effects: origin $\times$ year, destination $\times$ year, product"),
+             (3, r"Fixed effects: origin $\times$ destination $\times$ product, origin $\times$ destination $\times$ year")]
     ncol = len(SECTOR_COLS)
-    lines = [rf"\begin{{tabular}}{{l{'c' * ncol}}} \hline", " & " + " & ".join(l for _, l in SECTOR_COLS) + r" \\ \hline"]
-    for pnl, ptitle in (("Panel A", r"Panel A: all exports of the cell ($\ln$)"), ("Panel B", r"Panel B: exports of the cell's non-MNE firms ($\ln$)")):
+    lines = [rf"\begin{{tabular}}{{l{'c' * ncol}}} \hline", "Sample & " + " & ".join(l for _, l in SECTOR_COLS) + r" \\ \hline"]
+    for pnl, ptitle in (("Panel A", r"Panel A. Dependent variable: $\ln$ exports of the origin--destination--product--year cell (all firms)"),
+                        ("Panel B", r"Panel B. Dependent variable: $\ln$ exports of the cell's local (non-MNE) firms")):
         lines.append(rf"\multicolumn{{{ncol + 1}}}{{l}}{{\textit{{{ptitle}}}}} \\")
         for j, stitle in SPECS:
             lines.append(rf"\multicolumn{{{ncol + 1}}}{{l}}{{\footnotesize {stitle}}} \\")
             for lab, short in ROWS:
                 b = [_cell(*frags[c], (pnl, lab), j) for c, _ in SECTOR_COLS]
-                lines.append(f"\\quad $\\ln$(\\# {short[0].lower() + short[1:]}) & " + " & ".join(x[0] for x in b) + r" \\")
+                lines.append(f"\\quad {short} & " + " & ".join(x[0] for x in b) + r" \\")
                 lines.append(" & " + " & ".join(x[1] for x in b) + r" \\")
             key = "Observations (all exports)" if pnl == "Panel A" else "Observations (non-MNE exports)"
             obs = [_cell(*frags[c], ("Panel B", key), j)[0] or _cell(*frags[c], ("Panel A", key), j)[0] or _cell(*frags[c], ("", key), j)[0] for c, _ in SECTOR_COLS]
             lines.append("\\quad Observations & " + " & ".join(obs) + r" \\")
         if pnl == "Panel A":
             lines.append(r"\midrule")
-    lines += [r"\hline", rf"\multicolumn{{{ncol + 1}}}{{p{{0.95\textwidth}}}}{{\footnotesize Fact 5 in one table: the coefficients of $\ln$(\# foreign MNEs) and $\ln$(\# domestic MNEs) from the intensive-margin decomposition (columns (3) and (4) of the full table in each scope), all goods and within each sector. Origin--destination--product--year cells with at least one foreign and one domestic MNE; plain logs; dep.\ var.\ $\ln$ exports of the cell (Panel A) or of its non-MNE exporters (Panel B). A blank cell was not estimated (too few observations). SE clustered at origin--destination in parentheses. *** p$<$0.01, ** p$<$0.05, * p$<$0.1}} \\", r"\end{tabular}"]
-    W.write_tex(lines, T / "tab_wp3_fact5_summary.tex")
-    print("\n=== Fact 5 summary (col. 3): " + "; ".join(f"{l}: F {_cell(*frags[c], ('Panel A', ROWS[0][0]), 2)[0]} / D {_cell(*frags[c], ('Panel A', ROWS[1][0]), 2)[0]}" for c, l in SECTOR_COLS))
+    if margin == "intensive":
+        what = (r"Intensive margin: the coefficients of $\ln$(number of foreign MNEs) and $\ln$(number of domestic MNEs) exporting in the cell (columns (3) and (4) of the full table in each scope). "
+                r"Cells with at least one foreign and one domestic MNE (plain logs).")
+    else:
+        what = (r"Extensive margin: the coefficients of the indicators for at least one foreign and at least one domestic MNE exporting in the cell (columns (3) and (4) of the full table in each scope); all cells.")
+    lines += [r"\hline", rf"\multicolumn{{{ncol + 1}}}{{p{{0.95\textwidth}}}}{{\footnotesize Fact 5 by sector, all goods and within each sector. {what} Origin--destination--product--year cells, 2006--2022. A blank cell was not estimated (too few observations). SE clustered at origin--destination in parentheses. *** p$<$0.01, ** p$<$0.05, * p$<$0.1}} \\", r"\end{tabular}"]
+    W.write_tex(lines, T / ("tab_wp3_fact5_summary.tex" if margin == "intensive" else "tab_wp3_fact5ext_summary.tex"))
+    print(f"\n=== Fact 5 {margin} summary (col. 3): " + "; ".join(f"{l}: F {_cell(*frags[c], ('Panel A', ROWS[0][0]), 2)[0]} / D {_cell(*frags[c], ('Panel A', ROWS[1][0]), 2)[0]}" for c, l in SECTOR_COLS))
 
 
 def fact6_summary(T: Path) -> None:

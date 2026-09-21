@@ -46,7 +46,7 @@ def hs6_table(d: pd.DataFrame, cls: pd.DataFrame, top: list[str]) -> pd.DataFram
     d["n_mne_firms"] = d["n_firms"] * (d["owner_type"] != "local")
     g = d.groupby("hs07_6d", as_index=False).agg(total_value=("value", "sum"), val_ext=("val_ext", "sum"),
                                                    val_dom=("val_dom", "sum"), val_total=("val_total", "sum"),
-                                                   n_firms=("n_firms", "sum"), n_mne_firms=("n_mne_firms", "sum"))
+                                                   n_firms=("n_firms", "sum"), n_mne_firms=("n_mne_firms", "sum"), total_value_yr=("value_yr", "sum"))
     lead = (d[d["owner_type"] == "ext"].groupby(["hs07_6d", "iso3_parent"])["value"].sum().reset_index()
               .sort_values(["hs07_6d", "value"], ascending=[True, False]).drop_duplicates("hs07_6d"))
     lead = lead.rename(columns={"iso3_parent": "lead_parent", "value": "lead_value"})
@@ -62,19 +62,19 @@ def hs6_table(d: pd.DataFrame, cls: pd.DataFrame, top: list[str]) -> pd.DataFram
 
 def write_hs6_table(g: pd.DataFrame, path: Path, title_note: str, share_of: pd.Series | None = None) -> None:
     """Compact layout: wrapped description column, shares in percent, leading parent code + its share."""
-    vfmt = "{:,.2f}" if (len(g) and g["total_value"].max() < 20e9) else "{:,.1f}"   # two decimals when the scope is small (Rest)
+    vfmt = "{:,.2f}" if (len(g) and g["total_value_yr"].max() < 2e9) else "{:,.1f}"   # two decimals when the scope is small (Rest)
     lines = [r"\begin{tabular}{@{}l p{6.4cm} r r r r l@{}}", r"\toprule",
-             r"HS6 & Description & \$bn & For. & Dom. & Local & Lead parent \\", r"\midrule"]
+             rf"HS6 & Description & {W.VAL_HDR} & For. & Dom. & Local & Lead parent \\", r"\midrule"]
     for _, r in g.iterrows():
         lp = f"{r['lead_parent']} ({r['lead_share']:.2f})" if isinstance(r["lead_parent"], str) else "--"
         desc = W.tex_escape(short(r['hs6_desc'], 95)).replace("/", "/\\allowbreak{}")
-        lines.append(f"{r['hs07_6d']} & {desc} & {vfmt.format(r['total_value'] / 1e9)} & "
+        lines.append(f"{r['hs07_6d']} & {desc} & {vfmt.format(r['total_value_yr'] / 1e9)} & "
                      f"{100 * r['sh_ext']:.0f} & {100 * r['sh_dom']:.0f} & {100 * r['sh_local']:.0f} & {lp} \\\\")
     lines += [r"\bottomrule",
               rf"\multicolumn{{7}}{{p{{0.97\textwidth}}}}{{\footnotesize {title_note} For./Dom./Local = foreign-MNE, domestic-MNE and "
               r"local-firm shares of the product's export value, percent (pooled 2006--2022, nine LAC origins). Foreign = matched firms whose "
               r"parent is abroad or unknown; Domestic = parent in the exporting country; Local = unmatched. Lead parent = largest parent country "
-              r"among the product's foreign MNEs and its share of the product's foreign-MNE value.}} \\",
+              rf"among the product's foreign MNEs and its share of the product's foreign-MNE value. {W.VAL_NOTE}}} \\",
               r"\end{tabular}"]
     W.write_tex(lines, path)
 
@@ -114,9 +114,9 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     ax.barh(y, t20["sh_local"], left=t20["sh_ext"] + t20["sh_dom"], color="#e8e8e8", edgecolor="white", label="Local firms")
     for yi, r in zip(y, t20.itertuples()):
         if r.sh_ext > 0.06: ax.text(r.sh_ext / 2, yi, f"{r.sh_ext:.2f}", ha="center", va="center", color="white", fontsize=8)
-        ax.text(1.01, yi, (f"${r.total_value / 1e9:,.1f}bn" if r.total_value < 20e9 else f"${r.total_value / 1e9:,.0f}bn"), va="center", fontsize=8)
+        if r.sh_dom > 0.06: ax.text(r.sh_ext + r.sh_dom / 2, yi, f"{r.sh_dom:.2f}", ha="center", va="center", color="black", fontsize=8)
     ax.set_yticks(y); ax.set_yticklabels(labels, fontsize=9)
-    ax.set_xlim(0, 1.14); ax.set_xlabel("share of the product's export value", fontsize=10)
+    ax.set_xlim(0, 1.0); ax.set_xlabel("share of the product's export value (products ranked by export value, largest at the top)", fontsize=10)
     ax.legend(frameon=False, fontsize=9, loc="upper center", bbox_to_anchor=(0.5, -0.07), ncol=3)
     W.savefig(fig, "fig_wp1f_top20_hs6_stacked", G)
 
@@ -164,17 +164,18 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
 
     # HS sections by export value (same structure as the HS6 tables) --------------------------------------
     d2 = d.copy(); d2["section"] = W.hs_section_label(d2["hs2"])
-    gs = d2.groupby("section").agg(total_value=("value", "sum"), val_ext=("val_ext", "sum"), val_dom=("val_dom", "sum"), val_total=("val_total", "sum"))
+    gs = d2.groupby("section").agg(total_value=("value", "sum"), val_ext=("val_ext", "sum"), val_dom=("val_dom", "sum"), val_total=("val_total", "sum"), total_value_yr=("value_yr", "sum"))
     lead = (d2[d2["owner_type"] == "ext"].groupby(["section", "iso3_parent"])["value"].sum().reset_index()
               .sort_values(["section", "value"], ascending=[True, False]).drop_duplicates("section").set_index("section"))
     gs["lead_parent"] = lead["iso3_parent"]; gs["lead_share"] = lead["value"] / gs["val_ext"]
     gs["sh_ext"] = gs["val_ext"] / gs["total_value"]; gs["sh_dom"] = gs["val_dom"] / gs["total_value"]; gs["sh_local"] = 1 - gs["val_total"] / gs["total_value"]
     gs = gs.sort_values("total_value", ascending=False)
-    lines = [r"\begin{tabular}{@{}p{7.2cm} r r r r l@{}}", r"\toprule", r"HS section & \$bn & For. & Dom. & Local & Lead parent \\", r"\midrule"]
+    lines = [r"\begin{tabular}{@{}p{7.2cm} r r r r l@{}}", r"\toprule", rf"HS section & {W.VAL_HDR} & For. & Dom. & Local & Lead parent \\", r"\midrule"]
     for sec, r in gs.iterrows():
         lp = f"{r['lead_parent']} ({r['lead_share']:.2f})" if isinstance(r["lead_parent"], str) else "--"
-        lines.append(f"{W.tex_escape(sec)} & {r['total_value'] / 1e9:,.1f} & {100 * r['sh_ext']:.0f} & {100 * r['sh_dom']:.0f} & {100 * r['sh_local']:.0f} & {lp} \\\\")
-    lines += [r"\bottomrule", r"\multicolumn{6}{p{0.95\textwidth}}{\footnotesize HS sections ranked by export value. For./Dom./Local = foreign-MNE, domestic-MNE and local-firm shares of the section's export value, percent; Lead parent = largest parent country among the section's foreign MNEs and its share of the section's foreign-MNE value.} \\", r"\end{tabular}"]
+        lines.append(f"{W.tex_escape(sec)} & {r['total_value_yr'] / 1e9:,.1f} & {100 * r['sh_ext']:.0f} & {100 * r['sh_dom']:.0f} & {100 * r['sh_local']:.0f} & {lp} \\\\")
+    lines += [r"\midrule", f"All sections & {gs['total_value_yr'].sum() / 1e9:,.1f} & {100 * gs['val_ext'].sum() / gs['total_value'].sum():.0f} & {100 * gs['val_dom'].sum() / gs['total_value'].sum():.0f} & {100 * (1 - gs['val_total'].sum() / gs['total_value'].sum()):.0f} & \\\\",
+              r"\bottomrule", rf"\multicolumn{{6}}{{p{{0.95\textwidth}}}}{{\footnotesize HS sections ranked by export value. For./Dom./Local = foreign-MNE, domestic-MNE and local-firm shares of the section's export value, percent; Lead parent = largest parent country among the section's foreign MNEs and its share of the section's foreign-MNE value. {W.VAL_NOTE}}} \\", r"\end{tabular}"]
     W.write_tex(lines, T / "tab_wp1f_hs_sections.tex")
 
     # Lorenz: concentration of foreign-MNE exports across products -------------------------------------------

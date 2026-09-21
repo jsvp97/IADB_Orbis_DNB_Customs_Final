@@ -166,16 +166,18 @@ def part_a(cube: pd.DataFrame, scope: str) -> None:
 
     # descriptive: foreign-MNE value by presence type, by origin ------------------------------------
     by_o = g.groupby("country_orig").agg(v_ext=("v_ext", "sum"), v_hq=("v_hqdest", "sum"), v_aff=("v_affpres", "sum"), v_mne=("v_mne", "sum"), v_dom=("v_dom", "sum"))
+    yr = d.groupby("country_orig").agg(v_mne_yr=("val_total_yr", "sum"), v_ext_yr=("val_ext_yr", "sum"))
+    by_o = by_o.join(yr)
     tot = by_o.sum(); tot.name = "All"; by_o = pd.concat([by_o, tot.to_frame().T])
     lines = [r"\begin{tabular}{lrrrrr}", r"\toprule",
-             r"Origin & MNE value (\$bn) & of which domestic (\%) & Foreign-MNE value (\$bn) & \multicolumn{2}{c}{\% of foreign-MNE value: group present at destination} \\",
+             rf"Origin & MNE value ({W.VAL_HDR}) & of which domestic (\%) & Foreign-MNE value ({W.VAL_HDR}) & \multicolumn{{2}}{{c}}{{\% of foreign-MNE value: group present at destination}} \\",
              r" & & & & through headquarters & not through HQ (of which via another affiliate) \\", r"\midrule"]
     for o, r in by_o.iterrows():
         v = r["v_ext"]; hq = 100 * r["v_hq"] / v if v else np.nan; af = 100 * r["v_aff"] / v if v else np.nan
         if o == "All": lines.append(r"\midrule")
-        lines.append(f"{o} & {r['v_mne'] / 1e9:,.1f} & {100 * r['v_dom'] / r['v_mne']:.1f} & {v / 1e9:,.1f} & {hq:.1f} & {100 - hq:.1f} ({af:.1f}) \\\\")
+        lines.append(f"{o} & {r['v_mne_yr'] / 1e9:,.1f} & {100 * r['v_dom'] / r['v_mne']:.1f} & {r['v_ext_yr'] / 1e9:,.1f} & {hq:.1f} & {100 - hq:.1f} ({af:.1f}) \\\\")
     lines += [r"\bottomrule",
-              r"\multicolumn{6}{p{0.95\textwidth}}{\footnotesize `Through headquarters': the affiliate ships to its parent's country. `Not through HQ': every other destination; in parentheses the part where the group has another affiliate in the destination (Orbis/D\&B roster). Pooled 2006--2022.}} \\",
+              rf"\multicolumn{{6}}{{p{{0.95\textwidth}}}}{{\footnotesize `Through headquarters': the affiliate ships to its parent's country. `Not through HQ': every other destination; in parentheses the part where the group has another affiliate in the destination (Orbis/D\&B roster). Pooled 2006--2022. {W.VAL_NOTE}}} \\",
               r"\end{tabular}"]
     W.write_tex(lines, T / "tab_wp1e_presence_shares.tex")
     a = by_o.loc["All"]

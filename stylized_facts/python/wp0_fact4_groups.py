@@ -73,11 +73,11 @@ def fig5_network(f: pd.DataFrame, G: Path, T: Path, scope: str) -> None:
     for xi, v in zip(x + 0.2, g["sp"]):
         ax.text(xi, v + 0.01, f"{v:.0%}", ha="center", va="bottom", fontsize=8)
     W.savefig(fig, "fig_wp0_fig5_network", G)
-    lines = [r"\begin{tabular}{lrrrr}", r"\toprule", r"Global affiliate count & Parents & Share of parents (\%) & Export value (\$bn) & Share of value (\%) \\", r"\midrule"]
+    lines = [r"\begin{tabular}{lrrr}", r"\toprule", r"Global affiliate count & Parents & Share of parents (\%) & Share of foreign-MNE export value (\%) \\", r"\midrule"]
     for lab, r in g.iterrows():
-        lines.append(f"{lab} & {int(r['npar']):,} & {100 * r['sp']:.1f} & {r['v'] / 1e9:,.1f} & {100 * r['sv']:.1f} \\\\")
-    lines += [r"\midrule", f"All parents with a network record & {int(g['npar'].sum()):,} & 100 & {g['v'].sum() / 1e9:,.1f} & 100 \\\\", r"\bottomrule",
-              rf"\multicolumn{{5}}{{p{{0.9\textwidth}}}}{{\footnotesize Foreign-MNE parents (parent name key) exporting from the nine origins; {100 * cov_n:.0f}\% of parents and {100 * cov_v:.0f}\% of foreign-MNE export value have a matched global-network record (Orbis $\cup$ D\&B roster, src/16). Network size = number of distinct worldwide affiliates.}} \\", r"\end{tabular}"]
+        lines.append(f"{lab} & {int(r['npar']):,} & {100 * r['sp']:.1f} & {100 * r['sv']:.1f} \\\\")
+    lines += [r"\midrule", f"All parents with a network record & {int(g['npar'].sum()):,} & 100 & 100 \\\\", r"\bottomrule",
+              rf"\multicolumn{{4}}{{p{{0.9\textwidth}}}}{{\footnotesize Foreign-MNE parents (parent name key) exporting from the nine origins; {100 * cov_n:.0f}\% of parents and {100 * cov_v:.0f}\% of foreign-MNE export value have a matched global-network record (Orbis $\cup$ D\&B roster, src/16). Network size = number of distinct worldwide affiliates.}} \\", r"\end{tabular}"]
     W.write_tex(lines, T / "tab_wp0_fig5_network.tex")
     print(f"   [{scope}] Fig 5: " + ", ".join(f"{lab}: {100 * r['sv']:.0f}% of value / {100 * r['sp']:.0f}% of parents" for lab, r in g.iterrows())
           + f" | network coverage {cov_n:.0%} of parents, {cov_v:.0%} of value")

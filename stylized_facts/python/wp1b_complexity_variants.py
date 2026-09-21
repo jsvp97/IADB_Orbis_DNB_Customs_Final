@@ -66,7 +66,7 @@ def _insufficient(ax, short, n):
 
 def hs6_cross_section(d: pd.DataFrame, cls: pd.DataFrame) -> pd.DataFrame:
     hs6 = d.groupby("hs07_6d", as_index=False).agg(total_value=("value", "sum"), val_ext=("val_ext", "sum"),
-                                                     val_dom=("val_dom", "sum"), val_total=("val_total", "sum"))
+                                                     val_dom=("val_dom", "sum"), val_total=("val_total", "sum"), total_value_yr=("value_yr", "sum"))
     hs6 = hs6.merge(cls[["hs07_6d"] + [m[0] for m in MEASURES] + ["rauch", "bec_enduse", "hs6_desc"]],
                     on="hs07_6d", how="left")
     for k in ("ext", "dom", "total"):
@@ -79,7 +79,7 @@ def hs6_cross_section(d: pd.DataFrame, cls: pd.DataFrame) -> pd.DataFrame:
 def aggregate(hs6: pd.DataFrame, by: str, order=None) -> pd.DataFrame:
     g = hs6.dropna(subset=[by]).groupby(by, as_index=False).agg(
         total_value=("total_value", "sum"), val_ext=("val_ext", "sum"), val_dom=("val_dom", "sum"),
-        val_total=("val_total", "sum"), n_hs6=("hs07_6d", "nunique"))
+        val_total=("val_total", "sum"), n_hs6=("hs07_6d", "nunique"), total_value_yr=("total_value_yr", "sum"))
     for k in ("ext", "dom", "total"):
         g[f"sh_{k}"] = g[f"val_{k}"] / g["total_value"]
     if order is not None:
@@ -205,10 +205,13 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
         vbar_2def(ax, g, {}, hdr); ax.legend(frameon=False, fontsize=9, loc="upper left")
         W.savefig(fig, f"fig_wp1b_{fname}", G)
         lines = [r"\begin{tabular}{lcccrr}", r"\toprule",
-                 f"{hdr} & Foreign & Domestic & MNE total & N HS6 & Value (\\$bn) \\\\", r"\midrule"]
+                 f"{hdr} & Foreign & Domestic & MNE total & N HS6 & Value ({W.VAL_HDR}) \\\\", r"\midrule"]
         for _, r in g.iterrows():
-            lines.append(f"{W.tex_escape(r[col])} & {r['sh_ext']:.3f} & {r['sh_dom']:.3f} & {r['sh_total']:.3f} & {int(r['n_hs6']):,} & {r['total_value'] / 1e9:,.1f} \\\\")
-        lines += [r"\bottomrule", r"\end{tabular}"]
+            lines.append(f"{W.tex_escape(r[col])} & {r['sh_ext']:.3f} & {r['sh_dom']:.3f} & {r['sh_total']:.3f} & {int(r['n_hs6']):,} & {r['total_value_yr'] / 1e9:,.1f} \\\\")
+        extra = ("BEC Rev.\\,4 end use in three classes: intermediate = industrial supplies, fuels (incl.\\ motor spirit and goods n.e.s., which are fuels in these data), parts and food for industry; "
+                 "consumption = food for households, passenger cars and consumer goods; capital = capital goods and industrial transport equipment. HS6 lines without a BEC correspondence are excluded. "
+                 if fname == "bec" else "")
+        lines += [r"\bottomrule", rf"\multicolumn{{6}}{{p{{0.95\textwidth}}}}{{\footnotesize {extra}{W.VAL_NOTE}}} \\", r"\end{tabular}"]
         W.write_tex(lines, T / f"tab_wp1b_{fname}.tex")
 
     # --- correlations across measures (HS6 cross-section, value-weighted) -------------------
@@ -279,6 +282,65 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     lines += [r"\hline", rf"\multicolumn{{{ncol + 1}}}{{p{{0.9\textwidth}}}}{{\footnotesize Origin-destination-product-year cells; dep.\ var.\ MNE value share; weighted by total trade value; robust (HC1) SE. "
               r"$|\sigma|$ FGO standardised (mean 0, s.d.\ 1). *** p$<$0.01, ** p$<$0.05, * p$<$0.1}} \\", r"\end{tabular}"]
     W.write_tex(lines, R / "reg_wp1b_odpy_fgo.tex")
+    odpy_measures_separately(d, cls, R, scope)
+
+
+def odpy_measures_separately(d: pd.DataFrame, cls: pd.DataFrame, R: Path, scope: str) -> None:
+    """Revision 7 (Volpe): the A.4 ladder with PCI, Lall and Rauch entered in SEPARATE regressions (one measure per
+    column pair), each with the two tighter FE sets. Lall in the four categories of Figure 3 (base = primary and
+    resource-based); Rauch in three classes (base = homogeneous). Weighted by cell value, HC1 SE, as in Table A.4."""
+    from wp1a_figures_by_parent import LALL_4, LALL_4_ORDER
+    odpy = d.groupby(["country_orig", "country_dest", "hs07_6d", "year"], as_index=False).agg(
+        total_value=("value", "sum"), val_ext=("val_ext", "sum"), val_dom=("val_dom", "sum"), val_total=("val_total", "sum"))
+    odpy = odpy.merge(cls[["hs07_6d", "complexity", "lall2000_category", "rauch"]], on="hs07_6d", how="left")
+    if len(odpy) < 5000:
+        print(f"   [{scope}] too few ODPY cells for the separate-measure ladder; skipped"); return
+    for k in ("ext", "dom", "total"):
+        odpy[f"sh_{k}"] = odpy[f"val_{k}"] / odpy["total_value"]
+    odpy["ot"] = odpy["country_orig"] + odpy["year"].astype(str); odpy["dt"] = odpy["country_dest"] + odpy["year"].astype(str)
+    odpy["odt"] = odpy["country_orig"] + odpy["country_dest"] + odpy["year"].astype(str)
+    odpy["lall4"] = odpy["lall2000_category"].map(LALL_4)
+    LALL_D = {"lall_high": "High tech manufacturing", "lall_med": "Medium tech manufacturing", "lall_low": "Low tech manufacturing"}
+    for v, lab in LALL_D.items():
+        odpy[v] = (odpy["lall4"] == lab).astype(float)
+    odpy.loc[odpy["lall4"].isna(), list(LALL_D)] = np.nan
+    RAUCH_D = {"rauch_diff": "Differentiated", "rauch_ref": "Reference-priced"}
+    for v, lab in RAUCH_D.items():
+        odpy[v] = (odpy["rauch"] == lab).astype(float)
+    odpy.loc[odpy["rauch"].isna(), list(RAUCH_D)] = np.nan
+    MEAS = [("PCI", ["complexity"]), ("Lall", list(LALL_D)), ("Rauch", list(RAUCH_D))]
+    FE = [("ot + dt", {"OY", "DY"}), ("odt", {"ODY"})]
+    ROWS = [("Complexity (PCI)", "complexity"), ("Lall: high tech (vs primary and resource-based)", "lall_high"), ("Lall: medium tech", "lall_med"),
+            ("Lall: low tech", "lall_low"), ("Rauch: differentiated (vs homogeneous)", "rauch_diff"), ("Rauch: reference-priced", "rauch_ref")]
+    PANELS = [(r"Panel A: MNE$_{total}$ share", "sh_total"), (r"Panel B: MNE$_{ext}$ share", "sh_ext"), (r"Panel C: MNE$_{dom}$ share", "sh_dom")]
+    cols = [(f"({i + 1})", mname, regs, fe, fek) for i, ((mname, regs), (fe, fek)) in enumerate((m, f) for m in MEAS for f in FE)]
+    res = {}
+    for pi, (plab, dep) in enumerate(PANELS):
+        for ci, (tag, mname, regs, fe, fek) in enumerate(cols):
+            dd = odpy.dropna(subset=regs + [dep])
+            m = W.feols(f"{dep} ~ {' + '.join(regs)} | {fe}", data=dd, weights="total_value", vcov="hetero")
+            b, se, p = m.coef(), m.se(), m.pvalue()
+            res[(pi, ci)] = ({v: (float(b[v]), float(se[v]), float(p[v])) for v in regs if v in b.index}, int(m._N))
+            print(f"   sep {dep:8s} {tag} {mname:5s} {fe:8s}: " + " ".join(f"{v}={float(b[v]):+.4f}{W.stars(float(p[v]))}" for v in regs if v in b.index))
+            del m; gc.collect()
+    ncol = len(cols)
+    lines = [rf"\begin{{tabular}}{{l{'c' * ncol}}} \hline",
+             " & " + " & ".join(rf"\multicolumn{{2}}{{c}}{{{m}}}" for m, _ in MEAS) + r" \\",
+             " & " + " & ".join(c[0] for c in cols) + r" \\ \hline"]
+    for pi, (plab, dep) in enumerate(PANELS):
+        if pi: lines.append(r"\midrule")
+        lines.append(rf"\multicolumn{{{ncol + 1}}}{{l}}{{\textit{{{plab}}}}} \\")
+        for lab, v in ROWS:
+            lines.append(f"{lab} & " + " & ".join(f"{res[(pi, ci)][0][v][0]:.4f}{W.stars(res[(pi, ci)][0][v][2])}" if v in res[(pi, ci)][0] else "" for ci in range(ncol)) + r" \\")
+            lines.append(" & " + " & ".join(f"({res[(pi, ci)][0][v][1]:.4f})" if v in res[(pi, ci)][0] else "" for ci in range(ncol)) + r" \\")
+        lines.append("Observations & " + " & ".join(f"{res[(pi, ci)][1]:,}" for ci in range(ncol)) + r" \\")
+    lines.append(r"\hline")
+    for lab, key in ((r"Origin $\times$ year and destination $\times$ year FE", "OY"), (r"Origin $\times$ dest.\ $\times$ year FE", "ODY")):
+        lines.append(f"{lab} & " + " & ".join(r"$\checkmark$" if key in cols[ci][4] else "" for ci in range(ncol)) + r" \\")
+    lines += [r"\hline", rf"\multicolumn{{{ncol + 1}}}{{p{{0.95\textwidth}}}}{{\footnotesize Origin-destination-product-year cells; dep.\ var.\ MNE value share of the cell; each measure entered in its own regression; "
+              r"weighted by the cell's trade value; robust (HC1) SE. PCI = Hausmann--Hidalgo Product Complexity Index (continuous); Lall (2000) in the four categories of Figure~3, base = primary and resource-based; "
+              r"Rauch (1999) in three classes, base = homogeneous (exchange-traded). Cells whose HS6 line lacks the measure are dropped from that column. *** p$<$0.01, ** p$<$0.05, * p$<$0.1}} \\", r"\end{tabular}"]
+    W.write_tex(lines, R / "reg_wp1b_odpy_measures.tex")
 
 
 def main():

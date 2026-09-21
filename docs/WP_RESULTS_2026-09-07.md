@@ -487,3 +487,50 @@ and in the "sectors side by side" block at the start of WP_sectors (192 pp.).
   fragment notes lose their "reproduction of the note's Table" phrases (`DRAFT_MODE`). No table of contents,
   no "draft for internal review" date line. The draft has its own exhibit numbering (the review's numbers are
   WP_total's).
+
+## Revision 7 — 2026-09-21 (Volpe's review of the draft: annual averages, exhibit list, new exhibits)
+
+Christian reviewed `WP_draft_2026-09-18` with Sebastián; the list of changes is implemented across the pipeline
+and the four documents (`WP_draft` 29 pp., `WP_total` 52, `WP_sectors` 215, `WP_countries` 58; all dated
+2026-09-21). Full rerun (steps 0–3, 80 min from the cached cube) plus `build_classifications(force=True)`.
+
+- **Annual averages instead of pooled sums.** Every dollar value is now the origin's pooled value divided by
+  the number of years it is observed (ARG 9, CHL 14, COL 12, CRI 10, DOM 8, PER 10, PRY 9, SLV 13, URY 10 years;
+  `mne_flags` adds `value_yr`, `val_total_yr`, `val_ext_yr`, `val_dom_yr`); an aggregate is the sum of its origins'
+  annual averages (all goods $224.5bn/yr instead of the pooled $2,393.8bn). Shares are still computed on the
+  pooled values. Headers say `\$bn/yr` (`W.VAL_HDR`), notes carry `W.VAL_NOTE`. Figures no longer print dollar
+  values (home-share figures, to-USA bars, top-20 HS6, sector bars); the network-size table lost its value column.
+- **BEC in three classes** (`BEC4_ENDUSE`): motor spirit (321) and goods n.e.s. (7 — HS 27 fuels in these data)
+  → intermediate; passenger cars (51) → consumption. Unclassified HS6 (6.6 % of value) excluded. Foreign / domestic:
+  intermediate 0.476 / 0.155, consumption 0.438 / 0.082, capital 0.647 / 0.056.
+- **New exhibits.** (i) `tab/fig_wp3_us_three_shares_{total,origin}`: with the origin's total exports as the
+  denominator, 18.4 % goes to the USA, 10.0 % is carried by US-parent MNEs, 2.2 % is both (by origin: SLV 38 / 28 /
+  19 %, CRI 38 / 30 / 14 %, DOM 48 / 17 / 12 %, PRY 2 / 30 / 0.1 %). Replaces the origin × sector US-share exhibit in
+  the draft. (ii) `fig_wp1a_pci_lall_by_oecd` (+ tables): Figures 2–3 with the foreign bar split OECD / non-OECD
+  parent; the PCI gradient is entirely the OECD parents (0.36 → 0.58; non-OECD 0.10 → 0.07). (iii)
+  `reg_wp1b_odpy_measures`: PCI, Lall (4 categories, base primary) and Rauch (3 classes, base homogeneous) each
+  in its own regression, two FE sets, panels total / foreign / domestic (foreign: PCI +0.039, Lall high-tech +0.033,
+  Rauch differentiated +0.209; domestic: −0.039, −0.062, −0.127; all 1 %). (iv) `tab_wp1c_parent_x_parentdest_rowpct`:
+  top-10 parents × the same ten countries as destinations, diagonal = home share. (v)
+  `fig/tab_wp1d_home_share_by_parent_consolidated`: dependencies folded into their sovereign (GBR ← BMU, CYM, VGB,
+  JEY, GGY, IMN, GIB, …; NLD ← CUW, ABW, SXM; USA ← PRI, VIR; CHN ← HKG, MAC) and stand-alone havens / conduits
+  (LIE, CHE, LUX, PAN, BHS, …) pooled — USA 23.8 %, CAN 19.5 %, BRA 18.6 %, GBR 0.6 %, havens 2.4 %
+  (`W.HAVEN_SOVEREIGN`, `W.HAVEN_STANDALONE`, `W.consolidate_parent`). (vi) `fig_wp3_dest_carriers` redrawn with
+  US-, EU-27- and CAN-parent segments (EU-27 = strict 27 members, GBR excluded), no dollar totals; table gains the
+  EU / CAN columns. (vii) `tab_wp3_us_home_products` gains the three main origins of each line. (viii)
+  `tab_wp3_fact5ext_summary` (extensive-margin twin of the Fact-5 summary) and clearer row / panel titles in both.
+  (ix) `fig_wp3_fig1_by_sector_panels`: Figure 1 within agriculture / manufacturing / mining as one three-panel
+  figure. (x) `fig_wp1b_rauch` (three classes) used as a figure in the draft.
+- **Draft structure.** The 2026-09-18 order is kept; every caption starts with `[Main text]` or `[Appendix]`
+  (Volpe's assignment) and the exhibits he dropped are gone: by-parent PCI/Lall figures, four-sector bars,
+  origin × sector table, parent-share table, home-share-by-sector table, destination table, US-home-products
+  figure, WP_countries home-share figures, region value/colpct tables, origin × dest-region tables, cell-share heat
+  map, to-USA by-origin table, top LAC→USA lines, HHI figure and table, Lorenz, top-30 lists, quintile panel and
+  table. `panel_fig` builds lettered panels from existing graphs (PCI + Lall).
+- **Audit.** `scratch/audit_draft.py`: 96 checks recomputed from the cube against the fragments — Figure-1
+  shares and annual values, four-sector totals, the three US shares and their cross-exhibit identities (col 2 =
+  US share in the origin × sector table; col 3 / col 1 = US-parent share of exports to the USA = destination table
+  USA row), destination shares for EU-27 / CHN / CAN summing to 100, Rauch two-class = weighted merge of three,
+  BEC rows, parent shares and diagonal, consolidated home shares, HS-section totals, presence shares, US home
+  products, Fact 5 / 6 summaries = full fragments, OECD + non-OECD = foreign. All passed.
+- No text below 5 pt in the draft; zero overfull boxes; 2026-09-18 PDFs removed from git.

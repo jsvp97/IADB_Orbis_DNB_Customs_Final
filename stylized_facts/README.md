@@ -78,6 +78,9 @@ python/wp3_usa_destinations.py       rev. 6   the destination side of Fact 3: wh
                                      what US-parent MNEs ship home (HS6); US-parent share origin x sector; home share by parent x sector;
                                      Facts 5 and 6 in one four-column table each (read from wp1e's fragments -- run after 1e)
 python/wp_run_all.py                 runner:  python wp_run_all.py [cube 0 1a 1b 1cd 1e 1f 2 3]
+                                     rev. 7 (2026-09-21): dollar values are annual averages (value_yr columns from mne_flags), BEC in three
+                                     classes (rebuild the classification cache with build_classifications(force=True)), OECD split,
+                                     separate-measure ladder, parent x parent-destination table, consolidated (tax-haven) home shares
 python/wp_build_overleaf.py          assembles THREE Overleaf projects (output/wp/overleaf_WP_{total,sectors,countries}/),
                                      compiles each with pdflatex and zips them; copies of the PDFs in docs/
 ```
