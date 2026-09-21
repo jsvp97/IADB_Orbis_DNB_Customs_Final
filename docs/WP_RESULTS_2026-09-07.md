@@ -534,3 +534,30 @@ and the four documents (`WP_draft` 29 pp., `WP_total` 52, `WP_sectors` 215, `WP_
   BEC rows, parent shares and diagonal, consolidated home shares, HS-section totals, presence shares, US home
   products, Fact 5 / 6 summaries = full fragments, OECD + non-OECD = foreign. All passed.
 - No text below 5 pt in the draft; zero overfull boxes; 2026-09-18 PDFs removed from git.
+
+## Revision 8 — 2026-09-21, second pass (Volpe / Sebastián: consistency of every number)
+
+- **One share engine.** `W.flow_shares(d, by, numerators, denominator)` computes every share of the US, parent
+  and destination exhibits (wp3's carrier tables, the three-share table, the parent ranking on total exports)
+  from the same masks and the same pooled values; a different denominator is always a different column, never a
+  different figure. `wp_audit.py` (step `audit`, run last) recomputes the shared quantities from the cube and
+  checks the identities that link exhibits: US-parent share of TOTAL exports 10.0 % (parent ranking on total
+  exports = three-share column (2) = origin × sector 'All'); share of US-parent exports going home 22.3 %
+  (parent × parent-destination diagonal = country row % USA→USA = home-share figures); (3) = (2) × 0.223 = 2.2 %;
+  column (4) = (3)/(1) = US-parent share of exports TO the USA = to-USA carriers by origin / by sector = destination
+  table USA row (12.1 %). All pass.
+- **The three numbers Christian flagged are three denominators, now labelled as such**: 23.3 % was the US share
+  of foreign-MNE value with a known parent (kept only in WP_total); the draft's parent ranking now uses total
+  exports (`fig_wp1a_parent_share_total`: USA 10.0, GBR 8.3, CAN 3.4, …, other foreign 9.5, domestic 14.1; bars
+  add to the MNE share 60.5 %). 22.3 % is the share of US-parent exports that goes to the USA (Table 7 diagonal,
+  Figures 14 and 16 now print one decimal). SLV 40.2 / CRI 37.2 / DOM 24.7 in the to-USA figure are column (4)
+  of the three-share table, added for that purpose.
+- **Rauch in three classes everywhere** in the draft (`tab/fig_wp1b_rauch`, all goods and manufacturing); the
+  two-class exhibits stay in WP_total / WP_sectors only.
+- **Tax-haven figure as two panels** (`fig_wp1d_home_share_haven_panels`): Panel A the ten largest non-haven
+  parents with dependencies folded into their sovereign (USA 23.8, CAN 19.5, BRA 18.6, ESP 12.2, CHL 9.6, JPN 8.9,
+  DEU 8.3, FRA 3.1, NLD 2.2, GBR 0.6); Panel B the ten largest haven / conduit jurisdictions as recorded (LIE 0.0,
+  CHE 0.3, PAN 1.4, LUX 0.1, IRL, CYM 0.2, BMU, SGP, VGB, BHS 0.0).
+- Captions: bold `[Main text]` / `[Appendix]`; no "Appendix" section — every former appendix exhibit sits next to
+  the exhibit it documents (Figure-1 numbers after Figure 1, etc.); no "in the cell" wording — units spelled out
+  as "the product from the origin to the destination in the year". Draft 29 pp.; WP_total 54; WP_sectors 223.

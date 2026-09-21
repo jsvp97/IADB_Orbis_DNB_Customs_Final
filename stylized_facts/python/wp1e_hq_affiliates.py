@@ -212,7 +212,7 @@ def part_a(cube: pd.DataFrame, scope: str) -> None:
     ROWS_E = [(LAB[v], v) for v in ("any_n_mne", "any_n_ext", "any_n_ext_hq", "any_n_ext_nothq", "any_n_dom")]
     run_panel_table(g, [("(1)", FE_A, ["any_n_mne"]), ("(2)", FE_B, ["any_n_mne"]), ("(3)", FE_A, EX1), ("(4)", FE_B, EX1), ("(5)", FE_A, EX2), ("(6)", FE_B, EX2)],
                     PANELS, ROWS_E, "od", R / "reg_wp1e_extensive.tex",
-                    "Origin-destination-product-year cells; dep.\\ var.\\ $\\ln$ exports. Extensive margin: indicators for the presence of at least one MNE of each type in the cell; all cells.",
+                    "One observation = origin $\\times$ destination $\\times$ HS6 product $\\times$ year; dep.\\ var.\\ $\\ln$ exports of the product from the origin to the destination in the year. Extensive margin: indicators for at least one MNE of each type exporting the product to the destination; all observations.",
                     col_groups=[("All MNEs", 2), ("Foreign / domestic", 2), ("Foreign through HQ / not through HQ / domestic", 2)])
 
     # (3) groups vs affiliates ---------------------------------------------------------------------------------

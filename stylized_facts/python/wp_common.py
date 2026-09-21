@@ -508,6 +508,25 @@ HAVEN_STANDALONE = {"LIE", "CHE", "LUX", "PAN", "BHS", "BRB", "BLZ", "CYP", "MLT
 HAVEN_GROUP_LABEL = "Tax havens & conduits"
 
 
+def flow_shares(d: pd.DataFrame, by, numerators: dict, denominator=None, order=None) -> pd.DataFrame:
+    """THE single share engine (revision 8). For every group of `by` (a column name, a Series aligned with d, or
+    None for one row 'All'): the pooled export value of each numerator mask as a percent of the pooled value of the
+    denominator mask (default: everything in the group), plus the denominator's annual-average value in USD bn
+    ('total_bn'). Every share in every US / parent / destination exhibit is computed here, so two exhibits that
+    describe the same quantity cannot disagree; a different denominator is always a different column."""
+    den = pd.Series(True, index=d.index) if denominator is None else denominator.reindex(d.index).fillna(False).astype(bool)
+    g = pd.Series("All", index=d.index) if by is None else (d[by] if isinstance(by, str) else pd.Series(by, index=d.index))
+    base = d.loc[den, "value"].groupby(g[den]).sum()
+    out = pd.DataFrame(index=base.index)
+    for name, mask in numerators.items():
+        m = mask.reindex(d.index).fillna(False).astype(bool) & den
+        out[name] = 100 * d.loc[m, "value"].groupby(g[m]).sum().reindex(base.index).fillna(0.0) / base
+    out["total_bn"] = d.loc[den, "value_yr"].groupby(g[den]).sum().reindex(base.index) / 1e9
+    if order is not None:
+        out = out.reindex([o for o in order if o in out.index])
+    return out
+
+
 def consolidate_parent(code: pd.Series) -> pd.Series:
     """Parent country with dependencies folded into their sovereign and stand-alone havens pooled."""
     out = code.map(HAVEN_SOVEREIGN).fillna(code)

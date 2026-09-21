@@ -337,8 +337,8 @@ def odpy_measures_separately(d: pd.DataFrame, cls: pd.DataFrame, R: Path, scope:
     lines.append(r"\hline")
     for lab, key in ((r"Origin $\times$ year and destination $\times$ year FE", "OY"), (r"Origin $\times$ dest.\ $\times$ year FE", "ODY")):
         lines.append(f"{lab} & " + " & ".join(r"$\checkmark$" if key in cols[ci][4] else "" for ci in range(ncol)) + r" \\")
-    lines += [r"\hline", rf"\multicolumn{{{ncol + 1}}}{{p{{0.95\textwidth}}}}{{\footnotesize Origin-destination-product-year cells; dep.\ var.\ MNE value share of the cell; each measure entered in its own regression; "
-              r"weighted by the cell's trade value; robust (HC1) SE. PCI = Hausmann--Hidalgo Product Complexity Index (continuous); Lall (2000) in the four categories of Figure~3, base = primary and resource-based; "
+    lines += [r"\hline", rf"\multicolumn{{{ncol + 1}}}{{p{{0.95\textwidth}}}}{{\footnotesize One observation = origin $\times$ destination $\times$ HS6 product $\times$ year; dep.\ var.\ MNE share of the export value of the product from the origin to the destination in the year; each measure entered in its own regression; "
+              r"weighted by that export value; robust (HC1) SE. PCI = Hausmann--Hidalgo Product Complexity Index (continuous); Lall (2000) in the four categories of Figure~3, base = primary and resource-based; "
               r"Rauch (1999) in three classes, base = homogeneous (exchange-traded). Cells whose HS6 line lacks the measure are dropped from that column. *** p$<$0.01, ** p$<$0.05, * p$<$0.1}} \\", r"\end{tabular}"]
     W.write_tex(lines, R / "reg_wp1b_odpy_measures.tex")
 

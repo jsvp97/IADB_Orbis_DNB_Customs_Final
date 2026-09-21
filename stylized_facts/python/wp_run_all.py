@@ -27,6 +27,7 @@ STEPS = {
     "1f": "wp1f_hs6_products.py",
     "2": "wp2_agro_sectors.py",
     "3": "wp3_usa_destinations.py",   # revision 6: destination side of Fact 3 + cross-sector summaries (reads wp1e's fragments)
+    "audit": "wp_audit.py",           # revision 8: cross-exhibit consistency checks (run last)
 }
 
 if __name__ == "__main__":

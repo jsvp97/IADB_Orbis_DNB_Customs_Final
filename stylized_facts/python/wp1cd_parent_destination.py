@@ -122,6 +122,48 @@ def home_share_consolidated(ext: pd.DataFrame, G: Path, T: Path, k: int = TOP_TA
     print("   consolidated home shares: " + ", ".join(f"{p} {r['share']:.1f}%" for p, r in hs.head(8).iterrows()))
 
 
+def home_share_haven_panels(ext: pd.DataFrame, G: Path, T: Path, k: int = TOP_TAB) -> None:
+    """Revision 8 (Volpe): Panel A = the ten largest NON-haven parents (dependencies folded into their sovereign),
+    Panel B = the ten largest tax-haven / conduit jurisdictions as recorded, each with its own home share (shipments
+    to that jurisdiction)."""
+    sov = ext["iso3_parent"].map(W.HAVEN_SOVEREIGN).fillna(ext["iso3_parent"])
+    is_haven = ext["iso3_parent"].isin(W.HAVEN_STANDALONE) | ext["iso3_parent"].isin(W.HAVEN_SOVEREIGN)
+    e = ext.assign(pc=sov, dest_c=ext["country_dest"].map(W.HAVEN_SOVEREIGN).fillna(ext["country_dest"]), haven=is_haven)
+    a = e[~e["haven"]]; b = e[e["haven"]]
+    top_a = list(a.groupby("pc")["value"].sum().sort_values(ascending=False).index[:k])
+    top_b = list(b.groupby("iso3_parent")["value"].sum().sort_values(ascending=False).index[:k])
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5.2))
+    rows = []
+    for ax, (dd, col, home_col, top, title) in zip(axes, ((a, "pc", "dest_c", top_a, "Panel A. Ten largest parent countries (not tax havens)"),
+                                                          (b, "iso3_parent", "country_dest", top_b, "Panel B. Ten largest tax-haven and conduit jurisdictions"))):
+        h = dd.assign(home=(dd[home_col] == dd[col]).astype(int) * dd["value"])
+        hs = h.groupby(col).agg(value=("value", "sum"), value_yr=("value_yr", "sum"), home=("home", "sum")).reindex(top)
+        hs["share"] = 100 * hs["home"] / hs["value"]
+        y = np.arange(len(hs))[::-1]
+        ax.barh(y, hs["share"], color=W.C_MNE_EXT)
+        for yi, (i, r) in zip(y, hs.iterrows()):
+            ax.text(r["share"] + 0.4, yi, f"{r['share']:.1f}%", va="center", fontsize=10)
+        ax.set_yticks(y); ax.set_yticklabels(hs.index, fontsize=11); ax.tick_params(axis="x", labelsize=10)
+        ax.set_xlim(0, max(30, float(hs["share"].max()) * 1.25)); ax.set_title(title, fontsize=12)
+        ax.set_xlabel("% of the parent's LAC exports shipped to the parent's own jurisdiction", fontsize=10)
+        for s in ("top", "right"):
+            ax.spines[s].set_visible(False)
+        rows.append(hs.assign(panel=title[:7]))
+    fig.tight_layout()
+    W.savefig(fig, "fig_wp1d_home_share_haven_panels", G)
+    lines = [r"\begin{tabular}{llrr}", r"\toprule", rf"Panel & Parent & Home share (\%) & Exports ({W.VAL_HDR}) \\", r"\midrule"]
+    for hs in rows:
+        for p, r in hs.iterrows():
+            lines.append(f"{r['panel']} & {W.tex_escape(p)} & {r['share']:.1f} & {r['value_yr'] / 1e9:,.1f} \\\\")
+        lines.append(r"\midrule")
+    dep = ", ".join(f"{c}$\\to${s}" for c, s in sorted(W.HAVEN_SOVEREIGN.items(), key=lambda x: (x[1], x[0])))
+    lines[-1] = r"\bottomrule"
+    lines += [rf"\multicolumn{{4}}{{p{{0.95\textwidth}}}}{{\footnotesize Panel A: parents that are not tax havens, with dependencies and overseas territories folded into their sovereign ({dep}). "
+              rf"Panel B: the tax-haven and conduit jurisdictions as recorded ({', '.join(sorted(W.HAVEN_STANDALONE))} and the dependencies above), each with its own home share. {W.VAL_NOTE}}} \\", r"\end{tabular}"]
+    W.write_tex(lines, T / "tab_wp1d_home_share_haven_panels.tex")
+    print("   haven panels: A " + ", ".join(f"{p} {r['share']:.1f}" for p, r in rows[0].iterrows()) + " | B " + ", ".join(f"{p} {r['share']:.1f}" for p, r in rows[1].iterrows()))
+
+
 def parent_x_parentdest(ext: pd.DataFrame, top_p: list, T: Path, note: str) -> None:
     """Revision 7: top-10 parents x the SAME ten countries as destinations (row %), so the diagonal is the home share."""
     dcol = ext["country_dest"].where(ext["country_dest"].isin(top_p), "Other destinations")
@@ -169,6 +211,7 @@ def run_scope(cube: pd.DataFrame, scope: str) -> None:
                 mat_yr=country_matrix(TOP_TAB, "value_yr")[2])
     parent_x_parentdest(ext, top_p, T, f"Foreign MNEs with a recorded parent country; top {TOP_TAB} parents by foreign-MNE export value. " + note)
     home_share_consolidated(ext, G, T)
+    home_share_haven_panels(ext, G, T)
     # heat maps on the 15 x 15 version
     top_p, top_d, mat_m = country_matrix(TOP_MAP)
     core = mat_m.loc[top_p, top_d]

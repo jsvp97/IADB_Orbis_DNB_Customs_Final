@@ -177,7 +177,38 @@ def parent_share_figure(d: pd.DataFrame, gdir: Path, tdir: Path, scope: str, top
     W.write_tex(lines, tdir / "tab_wp1a_parent_share.tex")
     print(f"   [{scope}] parent shares: " + ", ".join(f"{a} {b * 100:.1f}%" for a, b in zip(labels[:6], shares[:6]))
           + f" | unknown parent = {unknown / (unknown + total):.0%} of foreign-MNE value")
+    parent_share_total(d, gdir, tdir, top["iso3_parent"].tolist())
     return ext
+
+
+def parent_share_total(d: pd.DataFrame, gdir: Path, tdir: Path, top: list) -> None:
+    """Revision 8: the same ranking with ONE denominator -- the scope's TOTAL export value -- so the USA bar is the
+    same 10.0 % that the US three-share exhibit shows. Bars: top-15 parents, other foreign (incl. unknown parent),
+    domestic MNEs; the bars add up to the MNE share of Figure 1. Computed with W.flow_shares."""
+    ext = d["owner_type"] == "ext"
+    masks = {p: ext & (d["iso3_parent"] == p) for p in top}
+    masks["Other foreign MNEs (incl. unknown parent)"] = d["owner_type"].isin(["ext", "ext_unknown"]) & ~(ext & d["iso3_parent"].isin(top))
+    masks["Domestic MNEs"] = d["owner_type"] == "dom"
+    sh = W.flow_shares(d, None, masks).loc["All"]
+    labels = list(masks); vals = [sh[k] for k in labels]
+    fig, ax = plt.subplots(figsize=(8, 6.4))
+    y = np.arange(len(labels))[::-1]
+    colors = [W.C_MNE_EXT] * len(top) + [W.C_OTHER_FOREIGN, W.C_MNE_DOM]
+    ax.barh(y, vals, color=colors)
+    for yi, v in zip(y, vals):
+        ax.text(v + max(vals) * 0.01, yi, f"{v:.1f}%", va="center", fontsize=9)
+    ax.set_yticks(y); ax.set_yticklabels(labels, fontsize=9)
+    ax.set_xlim(0, max(vals) * 1.15); ax.set_xlabel("share of the scope's total export value (%)")
+    for s in ("top", "right"):
+        ax.spines[s].set_visible(False)
+    W.savefig(fig, "fig_wp1a_parent_share_total", gdir)
+    lines = [r"\begin{tabular}{lr}", r"\toprule", r"Exporter type / parent country & Share of total exports (\%) \\", r"\midrule"]
+    for k in labels:
+        lines.append(f"{W.tex_escape(k)} & {sh[k]:.1f} \\\\")
+    lines += [r"\midrule", f"All MNEs & {sum(vals):.1f} \\\\", f"Local firms (unmatched) & {100 - sum(vals):.1f} \\\\", r"\bottomrule",
+              r"\multicolumn{2}{p{0.8\textwidth}}{\footnotesize Denominator: the scope's total export value, all firms and destinations (the same denominator as Figure 1 and as the US three-share exhibit). Foreign MNEs with a recorded parent are shown for the 15 largest parent countries; every other foreign MNE, including matched firms with no recorded parent, is pooled.} \\", r"\end{tabular}"]
+    W.write_tex(lines, tdir / "tab_wp1a_parent_share_total.tex")
+    print("   parent shares of TOTAL exports: " + ", ".join(f"{k} {sh[k]:.1f}%" for k in labels[:5]))
 
 
 # ---------------------------------------------------------------------
