@@ -272,13 +272,13 @@ def originals(d: pd.DataFrame, hs6q: pd.DataFrame, hs6l: pd.DataFrame, G: Path, 
 
 OECD_GROUPS = ["OECD", "Non-OECD", "Domestic"]
 OECD_COLORS = {"OECD": W.C_MNE_EXT, "Non-OECD": W.BLUE_SHADES[5], "Domestic": W.C_MNE_DOM}
-OECD_LABEL = {"OECD": "Foreign MNEs, OECD parent", "Non-OECD": "Foreign MNEs, non-OECD or unknown parent", "Domestic": "Domestic MNEs"}
+OECD_LABEL = {"OECD": "Foreign MNEs, OECD parent", "Non-OECD": "Foreign MNEs, non-OECD parent", "Domestic": "Domestic MNEs"}
 
 
 def oecd_group(d: pd.DataFrame) -> pd.Series:
     out = pd.Series("Local", index=d.index, dtype="object")
     out[d["owner_type"] == "dom"] = "Domestic"
-    out[d["owner_type"] == "ext_unknown"] = "Non-OECD"
+    out[d["owner_type"] == "ext_unknown"] = "Unknown"
     ext = d["owner_type"] == "ext"
     out[ext] = np.where(d.loc[ext, "iso3_parent"].isin(W.OECD_CODES), "OECD", "Non-OECD")
     return out
@@ -301,11 +301,22 @@ def _stacked_on_ax(ax, sh: pd.DataFrame, xlabels: dict, xlabel: str, ymax: float
         ax.spines[s].set_visible(False)
 
 
+def _allocate_unknown(sh: pd.DataFrame) -> pd.DataFrame:
+    """Foreign MNEs with no recorded parent country (7.5 % of foreign-MNE value) cannot be classified as OECD or
+    non-OECD. Ignacio's Figure 4 drops them; here the foreign bar must still equal Figure 2's, so their value is
+    allocated to OECD / non-OECD in proportion to the known parents of the same category (revision 8)."""
+    known = sh["OECD"] + sh["Non-OECD"]
+    tot_f = known + sh["Unknown"]
+    sh = sh.copy()
+    sh["OECD"] = tot_f * sh["OECD"] / known.replace(0, np.nan); sh["Non-OECD"] = tot_f * sh["Non-OECD"] / known.replace(0, np.nan)
+    return sh.fillna(0.0)
+
+
 def oecd_split(dq: pd.DataFrame, dl: pd.DataFrame, G: Path, T: Path, note_conv: str) -> None:
     """Figures 2 and 3 with the foreign bar split by whether the parent is an OECD member: one figure, two panels."""
     dq = dq.assign(pgrp=oecd_group(dq)); dl = dl.assign(pgrp=oecd_group(dl))
-    sh2 = shares_by(dq, "quintile", OECD_GROUPS)
-    sh3 = shares_by(dl, "lall_4", OECD_GROUPS).reindex([c for c in LALL_4_ORDER if c in dl["lall_4"].unique()])
+    sh2 = _allocate_unknown(shares_by(dq, "quintile", OECD_GROUPS + ["Unknown"]))
+    sh3 = _allocate_unknown(shares_by(dl, "lall_4", OECD_GROUPS + ["Unknown"]).reindex([c for c in LALL_4_ORDER if c in dl["lall_4"].unique()]))
     fig, axes = plt.subplots(1, 2, figsize=(12, 5.6), gridspec_kw={"width_ratios": [1, 1]})
     _stacked_on_ax(axes[0], sh2, QLBL, "Panel A. PCI quintile (1 = lowest complexity, 5 = highest)")
     _stacked_on_ax(axes[1], sh3, LALL_4_XLBL, "Panel B. Lall (2000) technology category")
@@ -313,8 +324,9 @@ def oecd_split(dq: pd.DataFrame, dl: pd.DataFrame, G: Path, T: Path, note_conv: 
     fig.legend(h, l, frameon=False, fontsize=11, loc="lower center", ncol=3, bbox_to_anchor=(0.5, 0.0))
     fig.tight_layout(rect=(0, 0.09, 1, 1))
     W.savefig(fig, "fig_wp1a_pci_lall_by_oecd", G)
-    note = ("Foreign MNEs split by the OECD membership of the parent's country (38 members; matched firms with no recorded parent are "
-            "counted with the non-OECD parents). " + note_conv.split(W.PARENT_GROUPS_NOTE)[0])
+    note = ("Foreign MNEs split by the OECD membership of the parent's country (38 members). Foreign MNEs with no recorded parent country "
+            "(7.5\\% of foreign-MNE value) are allocated to the two groups in proportion to the known parents of the same category, so the "
+            "foreign bar equals Figure 2's. " + note_conv.split(W.PARENT_GROUPS_NOTE)[0])
     write_share_table(sh2, OECD_GROUPS, T / "tab_wp1a_pci_by_oecd.tex", "PCI quintile", "Figure 2, foreign bar split by OECD / non-OECD parent. " + note, xlabels=QLBL)
     write_share_table(sh3, OECD_GROUPS, T / "tab_wp1a_lall_by_oecd.tex", "Technology category", "Figure 3, foreign bar split by OECD / non-OECD parent. " + note)
     print("   OECD split, PCI: " + ", ".join(f"Q{i} OECD {r['OECD']:.2f} / non-OECD {r['Non-OECD']:.2f}" for i, r in sh2.iterrows()))

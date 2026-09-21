@@ -49,13 +49,13 @@ def region_rows(d: pd.DataFrame) -> pd.Series:
     lab = pd.Series("", index=d.index, dtype="object")
     ext = d["owner_type"] == "ext"
     lab[ext] = d.loc[ext, "iso3_parent"].map(W.classify_region)
-    lab[d["owner_type"] == "ext_unknown"] = "Foreign MNE, parent unknown"
+    lab[d["owner_type"] == "ext_unknown"] = "Foreign MNE, parent country not recorded"
     lab[d["owner_type"] == "dom"] = "Domestic MNEs"
     lab[d["owner_type"] == "local"] = "Local firms (unmatched)"
     return lab
 
 
-ROW_ORDER = W.REGION_ORDER + ["Foreign MNE, parent unknown", "Domestic MNEs", "Local firms (unmatched)"]
+ROW_ORDER = W.REGION_ORDER + ["Foreign MNE, parent country not recorded", "Domestic MNEs", "Local firms (unmatched)"]
 
 
 def two_way(d: pd.DataFrame, row: pd.Series, col: pd.Series, row_order=None, col_order=None, value: str = "value"):

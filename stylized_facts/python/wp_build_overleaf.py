@@ -578,8 +578,9 @@ def build_draft() -> Path:
     L.append(fig(M, "fig_wp1b_rauch", f"{MAIN} Manufacturing: foreign vs domestic MNE shares by Rauch (1999) class: differentiated, reference-priced, homogeneous.", "d_rauch_manuf", 0.7))
     # ---- Fact 3
     L.append(sec("Fact 3 --- Multinational corporations from a small set of countries dominate exports"))
-    L.append(fig(A, "fig_wp1a_parent_share_total", f"{MAIN} Share of total export value by the parent's country (top 15), other foreign MNEs and domestic MNEs.", "d_f4", 0.85,
-                 "Denominator: total export value of the nine origins, the same as in Figure~\\ref{fig:d_f1} and in the US three-share exhibit (the USA bar is the 10.0\\,\\% there). The bars add up to the MNE share of exports, 60.5\\,\\%; the remaining 39.5\\,\\% is exported by local firms."))
+    L.append(fig(A, "fig_wp1a_parent_share", f"{MAIN} Foreign-MNE export value by the parent's country: top 15 and other (Figure 4 of the July note).", "d_f4", 0.78,
+                 "Denominator: export value of foreign MNEs with a recorded parent country, as in the note (matched firms whose parent country is not recorded, 7.5\\,\\% of foreign-MNE value, are left out because they cannot be attributed to a country). "
+                 "The USA's 23.3\\,\\% of that value is 10.0\\,\\% of total exports (foreign MNEs with a recorded parent export 42.8\\,\\% of the total), the figure the US three-share exhibit reports."))
     L.append(tab(A, "Tables", "tab_wp1c_country_rowpct.tex", f"{MAIN} Top-10 parents $\\times$ top-10 destinations: destination mix of each parent's exports (row \\%)", "d_pxd"))
     L.append(tab(A, "Tables", "tab_wp1c_parent_x_parentdest_rowpct.tex", f"{MAIN} Top-10 parents $\\times$ the same ten countries as destinations (row \\%): the diagonal is the share of each parent's exports shipped to the parent's own country (USA 22.3\\,\\%)", "d_pxp"))
     L.append(tab(A, "Tables", "tab_wp1c_region_rowpct.tex", f"{APP} Parent region $\\times$ destination region: destination mix of each group (row \\%)", "d_a_reg"))

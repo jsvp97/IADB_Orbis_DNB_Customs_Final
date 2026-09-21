@@ -561,3 +561,35 @@ and the four documents (`WP_draft` 29 pp., `WP_total` 52, `WP_sectors` 215, `WP_
 - Captions: bold `[Main text]` / `[Appendix]`; no "Appendix" section — every former appendix exhibit sits next to
   the exhibit it documents (Figure-1 numbers after Figure 1, etc.); no "in the cell" wording — units spelled out
   as "the product from the origin to the destination in the year". Draft 29 pp.; WP_total 54; WP_sectors 223.
+
+### Revision 8b — same day: the parent ranking back to Ignacio's definition; verification against the July note
+
+Sebastián asked for the parent-ranking figure to follow Ignacio's `sf2_mne_origin.py` (USA 23.3 %) and questioned
+the "unknown parent" bar. Done and verified:
+
+- **Figure 4 of the note = `fig_wp1a_parent_share`** (denominator: foreign-MNE value with a recorded parent;
+  matched firms with no recorded parent dropped, exactly as Ignacio's script does). It is back in the draft
+  (Fact 3, main text) in place of the total-exports version; the caption states the identity 23.3 % of
+  known-parent foreign value = 10.0 % of total exports (known-parent foreign MNEs export 42.8 % of the total).
+  `fig_wp1a_parent_share_total` stays in WP_total.
+- **Unknown parents exist**: 7.5 % of foreign-MNE value ($83.6bn pooled, 3.5 % of all exports; by origin COL 11 %,
+  PER 11 %, PRY 9 %, CRI 8 %, URY 7 %, CHL 7 %, DOM 5 %, ARG 4 %, SLV 4 %) is matched (`_merge_DNB_Orbis = 3`) but
+  carries no `iso3_parent`. The July note had ≈ 50 % (its own Figure-4 note). Treatment now follows Ignacio
+  everywhere: counted as foreign where only foreign / domestic matters (ext = total − dom, Figure 1); dropped
+  where the parent country is needed (Figure 4, parent × destination); in the OECD split they are allocated to
+  OECD / non-OECD in proportion to the known parents of the same category so the foreign bar equals Figure 2's
+  (`_allocate_unknown`); the word "unknown" no longer appears in any draft label.
+- **Verification against the note (`scratch/compare_note.py`, numbers read from the note's PDF).** Identical to
+  the digit wherever only the matched flag enters: Figure 1 totals by origin (COL 0.74 … PER 0.47), Figure 2
+  quintile totals (0.64 / 0.54 / 0.69 / 0.69 / 0.72), Figure 5 (5 / 12 / 26 / 56 % of value; 48 / 28 / 15 / 9 % of
+  parents), Figure 6 (0.192 / 0.209 / 0.215; 0.234 / 0.262 / 0.270), Table 1 Panel A and every N, Table 2 columns
+  (1)–(2) and N. Different only where the parent country enters, because the current base carries a parent for
+  92.5 % of foreign value against ≈ 50 % in the July copy: the foreign / domestic split within Figures 1–3 (COL
+  0.35 / 0.39 vs the note's 0.47 / 0.28; CHL 0.48 / 0.14 vs 0.54 / 0.09), Figure 4's ranking (USA 23.3, GBR 19.3,
+  CAN 7.8, LIE 5.4 vs the note's GBR 24.7, USA 22.5, CAN 10.2, NLD 5.6), Table 1 Panel B (1.3536 vs 1.3522),
+  Table 2 columns (3)–(4) (0.0689 / 0.0393 vs 0.0673 / 0.0405) and Table A.8's foreign / domestic distance
+  interactions (0.0487 / 0.0318 vs 0.0456 / 0.0552). Table A.4's PCI coefficient differs for a second reason as
+  well: the WP ladder adds the FGO elasticity and drops HS6 lines without it (N 1.56 M vs 1.65 M); the new
+  separate-measure table (PCI alone, 1.67 M) gives 0.0385 / −0.0389 for foreign / domestic against the note's
+  0.0452 / −0.0397. None of this is a code difference — `wp0` / `wp1a` implement Ignacio's aggregations (HS6
+  collapse, unweighted quintiles, value-weighted shares, ext = total − dom) on the current base.
