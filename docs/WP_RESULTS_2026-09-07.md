@@ -562,6 +562,30 @@ and the four documents (`WP_draft` 29 pp., `WP_total` 52, `WP_sectors` 215, `WP_
   the exhibit it documents (Figure-1 numbers after Figure 1, etc.); no "in the cell" wording — units spelled out
   as "the product from the origin to the destination in the year". Draft 29 pp.; WP_total 54; WP_sectors 223.
 
+### Revision 9 — 2026-09-21: ONE rule for the unrecorded parents, applied everywhere
+
+Sebastián: "no notes that reconcile — the document must be consistent by itself". The rule (`W.parent_scale`,
+`W.PARENT_RULE_NOTE`, stated once in the Data paragraph): matched exporters with no recorded parent country
+(7.5 % of foreign-MNE value) are allocated to parent countries in proportion to the recorded parents of the
+same group. Consequences, all implemented through `W.flow_shares(scale=...)` / `parent_scale`:
+- every share by parent country refers to ALL foreign MNEs and adds up with the domestic and local shares; a share
+  computed among recorded parents (Ignacio's Figure 4) is unchanged — USA 23.3 % of foreign-MNE value — and
+  Figure 4 stays exactly his;
+- the US-parent share of total exports is 23.3 % × 46.3 % (foreign share, Figure 1) = **10.8 %** (was 10.0 % on
+  recorded parents only); the three-share table is now (1) 18.4 % to the USA, (2) 10.8 % by US MNEs, (4) 13.6 %
+  US-parent share of exports to the USA (was 12.1 %), (3) = (4) × (1) = 2.5 %; by origin SLV 46.1 / 29.1 / 19.0 /
+  41.3, CRI 38.3 / 33.0 / 15.1 / 39.5, DOM 48.0 / 17.8 / 12.5 / 26.0;
+- carrier exhibits (to the USA, destination markets, top LAC→USA lines): parent groups scaled, `other foreign`
+  = residual, rows sum to 100 with no unknown category (USA row of the destination table: 13.6 / 7.7 EU / 1.4 CAN /
+  12.5 other / 24.4 domestic / 40.4 local);
+- Figure 2 by parent, the OECD split, the top-20 HS6 by parent, the parent ranking on total exports
+  (`parent_share_total`, WP_total), the origin × sector US share, the US home-products table: same rule;
+- lead-parent shares (HS6 tables, HS sections) computed among recorded parents (= share of all foreign under the
+  rule); region tables lose the "parent not recorded" row (row % unaffected);
+- home shares (ratios within a parent) and parent × destination row % are unaffected by construction.
+`wp_audit.py` now checks Figure 4 USA × Figure 1 foreign share = three-share column (2), (3) = (4) × (1), and
+column (4) by origin = the to-USA carrier bars.
+
 ### Revision 8b — same day: the parent ranking back to Ignacio's definition; verification against the July note
 
 Sebastián asked for the parent-ranking figure to follow Ignacio's `sf2_mne_origin.py` (USA 23.3 %) and questioned

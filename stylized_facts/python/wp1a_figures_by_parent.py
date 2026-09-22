@@ -62,6 +62,17 @@ def shares_by(d: pd.DataFrame, by: str, groups: list[str]) -> pd.DataFrame:
     tot = d.groupby(by)["value"].sum()
     mat = d.pivot_table(index=by, columns="pgrp", values="value", aggfunc="sum", fill_value=0.0)
     mat = mat.reindex(columns=[g for g in groups if g in mat.columns], fill_value=0.0)
+    # revision 9 -- one rule for matched firms with no recorded parent country: allocate their value to the parent
+    # groups in proportion to the recorded parents of the same row (W.parent_scale); the pooled `Other` group
+    # therefore holds recorded `other' parents only, and no `Unknown' column is kept
+    unk = d.loc[d["owner_type"] == "ext_unknown", "value"].groupby(d.loc[d["owner_type"] == "ext_unknown", by]).sum().reindex(mat.index).fillna(0.0)
+    if "Other" in mat.columns:
+        mat["Other"] = (mat["Other"] - unk).clip(lower=0.0)
+    if "Unknown" in mat.columns:
+        mat = mat.drop(columns="Unknown")
+    parent_cols = [c for c in mat.columns if c not in ("Domestic", "Local")]
+    sc = W.parent_scale(d, pd.Series(True, index=d.index), d[by], mat.index)
+    mat[parent_cols] = mat[parent_cols].mul(sc, axis=0)
     sh = mat.div(tot, axis=0)
     sh["sh_total"] = sh.drop(columns=[c for c in ("Local",) if c in sh.columns]).sum(axis=1)
     sh["total_value"] = tot
@@ -171,9 +182,8 @@ def parent_share_figure(d: pd.DataFrame, gdir: Path, tdir: Path, scope: str, top
     for _, r in top.iterrows():
         lines.append(f"{r['iso3_parent']} & {r['share'] * 100:.1f} & {r['value_yr'] / 1e9:,.1f} \\\\")
     lines.append(f"Other ({len(ext) - top_n} countries) & {other * 100:.1f} & {ext['value_yr'].iloc[top_n:].sum() / 1e9:,.1f} \\\\")
-    lines += [r"\midrule", f"Foreign MNEs with recorded parent & 100.0 & {total_yr / 1e9:,.1f} \\\\",
-              f"Foreign MNEs, parent unknown (excluded above) & -- & {unknown_yr / 1e9:,.1f} \\\\",
-              r"\bottomrule", rf"\multicolumn{{3}}{{p{{0.8\textwidth}}}}{{\footnotesize {W.VAL_NOTE}}} \\", r"\end{tabular}"]
+    lines += [r"\midrule", f"All foreign MNEs & 100.0 & {(total_yr + unknown_yr) / 1e9:,.1f} \\\\",
+              r"\bottomrule", rf"\multicolumn{{3}}{{p{{0.8\textwidth}}}}{{\footnotesize Shares of foreign-MNE export value by parent country (Figure 4 of the July note). {W.PARENT_RULE_NOTE} Value column: recorded parents only, annual averages; the last row is all foreign MNEs. {W.VAL_NOTE}}} \\", r"\end{tabular}"]
     W.write_tex(lines, tdir / "tab_wp1a_parent_share.tex")
     print(f"   [{scope}] parent shares: " + ", ".join(f"{a} {b * 100:.1f}%" for a, b in zip(labels[:6], shares[:6]))
           + f" | unknown parent = {unknown / (unknown + total):.0%} of foreign-MNE value")
@@ -187,9 +197,9 @@ def parent_share_total(d: pd.DataFrame, gdir: Path, tdir: Path, top: list) -> No
     domestic MNEs; the bars add up to the MNE share of Figure 1. Computed with W.flow_shares."""
     ext = d["owner_type"] == "ext"
     masks = {p: ext & (d["iso3_parent"] == p) for p in top}
-    masks["Other foreign MNEs (incl. unknown parent)"] = d["owner_type"].isin(["ext", "ext_unknown"]) & ~(ext & d["iso3_parent"].isin(top))
+    masks["Other foreign MNEs"] = ext & ~d["iso3_parent"].isin(top)
     masks["Domestic MNEs"] = d["owner_type"] == "dom"
-    sh = W.flow_shares(d, None, masks).loc["All"]
+    sh = W.flow_shares(d, None, masks, scale=set(top) | {"Other foreign MNEs"}).loc["All"]
     labels = list(masks); vals = [sh[k] for k in labels]
     fig, ax = plt.subplots(figsize=(8, 6.4))
     y = np.arange(len(labels))[::-1]
@@ -206,7 +216,7 @@ def parent_share_total(d: pd.DataFrame, gdir: Path, tdir: Path, top: list) -> No
     for k in labels:
         lines.append(f"{W.tex_escape(k)} & {sh[k]:.1f} \\\\")
     lines += [r"\midrule", f"All MNEs & {sum(vals):.1f} \\\\", f"Local firms (unmatched) & {100 - sum(vals):.1f} \\\\", r"\bottomrule",
-              r"\multicolumn{2}{p{0.8\textwidth}}{\footnotesize Denominator: the scope's total export value, all firms and destinations (the same denominator as Figure 1 and as the US three-share exhibit). Foreign MNEs with a recorded parent are shown for the 15 largest parent countries; every other foreign MNE, including matched firms with no recorded parent, is pooled.} \\", r"\end{tabular}"]
+              rf"\multicolumn{{2}}{{p{{0.8\textwidth}}}}{{\footnotesize Denominator: the scope's total export value, all firms and destinations (the same denominator as Figure 1 and as the US three-share exhibit). The 15 largest parent countries are shown; every other parent is pooled. {W.PARENT_RULE_NOTE}}} \\", r"\end{tabular}"]
     W.write_tex(lines, tdir / "tab_wp1a_parent_share_total.tex")
     print("   parent shares of TOTAL exports: " + ", ".join(f"{k} {sh[k]:.1f}%" for k in labels[:5]))
 
@@ -315,8 +325,8 @@ def _allocate_unknown(sh: pd.DataFrame) -> pd.DataFrame:
 def oecd_split(dq: pd.DataFrame, dl: pd.DataFrame, G: Path, T: Path, note_conv: str) -> None:
     """Figures 2 and 3 with the foreign bar split by whether the parent is an OECD member: one figure, two panels."""
     dq = dq.assign(pgrp=oecd_group(dq)); dl = dl.assign(pgrp=oecd_group(dl))
-    sh2 = _allocate_unknown(shares_by(dq, "quintile", OECD_GROUPS + ["Unknown"]))
-    sh3 = _allocate_unknown(shares_by(dl, "lall_4", OECD_GROUPS + ["Unknown"]).reindex([c for c in LALL_4_ORDER if c in dl["lall_4"].unique()]))
+    sh2 = shares_by(dq, "quintile", OECD_GROUPS + ["Unknown"])      # shares_by applies the parent rule (W.parent_scale)
+    sh3 = shares_by(dl, "lall_4", OECD_GROUPS + ["Unknown"]).reindex([c for c in LALL_4_ORDER if c in dl["lall_4"].unique()])
     fig, axes = plt.subplots(1, 2, figsize=(12, 5.6), gridspec_kw={"width_ratios": [1, 1]})
     _stacked_on_ax(axes[0], sh2, QLBL, "Panel A. PCI quintile (1 = lowest complexity, 5 = highest)")
     _stacked_on_ax(axes[1], sh3, LALL_4_XLBL, "Panel B. Lall (2000) technology category")
@@ -324,9 +334,7 @@ def oecd_split(dq: pd.DataFrame, dl: pd.DataFrame, G: Path, T: Path, note_conv: 
     fig.legend(h, l, frameon=False, fontsize=11, loc="lower center", ncol=3, bbox_to_anchor=(0.5, 0.0))
     fig.tight_layout(rect=(0, 0.09, 1, 1))
     W.savefig(fig, "fig_wp1a_pci_lall_by_oecd", G)
-    note = ("Foreign MNEs split by the OECD membership of the parent's country (38 members). Foreign MNEs with no recorded parent country "
-            "(7.5\\% of foreign-MNE value) are allocated to the two groups in proportion to the known parents of the same category, so the "
-            "foreign bar equals Figure 2's. " + note_conv.split(W.PARENT_GROUPS_NOTE)[0])
+    note = ("Foreign MNEs split by the OECD membership of the parent's country (38 members). " + W.PARENT_RULE_NOTE + " " + note_conv.split(W.PARENT_GROUPS_NOTE)[0])
     write_share_table(sh2, OECD_GROUPS, T / "tab_wp1a_pci_by_oecd.tex", "PCI quintile", "Figure 2, foreign bar split by OECD / non-OECD parent. " + note, xlabels=QLBL)
     write_share_table(sh3, OECD_GROUPS, T / "tab_wp1a_lall_by_oecd.tex", "Technology category", "Figure 3, foreign bar split by OECD / non-OECD parent. " + note)
     print("   OECD split, PCI: " + ", ".join(f"Q{i} OECD {r['OECD']:.2f} / non-OECD {r['Non-OECD']:.2f}" for i, r in sh2.iterrows()))

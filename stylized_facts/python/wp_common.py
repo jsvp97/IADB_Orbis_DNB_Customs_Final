@@ -508,19 +508,41 @@ HAVEN_STANDALONE = {"LIE", "CHE", "LUX", "PAN", "BHS", "BRB", "BLZ", "CYP", "MLT
 HAVEN_GROUP_LABEL = "Tax havens & conduits"
 
 
-def flow_shares(d: pd.DataFrame, by, numerators: dict, denominator=None, order=None) -> pd.DataFrame:
+PARENT_RULE_NOTE = ("Foreign MNEs whose parent country is not recorded (7.5\\% of foreign-MNE export value) are allocated to "
+                    "parent countries in proportion to the recorded parents of the same group, so every share by parent "
+                    "country refers to all foreign MNEs and adds up with the domestic and local shares.")
+
+
+def parent_scale(d: pd.DataFrame, den: pd.Series, g: pd.Series, index) -> pd.Series:
+    """Revision 9 -- THE one rule for matched firms with no recorded parent country: within each group of the
+    denominator, their value is allocated to parent countries in proportion to the recorded parents, i.e. every
+    parent-country quantity computed on recorded parents is scaled by (all foreign value / recorded-parent foreign
+    value) of the same group. Ignacio's Figure 4 (shares among recorded parents) is the special case where the
+    group is the whole sample, so its 23.3 % for the USA is preserved."""
+    ot = d["owner_type"]
+    known = d.loc[den & (ot == "ext"), "value"].groupby(g[den & (ot == "ext")]).sum().reindex(index)
+    fall = d.loc[den & ot.isin(["ext", "ext_unknown"]), "value"].groupby(g[den & ot.isin(["ext", "ext_unknown"])]).sum().reindex(index)
+    return (fall / known).replace([np.inf, -np.inf], np.nan).fillna(1.0)
+
+
+def flow_shares(d: pd.DataFrame, by, numerators: dict, denominator=None, order=None, scale: set | None = None) -> pd.DataFrame:
     """THE single share engine (revision 8). For every group of `by` (a column name, a Series aligned with d, or
     None for one row 'All'): the pooled export value of each numerator mask as a percent of the pooled value of the
     denominator mask (default: everything in the group), plus the denominator's annual-average value in USD bn
-    ('total_bn'). Every share in every US / parent / destination exhibit is computed here, so two exhibits that
-    describe the same quantity cannot disagree; a different denominator is always a different column."""
+    ('total_bn'). Numerators named in `scale` are parent-country quantities (masks inside the recorded-parent
+    foreign MNEs) and are scaled by `parent_scale` so that they refer to all foreign MNEs (revision 9). Every share
+    in every US / parent / destination exhibit is computed here, so two exhibits that describe the same quantity
+    cannot disagree; a different denominator is always a different column."""
     den = pd.Series(True, index=d.index) if denominator is None else denominator.reindex(d.index).fillna(False).astype(bool)
     g = pd.Series("All", index=d.index) if by is None else (d[by] if isinstance(by, str) else pd.Series(by, index=d.index))
     base = d.loc[den, "value"].groupby(g[den]).sum()
     out = pd.DataFrame(index=base.index)
+    sc = parent_scale(d, den, g, base.index) if scale else None
     for name, mask in numerators.items():
         m = mask.reindex(d.index).fillna(False).astype(bool) & den
         out[name] = 100 * d.loc[m, "value"].groupby(g[m]).sum().reindex(base.index).fillna(0.0) / base
+        if scale and name in scale:
+            out[name] = out[name] * sc
     out["total_bn"] = d.loc[den, "value_yr"].groupby(g[den]).sum().reindex(base.index) / 1e9
     if order is not None:
         out = out.reindex([o for o in order if o in out.index])

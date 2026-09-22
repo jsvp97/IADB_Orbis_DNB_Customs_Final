@@ -102,10 +102,18 @@ def carrier7(d: pd.DataFrame, home_parents) -> pd.Series:
     return pd.Series(lab, index=d.index)
 
 
+PARENT_GRPS = ["home", "us", "eu", "can"]
+
+
 def shares_table(t: pd.DataFrame, by: str, order=None) -> pd.DataFrame:
     """Carrier shares (% of the group's export value) for every group of `by` -- a thin wrapper over the single
-    share engine W.flow_shares, so these tables use exactly the same arithmetic as every other share exhibit."""
-    return W.flow_shares(t, by, {g: t["grp"] == g for g in GRPS}, order=order)
+    share engine W.flow_shares. The parent-country groups are scaled to all foreign MNEs (W.parent_scale) and
+    `other foreign` is the residual, so the rows add up to 100 with no unknown-parent category."""
+    num = {g: t["grp"] == g for g in PARENT_GRPS}
+    num["foreign"] = t["owner_type"].isin(["ext", "ext_unknown"]); num["dom"] = t["grp"] == "dom"; num["local"] = t["grp"] == "local"
+    sh = W.flow_shares(t, by, num, order=order, scale=set(PARENT_GRPS))
+    sh["other"] = (sh["foreign"] - sh[PARENT_GRPS].sum(axis=1)).clip(lower=0.0)
+    return sh[GRPS + ["total_bn"]]
 
 
 # ---------------------------------------------------------------------
@@ -254,19 +262,21 @@ def us_home_products(d: pd.DataFrame, T: Path, G: Path) -> None:
     for h in top:
         s = (by_o.loc[h] / by_o.loc[h].sum()).sort_values(ascending=False).head(3)
         origins[h] = ", ".join(f"{o} {100 * v:.0f}\\%" for o, v in s.items())
+    us_of_line = W.flow_shares(tu, "hs07_6d", {"x": (tu["owner_type"] == "ext") & (tu["iso3_parent"] == "USA")}, scale={"x"})["x"]   # parent-scaled within the line's exports to the USA
     rows = pd.DataFrame({"v_home": ph_yr.reindex(top) / 1e9, "sh_of_us_home": 100 * ph.loc[top] / ph.sum(),
                          "home_share": 100 * ph.loc[top] / pall.reindex(top), "lac_usa": lac_usa_yr.reindex(top) / 1e9,
-                         "us_share_of_lac_usa": 100 * ph.loc[top] / lac_usa.reindex(top)})
+                         "us_share_of_lac_usa": us_of_line.reindex(top)})
     H = lambda w, t: rf"\multicolumn{{1}}{{p{{{w}cm}}}}{{\raggedright {t}}}"
     lines = [r"\begin{tabular}{llrrrrrl}", r"\toprule",
              r"HS6 & Description & " + " & ".join([H(1.7, rf"US-parent exports to the USA ({W.VAL_HDR})"), H(1.7, r"\% of all US-parent exports to the USA"), H(2.0, r"\% of US-parent exports of the line going to the USA"),
                                                     H(1.9, rf"All LAC exports of the line to the USA ({W.VAL_HDR})"), H(2.2, r"US-parent share of LAC exports of the line to the USA (\%)"), H(2.6, r"Main origins of the US-parent shipments (\% of the line)")]) + r" \\", r"\midrule"]
     for h, r in rows.iterrows():
         lines.append(f"{h} & {W.tex_escape(desc[h])} & {r['v_home']:.2f} & {r['sh_of_us_home']:.1f} & {r['home_share']:.0f} & {r['lac_usa']:.2f} & {r['us_share_of_lac_usa']:.0f} & {origins[h]} \\\\")
-    lines += [r"\midrule", f"All lines & & {ph_yr.sum() / 1e9:,.1f} & 100.0 & {100 * ph.sum() / pall.sum():.0f} & {lac_usa_yr.sum() / 1e9:,.1f} & {100 * ph.sum() / lac_usa.sum():.0f} & \\\\", r"\bottomrule",
+    us_all_lines = W.flow_shares(tu, None, {"x": (tu["owner_type"] == "ext") & (tu["iso3_parent"] == "USA")}, scale={"x"})["x"].iloc[0]
+    lines += [r"\midrule", f"All lines & & {ph_yr.sum() / 1e9:,.1f} & 100.0 & {100 * ph.sum() / pall.sum():.0f} & {lac_usa_yr.sum() / 1e9:,.1f} & {us_all_lines:.0f} & \\\\", r"\bottomrule",
               rf"\multicolumn{{8}}{{p{{0.95\textwidth}}}}{{\footnotesize Top {N_PROD} HS6 lines by the value US-parent multinationals export from the nine origins to the United States. "
               r"Column 5 = of what US-parent MNEs export of the line from LAC (all destinations), the share shipped to the USA; column 7 = of what all firms in the nine origins export of the line to the USA, the share moved by US-parent MNEs; "
-              r"last column = the three origins with the largest US-parent shipments of the line to the USA and their share of those shipments. " + NOTE_BASE + " " + W.VAL_NOTE + "} \\\\", r"\end{tabular}"]
+              r"last column = the three origins with the largest US-parent shipments of the line to the USA and their share of those shipments. Dollar columns: recorded US parents only. " + W.PARENT_RULE_NOTE + " " + NOTE_BASE + " " + W.VAL_NOTE + "} \\\\", r"\end{tabular}"]
     W.write_tex(lines, T / "tab_wp3_us_home_products.tex")
     # figure: US-parent share of LAC -> USA exports of the line
     fig, ax = plt.subplots(figsize=(9, 0.42 * len(rows) + 1.8))
@@ -286,11 +296,7 @@ def us_home_products(d: pd.DataFrame, T: Path, G: Path) -> None:
     # who carries the top LAC -> USA lines
     top2 = lac_usa.sort_values(ascending=False).index[:N_PROD]
     desc2 = _desc(top2)
-    m = tu[tu["hs07_6d"].isin(top2)].pivot_table(index="hs07_6d", columns="grp", values="value", aggfunc="sum", fill_value=0.0)
-    for c in ("home", "other", "dom", "local"):
-        if c not in m.columns:
-            m[c] = 0.0
-    m = m.reindex(top2); tot = m.sum(axis=1); sh = 100 * m.div(tot, axis=0); tot_yr = lac_usa_yr.reindex(top2)
+    sh = shares_table(tu[tu["hs07_6d"].isin(top2)], "hs07_6d").reindex(top2); tot_yr = lac_usa_yr.reindex(top2)
     lines = [r"\begin{tabular}{llrrrrr}", r"\toprule",
              r"HS6 & Description & " + " & ".join([rf"\multicolumn{{1}}{{p{{2.0cm}}}}{{\raggedright LAC exports to the USA ({W.VAL_HDR})}}", r"\multicolumn{1}{p{1.8cm}}{\raggedright US-parent MNEs (\%)}", r"\multicolumn{1}{p{1.8cm}}{\raggedright Other foreign MNEs (\%)}", r"\multicolumn{1}{p{1.8cm}}{\raggedright Domestic MNEs (\%)}", r"\multicolumn{1}{p{1.8cm}}{\raggedright Local firms (\%)}"]) + r" \\", r"\midrule"]
     for h in top2:
@@ -332,11 +338,12 @@ def us_three_shares(d: pd.DataFrame, T: Path, G: Path) -> None:
     USA; (2) exports carried by US-parent MNEs (any destination); (3) exports carried by US-parent MNEs AND going to the
     USA. One table (All + nine origins) and two figures (total; by origin)."""
     us = (d["owner_type"] == "ext") & (d["iso3_parent"] == "USA"); to_us = d["country_dest"] == "USA"
-    NUM = {"to_usa": to_us, "by_us": us, "by_us_to_usa": us & to_us}
-    tab = pd.concat([W.flow_shares(d, None, NUM), W.flow_shares(d, "country_orig", NUM)]).rename(columns={"total_bn": "total_yr"})
-    # column 5 = column 4 / column 2: the US-parent share of the exports that go to the USA (the number the to-USA carrier
-    # exhibits show), computed from the same engine on the to-USA denominator so the identity is exact
-    tab["us_of_to_usa"] = pd.concat([W.flow_shares(d, None, {"x": us}, denominator=to_us), W.flow_shares(d, "country_orig", {"x": us}, denominator=to_us)])["x"]
+    NUM = {"to_usa": to_us, "by_us": us}
+    tab = pd.concat([W.flow_shares(d, None, NUM, scale={"by_us"}), W.flow_shares(d, "country_orig", NUM, scale={"by_us"})]).rename(columns={"total_bn": "total_yr"})
+    # column (4): the US-parent share of the exports that go to the USA (the to-USA carrier exhibits), same engine, to-USA
+    # denominator, parent scaling within the exports to the USA; column (3) = (4) x (1) so the identity is exact
+    tab["us_of_to_usa"] = pd.concat([W.flow_shares(d, None, {"x": us}, denominator=to_us, scale={"x"}), W.flow_shares(d, "country_orig", {"x": us}, denominator=to_us, scale={"x"})])["x"]
+    tab["by_us_to_usa"] = tab["us_of_to_usa"] * tab["to_usa"] / 100
     order = ["All"] + list(tab.drop("All").sort_values("by_us_to_usa", ascending=False).index)
     tab = tab.reindex(order)
     H = lambda w, t: rf"\multicolumn{{1}}{{p{{{w}cm}}}}{{\raggedright {t}}}"
@@ -347,7 +354,7 @@ def us_three_shares(d: pd.DataFrame, T: Path, G: Path) -> None:
         lines.append(f"{o} & {r['to_usa']:.1f} & {r['by_us']:.1f} & {r['by_us_to_usa']:.1f} & {r['us_of_to_usa']:.1f} & {r['total_yr']:,.1f} \\\\")
         if o == "All":
             lines.append(r"\midrule")
-    lines += [r"\bottomrule", rf"\multicolumn{{6}}{{p{{0.95\textwidth}}}}{{\footnotesize Columns (1)--(3) have the same denominator, the origin's total exports (all firms, all destinations): (1) value shipped to the United States by any firm; (2) value exported by multinationals whose recorded ultimate parent is in the United States, to any destination; (3) the intersection. Column (4) changes the denominator to the exports that go to the United States and is the ratio (3)/(1); it is the US-parent bar of the `who carries the exports to the USA' figure. Origins sorted by column (3). {NOTE_BASE} {W.VAL_NOTE}}} \\", r"\end{tabular}"]
+    lines += [r"\bottomrule", rf"\multicolumn{{6}}{{p{{0.95\textwidth}}}}{{\footnotesize Columns (1)--(3) have the same denominator, the origin's total exports (all firms, all destinations): (1) value shipped to the United States by any firm; (2) value exported by multinationals whose ultimate parent is in the United States, to any destination; (3) the intersection. Column (4) changes the denominator to the exports that go to the United States and is the ratio (3)/(1); it is the US-parent bar of the `who carries the exports to the USA' figure. Origins sorted by column (3). {W.PARENT_RULE_NOTE} {NOTE_BASE} {W.VAL_NOTE}}} \\", r"\end{tabular}"]
     W.write_tex(lines, T / "tab_wp3_us_three_shares.tex")
     LAB = ["Going to the USA", "Carried by US-parent MNEs", "Carried by US-parent MNEs\nand going to the USA"]
     COL = [W.BLUE_SHADES[7], W.BLUE_SHADES[4], W.BLUE_SHADES[0]]
@@ -433,7 +440,13 @@ def cross_sector(cube: pd.DataFrame) -> None:
     tot["All goods"] = tot.sum(axis=1); usv["All goods"] = usv.sum(axis=1)
     tot.loc["All"] = tot.sum(axis=0); usv.loc["All"] = usv.sum(axis=0)
     lab = {"all": "All goods", "agro": "Agriculture", "mining": "Mining & fuels", "manufacturing": "Manufacturing"}
-    share = pd.DataFrame({c: 100 * usv[lab[c]] / tot[lab[c]] for c in cols})
+    # shares through the single engine (parent scaling within each origin x sector cell)
+    share = pd.DataFrame(index=tot.index, columns=cols, dtype=float)
+    for c in cols:
+        sel = pd.Series(True, index=d.index) if c == "all" else (d["sector4"] == SECTOR_OF_COL[c])
+        s_o = W.flow_shares(d, "country_orig", {"x": us}, denominator=sel, scale={"x"})["x"]; s_all = W.flow_shares(d, None, {"x": us}, denominator=sel, scale={"x"})["x"]
+        share[c] = pd.concat([s_o, s_all]).reindex(tot.index)
+        share.loc[tot[lab[c]] <= 0, c] = np.nan
     usv_yr = d[us].groupby(["country_orig", "sector4"])["value_yr"].sum().unstack("sector4").reindex(tot.index).fillna(0.0)
     usv_yr["All goods"] = usv_yr.sum(axis=1); usv_yr.loc["All"] = usv_yr.sum(axis=0)
     value = pd.DataFrame({c: usv_yr[lab[c]] / 1e9 for c in cols})
@@ -445,8 +458,8 @@ def cross_sector(cube: pd.DataFrame) -> None:
     for o in order:
         if o == "All":
             lines.append(r"\midrule")
-        lines.append(f"{o} & " + " & ".join(f"{share.loc[o, c]:.1f}" if tot.loc[o, lab[c]] > 0 else "--" for c in cols) + " & " + " & ".join(f"{value.loc[o, c]:,.1f}" for c in cols) + r" \\")
-    lines += [r"\bottomrule", r"\multicolumn{9}{p{0.95\textwidth}}{\footnotesize Share of each origin's export value (all destinations) moved by multinationals whose recorded ultimate parent is in the United States, all goods and by sector; origins sorted by the all-goods share. Sectors as in the conventions (rest not shown, included in all goods). " + NOTE_BASE + " " + W.VAL_NOTE + r"} \\", r"\end{tabular}"]
+        lines.append(f"{o} & " + " & ".join(f"{share.loc[o, c]:.1f}" if np.isfinite(share.loc[o, c]) else "--" for c in cols) + " & " + " & ".join(f"{value.loc[o, c]:,.1f}" for c in cols) + r" \\")
+    lines += [r"\bottomrule", r"\multicolumn{9}{p{0.95\textwidth}}{\footnotesize Share of each origin's export value (all destinations) moved by multinationals whose ultimate parent is in the United States, all goods and by sector; origins sorted by the all-goods share. Sectors as in the conventions (rest not shown, included in all goods). Dollar columns: recorded US parents only. " + W.PARENT_RULE_NOTE + " " + NOTE_BASE + " " + W.VAL_NOTE + r"} \\", r"\end{tabular}"]
     W.write_tex(lines, T / "tab_wp3_us_share_origin_sector.tex")
     n = len(order); x = np.arange(n); bw = 0.2
     fig, ax = plt.subplots(figsize=(11, 5.6))

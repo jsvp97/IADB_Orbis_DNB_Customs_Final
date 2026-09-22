@@ -55,7 +55,7 @@ def region_rows(d: pd.DataFrame) -> pd.Series:
     return lab
 
 
-ROW_ORDER = W.REGION_ORDER + ["Foreign MNE, parent country not recorded", "Domestic MNEs", "Local firms (unmatched)"]
+ROW_ORDER = W.REGION_ORDER + ["Domestic MNEs", "Local firms (unmatched)"]   # rev. 9: no separate row for unrecorded parents (row % are unaffected by the parent rule)
 
 
 def two_way(d: pd.DataFrame, row: pd.Series, col: pd.Series, row_order=None, col_order=None, value: str = "value"):

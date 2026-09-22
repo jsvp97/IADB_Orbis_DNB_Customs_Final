@@ -87,14 +87,18 @@ def main() -> int:
 
     print("\n== The US identities (one denominator per column)")
     t3 = T("all", "tab_wp3_us_three_shares.tex"); c3 = cells(t3, "All")
-    us_share_total = 100 * d.loc[us, "value"].sum() / tot
+    fall = ext; scale_all = d.loc[fall, "value"].sum() / d.loc[kn, "value"].sum()                # parent rule, whole sample
+    scale_usa = d.loc[fall & to_us, "value"].sum() / d.loc[kn & to_us, "value"].sum()            # parent rule, exports to the USA
+    us_share_total = 100 * d.loc[us, "value"].sum() / tot * scale_all
     home_share_us = 100 * d.loc[us & to_us, "value"].sum() / d.loc[us, "value"].sum()
     check("three-shares (1) % to USA", c3[0], 100 * d.loc[to_us, "value"].sum() / tot)
-    check("three-shares (2) % by US MNEs", c3[1], us_share_total)
-    check("three-shares (3) % by US MNEs to USA", c3[2], 100 * d.loc[us & to_us, "value"].sum() / tot)
-    check("identity (3) = (2) x home share", c3[2], c3[1] * home_share_us / 100, 0.06)
-    check("three-shares (4) = US-parent share of exports to USA", c3[3], 100 * d.loc[us & to_us, "value"].sum() / d.loc[to_us, "value"].sum())
+    check("three-shares (2) % by US MNEs (parent rule)", c3[1], us_share_total)
+    check("three-shares (4) = US-parent share of exports to USA (parent rule)", c3[3], 100 * d.loc[us & to_us, "value"].sum() / d.loc[to_us, "value"].sum() * scale_usa)
+    check("identity (3) = (4) x (1)", c3[2], c3[3] * c3[0] / 100, 0.06)
     pt = cells(T("all", "tab_wp1a_parent_share_total.tex"), "USA"); check("parent-share-total USA == three-shares (2)", pt[0], c3[1], 0.06)
+    f4 = cells(T("all", "tab_wp1a_parent_share.tex"), "USA"); f1 = cells(T("all", "tab_wp0_fig1_origin.tex"), "All")
+    check("Figure 4 USA share x Figure 1 foreign share == three-shares (2)  [parent rule]", f4[0] * f1[0], c3[1], 0.06)   # f1[0] is a fraction
+    check("Figure 4 USA share == 23.3 (Ignacio, recorded parents)", f4[0], 100 * d.loc[us, "value"].sum() / d.loc[kn, "value"].sum(), 0.06)
     ox = cells(T("sectors", "tab_wp3_us_share_origin_sector.tex"), "All"); check("origin x sector All goods == three-shares (2)", ox[0], c3[1], 0.06)
     pxp = T("all", "tab_wp1c_parent_x_parentdest_rowpct.tex")
     hdr = [l for l in pxp.read_text(encoding="utf-8").split("\n") if l.startswith("Parent / Destination")][0]
@@ -111,8 +115,7 @@ def main() -> int:
         a = cells(t3, o); b = cells(T("all", "tab_wp3_to_usa_carriers.tex"), o)
         if a is not None and b is not None:
             check(f"{o}: three-shares (4) == to-USA carriers US-parent", a[3], b[1], 0.06)
-            sel = d["country_orig"] == o
-            check(f"{o}: (3) == (2) x own home share", a[2], a[1] * (100 * d.loc[sel & us & to_us, "value"].sum() / max(d.loc[sel & us, "value"].sum(), 1)) / 100, 0.06)
+            check(f"{o}: (3) == (4) x (1)", a[2], a[3] * a[0] / 100, 0.06)
 
     print("\n== destinations: rows sum to 100, strict EU-27")
     for mk in ("USA", "CHN", "EU-27", "BRA", "CAN"):

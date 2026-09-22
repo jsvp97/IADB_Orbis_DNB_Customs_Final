@@ -53,7 +53,8 @@ def hs6_table(d: pd.DataFrame, cls: pd.DataFrame, top: list[str]) -> pd.DataFram
     g = g.merge(lead, on="hs07_6d", how="left").merge(cls[["hs07_6d", "hs6_desc", "hs2", "sector4"]], on="hs07_6d", how="left")
     g["sh_ext"] = g["val_ext"] / g["total_value"]; g["sh_dom"] = g["val_dom"] / g["total_value"]
     g["sh_local"] = 1 - g["val_total"] / g["total_value"]
-    g["lead_share"] = g["lead_value"] / g["val_ext"]
+    kn = d[d["owner_type"] == "ext"].groupby("hs07_6d")["value"].sum()   # rev. 9: lead share among recorded parents (= share of all foreign under the parent rule)
+    g["lead_share"] = g["lead_value"] / g["hs07_6d"].map(kn)
     miss = g["hs6_desc"].isna()
     if miss.any():   # later-revision HS codes and national lines are not in the HS 2007 table
         g.loc[miss, "hs6_desc"] = W.hs6_desc_fallback(g.loc[miss, "hs07_6d"])
@@ -125,6 +126,12 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     sub = d[d["hs07_6d"].isin(t20["hs07_6d"])]
     mat = sub.pivot_table(index="hs07_6d", columns="pgrp", values="value", aggfunc="sum", fill_value=0.0)
     mat = mat.reindex(t20["hs07_6d"]).reindex(columns=[c for c in groups if c in mat.columns], fill_value=0.0)
+    # rev. 9 -- the parent rule (W.parent_scale): unrecorded parents allocated in proportion to the recorded parents of the same product
+    unk = sub.loc[sub["owner_type"] == "ext_unknown"].groupby("hs07_6d")["value"].sum().reindex(mat.index).fillna(0.0)
+    if "Other" in mat.columns:
+        mat["Other"] = (mat["Other"] - unk).clip(lower=0.0)
+    pcols = [c for c in mat.columns if c not in ("Domestic", "Local")]
+    mat[pcols] = mat[pcols].mul(W.parent_scale(sub, pd.Series(True, index=sub.index), sub["hs07_6d"], mat.index), axis=0)
     mat = mat.div(t20.set_index("hs07_6d")["total_value"], axis=0)
     fig, ax = plt.subplots(figsize=(9, 9.5))
     left = np.zeros(len(mat))
@@ -167,7 +174,8 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     gs = d2.groupby("section").agg(total_value=("value", "sum"), val_ext=("val_ext", "sum"), val_dom=("val_dom", "sum"), val_total=("val_total", "sum"), total_value_yr=("value_yr", "sum"))
     lead = (d2[d2["owner_type"] == "ext"].groupby(["section", "iso3_parent"])["value"].sum().reset_index()
               .sort_values(["section", "value"], ascending=[True, False]).drop_duplicates("section").set_index("section"))
-    gs["lead_parent"] = lead["iso3_parent"]; gs["lead_share"] = lead["value"] / gs["val_ext"]
+    kn_s = d2[d2["owner_type"] == "ext"].groupby("section")["value"].sum()
+    gs["lead_parent"] = lead["iso3_parent"]; gs["lead_share"] = lead["value"] / kn_s.reindex(gs.index)
     gs["sh_ext"] = gs["val_ext"] / gs["total_value"]; gs["sh_dom"] = gs["val_dom"] / gs["total_value"]; gs["sh_local"] = 1 - gs["val_total"] / gs["total_value"]
     gs = gs.sort_values("total_value", ascending=False)
     lines = [r"\begin{tabular}{@{}p{7.2cm} r r r r l@{}}", r"\toprule", rf"HS section & {W.VAL_HDR} & For. & Dom. & Local & Lead parent \\", r"\midrule"]
