@@ -81,8 +81,17 @@ python/wp_run_all.py                 runner:  python wp_run_all.py [cube 0 1a 1b
                                      rev. 7 (2026-09-21): dollar values are annual averages (value_yr columns from mne_flags), BEC in three
                                      classes (rebuild the classification cache with build_classifications(force=True)), OECD split,
                                      separate-measure ladder, parent x parent-destination table, consolidated (tax-haven) home shares
-python/wp_build_overleaf.py          assembles THREE Overleaf projects (output/wp/overleaf_WP_{total,sectors,countries}/),
-                                     compiles each with pdflatex and zips them; copies of the PDFs in docs/
+python/wp_paper_sample.py            the data section's sample tables (tab_paper_sample, tab_paper_sample_counts):
+                                     coverage by origin and the sample in figures. `python wp_paper_sample.py`
+                                     writes them for scopes `all` and `agro`; used by WP_paper and WP_paperagro
+python/wp_build_overleaf.py          assembles SIX Overleaf projects (output/wp/overleaf_WP_{total,sectors,countries,
+                                     draft,paper,paperagro}/), compiles each with pdflatex and zips them; PDFs copied to docs/.
+                                     `paper`     = the working paper (intro + data written out, [Main text] exhibits in
+                                                   fact order, [Appendix] ones in the appendix, the rest stated only;
+                                                   the US story is the through-line)
+                                     `paperagro` = the agriculture-only companion (HS 01-24, region-wide). NO US section,
+                                                   no three-share / to-USA / US-home-products exhibits; parent x
+                                                   destination tables moved to the appendix. Keep it that way.
 ```
 
 Outputs: `output/wp/<scope>/{Graphs,Tables,Regressions}/` with scope ∈ {all, agro, mining,

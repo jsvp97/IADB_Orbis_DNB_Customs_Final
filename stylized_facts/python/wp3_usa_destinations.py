@@ -153,7 +153,7 @@ def draw_carriers(ax, sh: pd.DataFrame, labels, title: str = "", home_label="US-
         segs.append(("us", C_US, us_label))
     if show_eu_can:
         segs += [("eu", C_EU, "EU-27-parent MNEs (destination outside the EU-27)"), ("can", C_CAN, "CAN-parent MNEs (destination $\\neq$ CAN)")]
-    segs += [("other", C_OTHER, "Other foreign MNEs"), ("dom", C_DOM, "Domestic MNEs"), ("local", C_LOCAL, "Local firms (unmatched)")]
+    segs += [("other", C_OTHER, "Other foreign MNEs"), ("dom", C_DOM, "Domestic MNEs"), ("local", C_LOCAL, "Local firms")]
     left = np.zeros(n)
     for col, color, lab in segs:
         v = sh[col].to_numpy() if col in sh.columns else np.zeros(n)
@@ -169,7 +169,7 @@ def draw_carriers(ax, sh: pd.DataFrame, labels, title: str = "", home_label="US-
         pass
     ax.set_yticks(y); ax.set_yticklabels(labels, fontsize=fontsize + 1)
     ax.set_xlim(0, 100); ax.set_xticks(np.arange(0, 101, 20))
-    ax.set_xlabel("% of the export value reaching the destination", fontsize=fontsize + 1)
+    ax.set_xlabel("Share of the export value reaching the destination (%)", fontsize=fontsize + 1)
     if title:
         ax.set_title(title, fontsize=fontsize + 2)
     for s in ("top", "right"):
@@ -286,7 +286,7 @@ def us_home_products(d: pd.DataFrame, T: Path, G: Path) -> None:
         ax.text(r["us_share_of_lac_usa"] + 1, yi, f"{r['us_share_of_lac_usa']:.0f}%", va="center", fontsize=8)
     ax.set_yticks(y); ax.set_yticklabels([f"{h} {desc[h][:44]}" for h in rows.index], fontsize=8)
     ax.set_xlim(0, 105); ax.set_xticks(np.arange(0, 101, 20))
-    ax.set_xlabel("US-parent MNEs' share of everything the nine origins export of the line to the USA (%)", fontsize=9)
+    ax.set_xlabel("US-parent MNE share of exports of the product to the United States (%)", fontsize=9)
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
     fig.tight_layout()
@@ -356,14 +356,14 @@ def us_three_shares(d: pd.DataFrame, T: Path, G: Path) -> None:
             lines.append(r"\midrule")
     lines += [r"\bottomrule", rf"\multicolumn{{6}}{{p{{0.95\textwidth}}}}{{\footnotesize Columns (1)--(3) have the same denominator, the origin's total exports (all firms, all destinations): (1) value shipped to the United States by any firm; (2) value exported by multinationals whose ultimate parent is in the United States, to any destination; (3) the intersection. Column (4) changes the denominator to the exports that go to the United States and is the ratio (3)/(1); it is the US-parent bar of the `who carries the exports to the USA' figure. Origins sorted by column (3). {W.PARENT_RULE_NOTE} {NOTE_BASE} {W.VAL_NOTE}}} \\", r"\end{tabular}"]
     W.write_tex(lines, T / "tab_wp3_us_three_shares.tex")
-    LAB = ["Going to the USA", "Carried by US-parent MNEs", "Carried by US-parent MNEs\nand going to the USA"]
+    LAB = ["Exports to the\nUnited States", "Exports by\nUS-parent MNEs", "Exports by US-parent MNEs\nto the United States"]
     COL = [W.BLUE_SHADES[7], W.BLUE_SHADES[4], W.BLUE_SHADES[0]]
     # (a) total
     fig, ax = plt.subplots(figsize=(6.5, 4.2)); r = tab.loc["All"]; v = [r["to_usa"], r["by_us"], r["by_us_to_usa"]]
     ax.bar(range(3), v, 0.6, color=COL)
     for i, vi in enumerate(v):
         ax.text(i, vi + 0.4, f"{vi:.1f}%", ha="center", fontsize=10)
-    ax.set_xticks(range(3)); ax.set_xticklabels(LAB, fontsize=9); ax.set_ylabel("% of the nine origins' total exports", fontsize=10)
+    ax.set_xticks(range(3)); ax.set_xticklabels(LAB, fontsize=9); ax.set_ylabel("Share of total exports (%)", fontsize=10)
     ax.set_ylim(0, max(v) * 1.2)
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
@@ -376,7 +376,7 @@ def us_three_shares(d: pd.DataFrame, T: Path, G: Path) -> None:
         for xi, vi in zip(x, v):
             ax.text(xi + (i - 1) * bw, vi + 0.5, f"{vi:.0f}", ha="center", fontsize=8)
     ax.set_xticks(x); ax.set_xticklabels(order, fontsize=11); ax.tick_params(axis="y", labelsize=10)
-    ax.set_ylabel("% of the origin's total exports", fontsize=11); ax.set_ylim(0, float(tab[["to_usa", "by_us", "by_us_to_usa"]].to_numpy().max()) * 1.18)
+    ax.set_ylabel("Share of the country's total exports (%)", fontsize=11); ax.set_ylim(0, float(tab[["to_usa", "by_us", "by_us_to_usa"]].to_numpy().max()) * 1.18)
     ax.axvline(0.5, color="#999999", linewidth=0.6, linestyle=":")
     ax.legend(frameon=False, fontsize=10, ncol=3, loc="upper right")
     for s in ("top", "right"):
@@ -425,7 +425,7 @@ def cross_sector(cube: pd.DataFrame) -> None:
             if r.sh_dom > 0.08: ax.text(r.sh_ext + r.sh_dom / 2, yi, f"{r.sh_dom:.2f}", va="center", ha="center", fontsize=10)
             ax.text(r.sh_total + 0.01, yi, f"{r.sh_total:.2f}", va="center", ha="left", fontsize=10.5, fontweight="bold")
         ax.set_yticks(y); ax.set_yticklabels(g.index, fontsize=12); ax.tick_params(axis="x", labelsize=11)
-        ax.set_xlim(0, 1.0); ax.set_title(lab, fontsize=13); ax.set_xlabel("MNE share in export value", fontsize=11)
+        ax.set_xlim(0, 1.0); ax.set_title(lab, fontsize=13); ax.set_xlabel("Share of export value", fontsize=11)
         for sp_ in ("top", "right"):
             ax.spines[sp_].set_visible(False)
     h, l = axes[0].get_legend_handles_labels()
@@ -470,7 +470,7 @@ def cross_sector(cube: pd.DataFrame) -> None:
             if np.isfinite(vi):
                 ax.text(xi + (i - 1.5) * bw, vi + 0.6, f"{vi:.0f}", ha="center", fontsize=8.5)
     ax.set_xticks(x); ax.set_xticklabels(order, fontsize=12); ax.tick_params(axis="y", labelsize=11)
-    ax.set_ylabel("US-parent MNE share of the origin's export value (%)", fontsize=11)
+    ax.set_ylabel("US-parent MNE share of the country's exports (%)", fontsize=11)
     ax.set_ylim(0, max(10, float(np.nanmax(share.to_numpy())) * 1.18))
     ax.axvline(n - 1.5, color="#999999", linewidth=0.6, linestyle=":")
     ax.legend(frameon=False, fontsize=11, ncol=4, loc="upper right")
@@ -513,7 +513,7 @@ def cross_sector(cube: pd.DataFrame) -> None:
             if np.isfinite(vi):
                 ax.text(vi + 0.6, yi, f"{vi:.1f}%", va="center", fontsize=8, color="#333333")
     ax.set_yticks(y); ax.set_yticklabels([p.replace("All known-parent foreign MNEs", "All foreign MNEs\n(known parent)") for p in parents], fontsize=11); ax.tick_params(axis="x", labelsize=10)
-    ax.set_xlim(0, max(30, float(np.nanmax(hs.to_numpy())) * 1.2)); ax.set_xlabel("% of the parent's export value from LAC shipped to the parent's own country", fontsize=9)
+    ax.set_xlim(0, max(30, float(np.nanmax(hs.to_numpy())) * 1.2)); ax.set_xlabel("Share of exports shipped to the parent country (%)", fontsize=9)
     ax.axhline(0.5, color="#999999", linewidth=0.6, linestyle=":")
     h, l = ax.get_legend_handles_labels()
     from matplotlib.patches import Patch

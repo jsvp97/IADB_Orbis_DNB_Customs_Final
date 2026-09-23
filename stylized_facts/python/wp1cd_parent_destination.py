@@ -51,11 +51,11 @@ def region_rows(d: pd.DataFrame) -> pd.Series:
     lab[ext] = d.loc[ext, "iso3_parent"].map(W.classify_region)
     lab[d["owner_type"] == "ext_unknown"] = "Foreign MNE, parent country not recorded"
     lab[d["owner_type"] == "dom"] = "Domestic MNEs"
-    lab[d["owner_type"] == "local"] = "Local firms (unmatched)"
+    lab[d["owner_type"] == "local"] = "Local firms"
     return lab
 
 
-ROW_ORDER = W.REGION_ORDER + ["Domestic MNEs", "Local firms (unmatched)"]   # rev. 9: no separate row for unrecorded parents (row % are unaffected by the parent rule)
+ROW_ORDER = W.REGION_ORDER + ["Domestic MNEs", "Local firms"]   # rev. 9: no separate row for unrecorded parents (row % are unaffected by the parent rule)
 
 
 def two_way(d: pd.DataFrame, row: pd.Series, col: pd.Series, row_order=None, col_order=None, value: str = "value"):
@@ -92,7 +92,7 @@ def home_share_figure(ext: pd.DataFrame, parents: list, fname: str, G: Path, ori
     ax.set_yticks(y); ax.set_yticklabels(hs.index, fontsize=9)
     ax.set_xlim(0, max(0.5, float(hs["share"].max()) * 1.2 if len(hs) else 0.5))
     ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"{v * 100:.0f}%"))
-    ax.set_xlabel(f"share of the parent's export value from {origin_label} shipped to the parent's own country")
+    ax.set_xlabel("Share of exports shipped to the parent country")
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
     W.savefig(fig, fname, G)
@@ -134,8 +134,8 @@ def home_share_haven_panels(ext: pd.DataFrame, G: Path, T: Path, k: int = TOP_TA
     top_b = list(b.groupby("iso3_parent")["value"].sum().sort_values(ascending=False).index[:k])
     fig, axes = plt.subplots(1, 2, figsize=(12, 5.2))
     rows = []
-    for ax, (dd, col, home_col, top, title) in zip(axes, ((a, "pc", "dest_c", top_a, "Panel A. Ten largest parent countries (not tax havens)"),
-                                                          (b, "iso3_parent", "country_dest", top_b, "Panel B. Ten largest tax-haven and conduit jurisdictions"))):
+    for ax, (dd, col, home_col, top, title) in zip(axes, ((a, "pc", "dest_c", top_a, "Panel A. Largest parent countries, excluding tax havens"),
+                                                          (b, "iso3_parent", "country_dest", top_b, "Panel B. Largest tax-haven and conduit jurisdictions"))):
         h = dd.assign(home=(dd[home_col] == dd[col]).astype(int) * dd["value"])
         hs = h.groupby(col).agg(value=("value", "sum"), value_yr=("value_yr", "sum"), home=("home", "sum")).reindex(top)
         hs["share"] = 100 * hs["home"] / hs["value"]
@@ -145,7 +145,7 @@ def home_share_haven_panels(ext: pd.DataFrame, G: Path, T: Path, k: int = TOP_TA
             ax.text(r["share"] + 0.4, yi, f"{r['share']:.1f}%", va="center", fontsize=10)
         ax.set_yticks(y); ax.set_yticklabels(hs.index, fontsize=11); ax.tick_params(axis="x", labelsize=10)
         ax.set_xlim(0, max(30, float(hs["share"].max()) * 1.25)); ax.set_title(title, fontsize=12)
-        ax.set_xlabel("% of the parent's LAC exports shipped to the parent's own jurisdiction", fontsize=10)
+        ax.set_xlabel("Share of exports shipped to the parent jurisdiction (%)", fontsize=10)
         for s in ("top", "right"):
             ax.spines[s].set_visible(False)
         rows.append(hs.assign(panel=title[:7]))
@@ -190,8 +190,8 @@ def run_scope(cube: pd.DataFrame, scope: str) -> None:
     write_three(mat_r, T, "wp1c_region", "Parent region / Destination region", note_region,
                 mat_yr=two_way(d, d["row_region"], d["dest_region"], ROW_ORDER, W.REGION_ORDER, value="value_yr"))
     rowpct_r = 100 * mat_r.div(mat_r.sum(axis=1), axis=0)
-    W.heatmap(rowpct_r, "fig_wp1d_heatmap_region_rowpct", G, cbar_label="% of the row group's export value",
-              fmt="{:.0f}", vmin=0, vmax=100, xlabel="destination region", ylabel="parent region of the exporter")
+    W.heatmap(rowpct_r, "fig_wp1d_heatmap_region_rowpct", G, cbar_label="Share of the group's export value (%)",
+              fmt="{:.0f}", vmin=0, vmax=100, xlabel="Destination region", ylabel="Parent region")
     print("   region row%:\n" + rowpct_r.round(0).to_string())
 
     # --- 1c country x country: top-10 parents x top-10 destinations (+ Other, Total) ---------------
@@ -217,11 +217,11 @@ def run_scope(cube: pd.DataFrame, scope: str) -> None:
     core = mat_m.loc[top_p, top_d]
     rowpct_c = 100 * core.div(mat_m.loc[top_p].sum(axis=1), axis=0)
     W.heatmap(rowpct_c, "fig_wp1d_heatmap_country_rowpct", G,
-              cbar_label="% of the parent's LAC export value going to the destination", fmt="{:.0f}", vmin=0,
+              cbar_label="Share of the parent country's exports (%)", fmt="{:.0f}", vmin=0,
               xlabel="destination country", ylabel="parent country of the MNE")
     cellpct = 100 * core / mat_m.values.sum()
     W.heatmap(cellpct, "fig_wp1d_heatmap_country_cellpct", G,
-              cbar_label="% of all foreign-MNE export value", fmt="{:.1f}", vmin=0, cmap="Blues",
+              cbar_label="Share of foreign-MNE export value (%)", fmt="{:.1f}", vmin=0, cmap="Blues",
               xlabel="destination country", ylabel="parent country of the MNE", annotate_thresh=0.05)
 
     # --- 1d companion: share shipped to the parent's own country, by parent -----------------

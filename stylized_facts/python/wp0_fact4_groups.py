@@ -63,10 +63,10 @@ def fig5_network(f: pd.DataFrame, G: Path, T: Path, scope: str) -> None:
     g["sv"] = g["v"] / g["v"].sum(); g["sp"] = g["npar"] / g["npar"].sum()
     fig, ax = plt.subplots(figsize=(7, 4.2))
     x = np.arange(len(g))
-    ax.bar(x - 0.2, g["sv"], 0.4, color=W.C_MNE_EXT, label="share of export value")
-    ax.bar(x + 0.2, g["sp"], 0.4, color=W.C_MNE_DOM, label="share of parents")
+    ax.bar(x - 0.2, g["sv"], 0.4, color=W.C_MNE_EXT, label="Share of foreign-MNE export value")
+    ax.bar(x + 0.2, g["sp"], 0.4, color=W.C_MNE_DOM, label="Share of parents")
     ax.set_xticks(x); ax.set_xticklabels(g.index)
-    ax.set_xlabel("Parent global affiliate count"); ax.set_ylabel("Share")
+    ax.set_xlabel("Number of affiliates of the group worldwide"); ax.set_ylabel("Share")
     ax.legend(frameon=False)
     for xi, v in zip(x - 0.2, g["sv"]):
         ax.text(xi, v + 0.01, f"{v:.0%}", ha="center", va="bottom", fontsize=8)

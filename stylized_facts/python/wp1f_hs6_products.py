@@ -117,7 +117,7 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
         if r.sh_ext > 0.06: ax.text(r.sh_ext / 2, yi, f"{r.sh_ext:.2f}", ha="center", va="center", color="white", fontsize=8)
         if r.sh_dom > 0.06: ax.text(r.sh_ext + r.sh_dom / 2, yi, f"{r.sh_dom:.2f}", ha="center", va="center", color="black", fontsize=8)
     ax.set_yticks(y); ax.set_yticklabels(labels, fontsize=9)
-    ax.set_xlim(0, 1.0); ax.set_xlabel("share of the product's export value (products ranked by export value, largest at the top)", fontsize=10)
+    ax.set_xlim(0, 1.0); ax.set_xlabel("Share of the product's export value", fontsize=10)
     ax.legend(frameon=False, fontsize=9, loc="upper center", bbox_to_anchor=(0.5, -0.07), ncol=3)
     W.savefig(fig, "fig_wp1f_top20_hs6_stacked", G)
 
@@ -140,7 +140,7 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
         if c == "Unknown": kw.update(hatch="///", edgecolor="#6b7a99")
         ax.barh(y, mat[c].values, left=left, **kw); left += mat[c].values
     ax.set_yticks(y); ax.set_yticklabels(labels, fontsize=9)
-    ax.set_xlim(0, 1.0); ax.set_xlabel("share of the product's export value (remainder = local firms)", fontsize=10)
+    ax.set_xlim(0, 1.0); ax.set_xlabel("Share of the product's export value", fontsize=10)
     ax.legend(frameon=False, fontsize=8, loc="upper center", bbox_to_anchor=(0.5, -0.07), ncol=4)
     W.savefig(fig, "fig_wp1f_top20_hs6_by_parent", G)
 
@@ -152,14 +152,14 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     dist["sh_value"] = dist["value"] / tot; dist["sh_n"] = dist["nm"] / dist["nf"].replace(0, np.nan)
     fig, ax = plt.subplots(figsize=(8.5, 4.5))
     x = np.arange(len(dist)); bw = 0.38
-    ax.bar(x - bw / 2, dist["sh_value"], bw, color=W.C_MNE_EXT, label="share of export value")
-    ax.bar(x + bw / 2, dist["sh_n"], bw, color=W.C_MNE_DOM, label="MNE share of exporting firms in the bin's products")
+    ax.bar(x - bw / 2, dist["sh_value"], bw, color=W.C_MNE_EXT, label="Share of total export value")
+    ax.bar(x + bw / 2, dist["sh_n"], bw, color=W.C_MNE_DOM, label="MNE share of exporting firms")
     for xi, r in zip(x, dist.itertuples()):
         if not np.isnan(r.sh_n): ax.text(xi + bw / 2, r.sh_n + 0.005, f"{r.sh_n:.2f}", ha="center", fontsize=7)
     for xi, r in zip(x, dist.itertuples()):
         ax.text(xi - bw / 2, r.sh_value + 0.005, f"{r.sh_value:.2f}", ha="center", fontsize=7)
     ax.set_xticks(x); ax.set_xticklabels(dist.index, rotation=0, fontsize=8)
-    ax.set_xlabel("foreign-MNE share of the product's export value (%)"); ax.set_ylabel("share"); ax.set_ylim(0, max(0.5, float(np.nanmax(dist[["sh_value", "sh_n"]].values)) * 1.15))
+    ax.set_xlabel("Foreign-MNE share of the product's export value (%)"); ax.set_ylabel("Share"); ax.set_ylim(0, max(0.5, float(np.nanmax(dist[["sh_value", "sh_n"]].values)) * 1.15))
     ax.legend(frameon=False, fontsize=9)
     W.savefig(fig, "fig_wp1f_foreign_share_distribution", G)
     above = g.loc[g["sh_ext"] > 0.5, "total_value"].sum() / tot
@@ -192,13 +192,13 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     s2 = g.sort_values("total_value", ascending=False)
     cum_v2 = np.cumsum(s2["total_value"].values) / s2["total_value"].sum()
     fig, ax = plt.subplots(figsize=(6, 5))
-    ax.plot(cum_n, cum_v, color=W.C_MNE_EXT, label="foreign-MNE exports")
-    ax.plot(cum_n, cum_v2, color="#7f7f7f", linestyle="--", label="all exports")
+    ax.plot(cum_n, cum_v, color=W.C_MNE_EXT, label="Foreign-MNE exports")
+    ax.plot(cum_n, cum_v2, color="#7f7f7f", linestyle="--", label="All exports")
     ax.plot([0, 1], [0, 1], color="black", linewidth=0.5)
     k = int(np.searchsorted(cum_v, 0.5)) + 1
     ax.axvline(k / len(s), color=W.C_MNE_EXT, linewidth=0.5, linestyle=":")
     ax.text(k / len(s) + 0.01, 0.1, f"{k} products = 50% of foreign-MNE exports", fontsize=8)
-    ax.set_xlabel("cumulative share of HS6 products (ranked by value)"); ax.set_ylabel("cumulative share of export value")
+    ax.set_xlabel("Cumulative share of HS6 products (ranked by value)"); ax.set_ylabel("Cumulative share of export value")
     ax.legend(frameon=False, fontsize=9, loc="lower right")
     W.savefig(fig, "fig_wp1f_lorenz_foreign", G)
     print(f"   {k} HS6 products account for 50% of foreign-MNE exports")

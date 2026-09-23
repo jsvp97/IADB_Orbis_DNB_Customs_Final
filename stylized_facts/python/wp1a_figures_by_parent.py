@@ -208,14 +208,14 @@ def parent_share_total(d: pd.DataFrame, gdir: Path, tdir: Path, top: list) -> No
     for yi, v in zip(y, vals):
         ax.text(v + max(vals) * 0.01, yi, f"{v:.1f}%", va="center", fontsize=9)
     ax.set_yticks(y); ax.set_yticklabels(labels, fontsize=9)
-    ax.set_xlim(0, max(vals) * 1.15); ax.set_xlabel("share of the scope's total export value (%)")
+    ax.set_xlim(0, max(vals) * 1.15); ax.set_xlabel("Share of total export value (%)")
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
     W.savefig(fig, "fig_wp1a_parent_share_total", gdir)
     lines = [r"\begin{tabular}{lr}", r"\toprule", r"Exporter type / parent country & Share of total exports (\%) \\", r"\midrule"]
     for k in labels:
         lines.append(f"{W.tex_escape(k)} & {sh[k]:.1f} \\\\")
-    lines += [r"\midrule", f"All MNEs & {sum(vals):.1f} \\\\", f"Local firms (unmatched) & {100 - sum(vals):.1f} \\\\", r"\bottomrule",
+    lines += [r"\midrule", f"All MNEs & {sum(vals):.1f} \\\\", f"Local firms & {100 - sum(vals):.1f} \\\\", r"\bottomrule",
               rf"\multicolumn{{2}}{{p{{0.8\textwidth}}}}{{\footnotesize Denominator: the scope's total export value, all firms and destinations (the same denominator as Figure 1 and as the US three-share exhibit). The 15 largest parent countries are shown; every other parent is pooled. {W.PARENT_RULE_NOTE}}} \\", r"\end{tabular}"]
     W.write_tex(lines, tdir / "tab_wp1a_parent_share_total.tex")
     print("   parent shares of TOTAL exports: " + ", ".join(f"{k} {sh[k]:.1f}%" for k in labels[:5]))
@@ -241,7 +241,7 @@ def originals(d: pd.DataFrame, hs6q: pd.DataFrame, hs6l: pd.DataFrame, G: Path, 
             ax.text(r.sh_ext + r.sh_dom / 2, yi, f"{r.sh_dom:.2f}", va="center", ha="center", color="black", fontsize=8)
         ax.text(r.sh_total + 0.006, yi, f"{r.sh_total:.2f}", va="center", ha="left", fontsize=8, fontweight="bold")
     ax.set_yticks(y); ax.set_yticklabels(sub.index)
-    ax.set_xlabel("MNE share in export value (value-weighted)")
+    ax.set_xlabel("Share of export value")
     xmax = max(0.85, sub["sh_total"].max() * 1.12); ax.set_xlim(0, xmax); ax.set_xticks(np.arange(0, xmax + 1e-9, 0.1))
     ax.legend(frameon=False, fontsize=9, loc="lower right")
     W.savefig(fig, "fig_wp0_fig1_origin", G)
@@ -261,7 +261,7 @@ def originals(d: pd.DataFrame, hs6q: pd.DataFrame, hs6l: pd.DataFrame, G: Path, 
             ax.text(xi - bw / 2, r.sh_ext + 0.01, f"{r.sh_ext:.2f}", ha="center", fontsize=8)
             ax.text(xi + bw / 2, r.sh_dom + 0.01, f"{r.sh_dom:.2f}", ha="center", fontsize=8)
         ax.set_xticks(x); ax.set_xticklabels([xlabels.get(v, str(v)) for v in g.index])
-        ax.set_xlabel(xlabel); ax.set_ylabel("Share in export value (value-weighted)"); ax.set_ylim(0, ymax)
+        ax.set_xlabel(xlabel); ax.set_ylabel("Share of export value"); ax.set_ylim(0, ymax)
         ax.legend(frameon=False, fontsize=9, loc="upper left")
         W.savefig(fig, fname, G)
 
@@ -273,7 +273,7 @@ def originals(d: pd.DataFrame, hs6q: pd.DataFrame, hs6l: pd.DataFrame, G: Path, 
     if hs6q is None or hs6l is None:
         print("   originals: Fig1 only (no product classification in this scope)"); return
     gq = agg2(d.merge(hs6q, on="hs07_6d", how="inner"), "quintile")
-    two_def(gq, QLBL, "PCI quintile (1 = lowest complexity, 5 = highest)", "fig_wp0_fig2_pci")
+    two_def(gq, QLBL, "Product Complexity Index quintile (Q1 = least complex)", "fig_wp0_fig2_pci")
     gl = agg2(d.merge(hs6l, on="hs07_6d", how="inner"), "lall_4").reindex([c for c in LALL_4_ORDER if c in set(hs6l["lall_4"])])
     two_def(gl, LALL_4_XLBL, "", "fig_wp0_fig3_lall")
     print("   originals: Fig1 " + ", ".join(f"{o}:{r.sh_ext:.2f}+{r.sh_dom:.2f}" for o, r in sub.sort_values("sh_total", ascending=False).iterrows())
@@ -306,7 +306,7 @@ def _stacked_on_ax(ax, sh: pd.DataFrame, xlabels: dict, xlabel: str, ymax: float
     for k in range(n):
         ax.text(x[k], bottom[k] + 0.012, f"{sh['sh_total'].iloc[k]:.2f}", ha="center", va="bottom", fontsize=11, fontweight="bold")
     ax.set_xticks(x); ax.set_xticklabels([xlabels.get(c, str(c)) for c in sh.index], fontsize=11); ax.tick_params(axis="y", labelsize=11)
-    ax.set_ylim(0, ymax); ax.set_ylabel("Share in export value (value-weighted)", fontsize=11); ax.set_xlabel(xlabel, fontsize=11)
+    ax.set_ylim(0, ymax); ax.set_ylabel("Share of export value", fontsize=11); ax.set_xlabel(xlabel, fontsize=11)
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
 
@@ -354,7 +354,7 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     # --- Figure 1 by parent: origins sorted by total MNE share (as in the document) -------
     sh1 = shares_by(d, "country_orig", groups).sort_values("sh_total", ascending=True)
     stacked_bars(sh1, groups, "fig_wp1a_origin_by_parent", G, horizontal=True,
-                 axis_label="MNE share in export value (value-weighted)")
+                 axis_label="Share of export value")
     write_share_table(sh1.sort_values("sh_total", ascending=False), groups, T / "tab_wp1a_origin_by_parent.tex",
                       "Origin", "Figure 1 split by parent country. " + note_conv)
 
@@ -369,8 +369,8 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     dq = d.merge(q[["hs07_6d", "quintile"]], on="hs07_6d", how="inner")
     sh2 = shares_by(dq, "quintile", groups)
     stacked_bars(sh2, groups, "fig_wp1a_pci_by_parent", G, horizontal=False, xlabels=QLBL,
-                 axis_label="Share in export value (value-weighted)",
-                 cat_label="PCI quintile (1 = lowest complexity, 5 = highest)", lim=1.0)
+                 axis_label="Share of export value",
+                 cat_label="Product Complexity Index quintile (Q1 = least complex)", lim=1.0)
     write_share_table(sh2, groups, T / "tab_wp1a_pci_by_parent.tex", "PCI quintile",
                       "Figure 2 split by parent country. Quintiles of the Hausmann--Hidalgo Product Complexity Index over HS6 products. " + note_conv, xlabels=QLBL)
 
@@ -379,7 +379,7 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
     dl = d.merge(hs6[["hs07_6d", "lall_4"]].dropna(), on="hs07_6d", how="inner")
     sh3 = shares_by(dl, "lall_4", groups).reindex([c for c in LALL_4_ORDER if c in dl["lall_4"].unique()])
     stacked_bars(sh3, groups, "fig_wp1a_lall_by_parent", G, horizontal=False, xlabels=LALL_4_XLBL,
-                 axis_label="Share in export value (value-weighted)", lim=1.0)
+                 axis_label="Share of export value", lim=1.0)
     write_share_table(sh3, groups, T / "tab_wp1a_lall_by_parent.tex", "Technology category",
                       "Figure 3 split by parent country. Lall (2000) technology classification, four categories. " + note_conv)
 
@@ -394,8 +394,8 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
 
     # --- companion: parent x origin matrix (share of each origin's exports by parent) ---------
     mat = sh1.sort_values("sh_total", ascending=False)[[g for g in groups if g in sh1.columns]] * 100
-    W.heatmap(mat, "fig_wp1a_origin_x_parent_heatmap", G, cbar_label="share of origin's export value (%)",
-              fmt="{:.1f}", cmap="Blues", vmin=0, xlabel="parent country of the MNE", ylabel="exporting country")
+    W.heatmap(mat, "fig_wp1a_origin_x_parent_heatmap", G, cbar_label="Share of the country's export value (%)",
+              fmt="{:.1f}", cmap="Blues", vmin=0, xlabel="Parent country", ylabel="Exporting country")
 
     for name, s in (("origin", sh1), ("pci", sh2), ("lall", sh3)):
         print(f"   [{scope}] {name}: USA segment = "

@@ -96,7 +96,7 @@ def vbar_2def(ax, g: pd.DataFrame, xlabels, xlabel: str, ymax: float = 0.8, font
         ax.text(xi - bw / 2, r.sh_ext + 0.01, f"{r.sh_ext:.2f}", ha="center", fontsize=fontsize)
         ax.text(xi + bw / 2, r.sh_dom + 0.01, f"{r.sh_dom:.2f}", ha="center", fontsize=fontsize)
     ax.set_xticks(x); ax.set_xticklabels([xlabels.get(v, str(v)) if isinstance(xlabels, dict) else str(v) for v in g.iloc[:, 0]])
-    ax.set_xlabel(xlabel, fontsize=fontsize + 1); ax.set_ylabel("Share in export value (value-weighted)", fontsize=fontsize + 1)
+    ax.set_xlabel(xlabel, fontsize=fontsize + 1); ax.set_ylabel("Share of export value", fontsize=fontsize + 1)
     ax.set_ylim(0, ymax)
 
 
@@ -123,13 +123,13 @@ def histograms(hs6: pd.DataFrame, G: Path, nbins: int = 25) -> None:
             a.bar(mids, g["d"] / tot, w, bottom=g["e"] / tot, color=W.C_MNE_DOM, label="Domestic MNEs")
             a.bar(mids, g["l"] / tot, w, bottom=(g["e"] + g["d"]) / tot, color="#e8e8e8", edgecolor="#cccccc", linewidth=0.3, label="Local firms")
             a.set_xlabel(xlabel.split(" quintile")[0].replace("|import-demand elasticity|", "|import-demand elasticity| (FGO 2022)"), fontsize=9)
-            a.set_ylabel("share of the scope's export value", fontsize=9)
+            a.set_ylabel("Share of export value", fontsize=9)
             ar = a.twinx()
             sh = np.where(g["v"] / tot >= 0.002, g["e"] / g["v"].replace(0, np.nan), np.nan)   # line only where the bin holds >= 0.2% of value
-            ar.plot(mids, sh, color="#c8a24a", marker="o", markersize=3, linewidth=1.2, label="foreign-MNE share of the bin")
-            ar.set_ylim(0, 1); ar.set_ylabel("foreign-MNE share within bin", fontsize=9, color="#8a6d1f"); ar.tick_params(axis="y", colors="#8a6d1f", labelsize=8)
+            ar.plot(mids, sh, color="#c8a24a", marker="o", markersize=3, linewidth=1.2, label="Foreign-MNE share of the bin")
+            ar.set_ylim(0, 1); ar.set_ylabel("Foreign-MNE share within bin", fontsize=9, color="#8a6d1f"); ar.tick_params(axis="y", colors="#8a6d1f", labelsize=8)
         ax2.bar(mids, g["n"], w, color=W.C_MNE_DOM, edgecolor="#9e9e9e", linewidth=0.4)
-        ax2.set_xlabel("same bins", fontsize=9); ax2.set_ylabel("number of HS6 products", fontsize=9)
+        ax2.set_xlabel("Same bins", fontsize=9); ax2.set_ylabel("Number of HS6 products", fontsize=9)
         ax.legend(frameon=False, fontsize=8, loc="upper right")
         fig.tight_layout()
         W.savefig(fig, f"fig_wp1b_hist_{col}", G)
