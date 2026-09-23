@@ -642,39 +642,34 @@ def build_draft() -> Path:
 
 # =====================================================================
 # WP_paper / WP_paper_agro -- the working-paper drafts for the coauthors
+#   rev. 2026-09-23: same exhibit conventions as WP_draft2 (titles, short notes with a plain
+#   description and a separate Source line, relabelled fragments, main/appendix split), and a
+#   plainer text throughout.
 # =====================================================================
 
 PAPER_ABSTRACT = r"""
-We match the customs export records of nine Latin American countries for 2006--2022 to the
-ownership data of Orbis and Dun \& Bradstreet, so that every exporter is an affiliate of a foreign
-multinational group, an affiliate of a domestic group, or a local firm. The data cover 165,543
-exporters, 5,930 products, 253 destinations and US\$2.4 trillion of exports, and give the country
-of the ultimate owner for 92\% of what foreign affiliates sell abroad. Six facts follow.
-Multinational affiliates sell 61\% of the region's exports, and most of that is foreign owned.
-Foreign affiliates concentrate in complex and differentiated goods, domestic ones in primary and
-homogeneous goods. The owners come from few countries: the United States, the United Kingdom and
-Canada together account for half of foreign-affiliate exports. Groups with more than a hundred
-affiliates worldwide are 9\% of parents and 56\% of the value. Where multinationals are present,
-exports are higher, and the association is about three times larger for foreign affiliates than
-for domestic ones. Distance holds multinational affiliates back less than it holds back other
-firms. US groups are a case of their own: they own 10.8\% of the region's exports and they are the
-only large investor that ships a sizeable part of what it produces in the region back home, 22.3\%
-against 0.6\% for British parents and close to zero for Swiss and Liechtenstein ones.
+We match the customs export records of nine Latin American countries to the ownership records of
+Orbis and Dun \& Bradstreet and classify every exporter as a foreign multinational affiliate, a
+domestic multinational affiliate or a local firm. Multinational affiliates account for 61 percent
+of the region's exports, most of it foreign owned. Foreign affiliates concentrate in complex and
+differentiated products, domestic ones in primary goods. The parents come from a few countries,
+and a small number of large groups accounts for most of the value. Product--destination pairs with
+more multinationals export more, and distance reduces the exports of multinationals less than
+those of other firms. US groups are the only large investors that ship a sizeable share of their
+affiliates' exports to their own country: 22 percent, against less than 3 percent for British,
+Dutch or Swiss groups.
 """
 
 AGRO_ABSTRACT = r"""
-We match the customs export records of nine Latin American countries for 2006--2022 to the
-ownership data of Orbis and Dun \& Bradstreet, and use them to describe who owns the region's
-agricultural exporters. Agriculture here is HS chapters 01--24 and is worth US\$78.9 billion a
-year across the nine countries. Multinational affiliates sell 48\% of it, 38\% foreign owned and
-10\% domestically owned, with shares that run from 29\% in El Salvador to 66\% in Paraguay. The
-owners are concentrated in a handful of countries, most of them grain traders and the holding
-jurisdictions they use. Foreign presence is heaviest in oil seeds, cereals and animal feed and
-lightest in sugar and beverages. Two of the patterns that hold for the region's exports as a whole
-do not hold inside agriculture: foreign affiliates are no more concentrated in complex or
-differentiated goods than in simple ones, and the product range is too narrow for a complexity
-gradient to appear. The other four hold. A few large groups carry the value, cells with more
-multinationals trade more, and distance holds multinational affiliates back less than other firms.
+We match the customs export records of nine Latin American countries to the ownership records of
+Orbis and Dun \& Bradstreet and describe who owns the region's agricultural exporters. Multinational
+affiliates account for 48 percent of agricultural exports (HS 01--24), 38 percent foreign owned and
+10 percent domestically owned. The share ranges from 29 percent in El Salvador to 66 percent in
+Paraguay. The parents come from a few countries, and a small number of large groups accounts for
+half of foreign-affiliate exports. Unlike in the region's exports as a whole, foreign affiliates in
+agriculture are not concentrated in more complex or more differentiated products.
+Product--destination pairs with more multinationals export more, and distance reduces the exports
+of multinationals less than those of other firms.
 """
 
 PAPER_KEYWORDS = "Multinational Firms, Foreign Direct Investment, Exports, Ownership, Firm-Level Data, Latin America"
@@ -717,379 +712,271 @@ the Inter-American Development Bank, its executive directors, or its member coun
 
 
 PAPER_INTRO = r"""
-Customs records show what a country sells abroad and to whom. They do not show who owns the
-seller. For Latin America this is a large blind spot, because much of the export base belongs to
-firms whose owners sit in another country. Aggregate investment statistics do not close it. They
-record where capital goes, not which firm ships which product to which market.
+Customs records show what a country exports and where, but not who owns the exporter. In Latin
+America many exporters are affiliates of groups headquartered abroad, so this is a large gap.
+Foreign direct investment statistics do not fill it: they show where capital goes, not which
+firms export which products to which markets.
 
-This paper closes it for nine countries: Argentina, Chile, Colombia, Costa Rica, the Dominican
-Republic, El Salvador, Paraguay, Peru and Uruguay. We match their customs export records for
-2006--2022 to the ownership records of Orbis and Dun \& Bradstreet. The result is a dataset of 5.1
-million firm, destination, product and year cells in which every exporter carries a label, foreign
-affiliate, domestic affiliate or local firm, and in which the sales of foreign affiliates can be
-traced back to the country of their parent.
+In this paper we match the customs export records of nine countries (Argentina, Chile, Colombia,
+Costa Rica, the Dominican Republic, El Salvador, Paraguay, Peru and Uruguay) to the ownership
+records of Orbis and Dun \& Bradstreet. Every exporter is classified as a foreign multinational
+affiliate, a domestic multinational affiliate or a local firm, and the exports of foreign
+affiliates can be traced to the country of their parent.
 
-Six facts come out of it. First, multinational affiliates sell 61\% of the region's exports, from
-47\% in Peru to 74\% in Colombia, and most of that is foreign owned. Second, foreign affiliates
-concentrate in complex and differentiated goods and domestic ones in primary and homogeneous
-goods, with the clearest gradient inside manufacturing. Third, the owners come from few countries:
-the United States, the United Kingdom and Canada account for half of foreign-affiliate exports.
-Fourth, a few large groups carry the value, since parents with more than a hundred affiliates
-worldwide are 9\% of parents and 56\% of what foreign affiliates sell. Fifth, cells with more
-multinationals trade more, and the association is about three times larger for foreign affiliates
-than for domestic ones, including for the local firms selling in the same cell. Sixth, distance
-reduces the exports of multinational affiliates less than it reduces those of other firms.
+The data show six facts. First, multinational affiliates account for 61 percent of the region's
+exports, from 47 percent in Peru to 74 percent in Colombia, and most of it is foreign owned.
+Second, foreign affiliates concentrate in complex and differentiated products and domestic
+multinationals in primary goods, especially within manufacturing. Third, the parents come from a
+few countries: the United States, the United Kingdom and Canada account for half of
+foreign-affiliate exports. Fourth, parents with more than 100 affiliates worldwide are 9 percent of
+all parents and account for 56 percent of foreign-affiliate exports. Fifth, product--destination
+pairs with more multinationals export more, and the relationship is about three times stronger for
+foreign than for domestic affiliates, also for the exports of local firms. Sixth, distance reduces
+the exports of multinationals less than those of other firms.
 
-The United States runs through all six facts and is the paper's main story. It is both the largest
-owner of the region's exporters and its largest single market, and the two roles almost never
-meet. US groups own 10.8\% of what the nine countries export, 18.4\% of those exports go to
-the United States, and the overlap is 2.5\%. What sets US parents apart is that they buy from
-their own affiliates at all. Of what their Latin American affiliates sell abroad, 22.3\% goes to
-the United States, against 0.6\% for British parents, 2.2\% for Dutch ones and close to zero for
-Swiss and Liechtenstein ones. Only Canadian (19.5\%) and Brazilian (18.6\%) parents come near.
-The overlap is concentrated in Central America and the Caribbean, where US affiliates move 41\% of
-what El Salvador sends to the United States, 40\% of Costa Rica's and 26\% of the Dominican
-Republic's, and in manufacturing, where they move 27\% of everything the region ships north. In
-the Southern Cone and the Andes it is small. The nationality of the owner predicts the
-destination, and it predicts a different one for each owner: British and Liechtenstein groups send
-mining products to Asia, German and Japanese groups export from Argentina to Brazil.
+The United States deserves separate attention because it is both the largest parent country and
+the largest destination. Affiliates of US groups account for 10.8 percent of the exports of the
+nine countries, the United States buys 18.4 percent of them, and the two overlap in 2.5 percent.
+US groups are the only large investors that ship a sizeable share of their affiliates' exports to
+their own country: 22.3 percent, against 0.6 percent for British groups, 2.2 percent for Dutch
+groups and almost none for Swiss or Liechtenstein groups. These shipments are concentrated in
+Central America and the Caribbean, where US-parent affiliates account for 41 percent of El
+Salvador's exports to the United States, 40 percent of Costa Rica's and 26 percent of the
+Dominican Republic's. Groups from other countries follow different patterns. British and
+Liechtenstein groups, mostly in mining, sell to Asia, and German and Japanese groups export from
+Argentina to Brazil.
 
 \tbw{Contribution to the literature: to be written.}
 
-Section~\ref{sec:lit} reviews the related literature. Section~\ref{sec:data} describes the data
-and how exporters are classified by ownership. Section~\ref{sec:facts} presents the six facts.
-Section~\ref{sec:products} takes them to the product and sector level. Section~\ref{sec:model}
-sketches the model and Section~\ref{sec:concl} concludes.
+Section~\ref{sec:lit} reviews the literature, Section~\ref{sec:data} describes the data and
+Section~\ref{sec:facts} presents the six facts. Section~\ref{sec:products} looks at products,
+Section~\ref{sec:model} outlines the model and Section~\ref{sec:concl} concludes.
 """
 
 AGRO_INTRO = r"""
-Customs records show what a country sells abroad and to whom. They do not show who owns the
-seller. In agriculture that gap is wide, because a large part of what Latin America ships is
-handled by grain traders, processors and food companies headquartered elsewhere, and the aggregate
-investment statistics do not say which firm ships which crop to which market.
+Customs records show what a country exports and where, but not who owns the exporter. In
+agriculture this matters because a large part of Latin America's exports is handled by traders,
+processors and food companies headquartered abroad. Foreign direct investment statistics show
+where capital goes, not which firms export which products to which markets.
 
-This paper closes the gap for nine countries: Argentina, Chile, Colombia, Costa Rica, the
-Dominican Republic, El Salvador, Paraguay, Peru and Uruguay. We match their customs export records
-for 2006--2022 to the ownership records of Orbis and Dun \& Bradstreet, label every exporter as a
-foreign affiliate, a domestic affiliate or a local firm, and restrict the result to agriculture,
-defined as HS chapters 01--24. That is US\$78.9 billion a year, a third of what the nine countries
-export. Everything here is for the region as a whole.
+In this paper we match the customs export records of nine countries (Argentina, Chile, Colombia,
+Costa Rica, the Dominican Republic, El Salvador, Paraguay, Peru and Uruguay) to the ownership
+records of Orbis and Dun \& Bradstreet, classify every exporter as a foreign multinational
+affiliate, a domestic multinational affiliate or a local firm, and focus on agricultural exports
+(HS chapters 01--24). These amount to US\$78.9 billion a year, a third of the nine countries'
+exports. All results are for the nine countries together.
 
-Five results are worth stating up front. Multinational affiliates sell 48\% of the region's
-agricultural exports, 38\% of it foreign owned, and the share ranges from 29\% in El Salvador to
-66\% in Paraguay. Ownership is concentrated in a few countries, most of them grain traders and the
-holding jurisdictions they use. Within agriculture the foreign share is highest in oil seeds
-(62\%), miscellaneous edible products (71\%) and tobacco (55\%), and lowest in sugar (19\%) and
-beverages (29\%). Groups with more than a hundred affiliates worldwide are 12\% of parents and
-half of foreign-affiliate value, while 45\% of parents have a single affiliate. And the two
-regularities that hold for merchandise exports as a whole do not survive inside agriculture: there
-is no complexity gradient and no difference between differentiated and homogeneous goods.
+Multinational affiliates account for 48 percent of agricultural exports, 38 percent foreign owned
+and 10 percent domestically owned, with shares that range from 29 percent in El Salvador to 66
+percent in Paraguay. Parents come from a few countries, and groups with more than 100 affiliates
+worldwide, 12 percent of all parents, account for half of foreign-affiliate exports. Among the five largest
+product groups, the foreign share is highest in oil seeds (62 percent) and cereals (49 percent). Two patterns found in the region's exports as a whole do not hold in
+agriculture: foreign affiliates are not concentrated in more complex products or in differentiated
+products. The other results do hold. Product--destination pairs with more multinationals export
+more, and distance reduces the exports of multinationals less than those of other firms.
 
 \tbw{Contribution to the literature: to be written.}
 
-Section~\ref{sec:lit} reviews the related literature. Section~\ref{sec:data} describes the data.
-Section~\ref{sec:facts} presents the facts within agriculture. Section~\ref{sec:sub} looks inside
-the sector. Section~\ref{sec:model} sketches the model and Section~\ref{sec:concl} concludes.
+Section~\ref{sec:lit} reviews the literature, Section~\ref{sec:data} describes the data and
+Section~\ref{sec:facts} presents the facts. Section~\ref{sec:sub} looks at product groups within
+agriculture, Section~\ref{sec:model} outlines the model and Section~\ref{sec:concl} concludes.
 """
 
 
 def data_section(agro: bool = False) -> str:
     scope = (r"""
-
-Agriculture is HS chapters 01--24, which covers live animals, meat, fish, dairy, vegetables,
-fruit, cereals, oil seeds, fats and oils, prepared foods, beverages and tobacco. Every figure in
-this paper is computed on that subset of the records described above, for the nine countries
-pooled. We do not report country-specific or partner-specific analyses.
+Agricultural exports are HS chapters 01--24: live animals, meat, fish, dairy, vegetables, fruit,
+cereals, oil seeds, fats and oils, prepared foods, beverages and tobacco. All results in this paper
+are for these products and for the nine countries together.
 """ if agro else "")
     return r"""
-\subsection{Customs transactions}
+\subsection{Customs data}
 
-The trade data are the export records of the customs authorities of nine Latin American countries,
-obtained by the Inter-American Development Bank under its agreements with the national agencies. A
-record gives the value exported (FOB, current US dollars) by one identified firm, of one six-digit
-HS 2007 product, to one destination, in one year. Firms are identified by their national tax
-number, which is unique within a country, and by the name written on the declaration.
+The export records come from the customs authorities of the nine countries. Each record gives the
+value exported (FOB, US dollars) by a firm, of an HS6 product (2007 revision), to a destination, in
+a year. Firms are identified by their tax number and name. The records cover all merchandise
+exports in the years available for each country: Argentina 2011--2019, Chile 2009--2022, Colombia
+2010--2021, Costa Rica 2010--2019, the Dominican Republic 2012--2019, El Salvador 2006--2018,
+Paraguay 2012--2020, Peru 2010--2019 and Uruguay 2010--2019.
+""" + scope + r"""
+\subsection{Ownership data and matching}
 
-Coverage is the universe of merchandise exports in the years each country made available. Those
-years differ, from Chile's 2009--2022 to Paraguay's 2012--2020, and all nine overlap between 2012
-and 2018. Because the panel is unbalanced, every dollar figure in this paper is an annual average,
-the country's pooled value divided by the number of years it is observed, while shares are
-computed on pooled values. Ecuador is in the raw data but excluded throughout. Services do not
-appear in customs merchandise records and are outside the paper.""" + scope + r"""
+Ownership comes from Orbis (Bureau van Dijk) and Dun \& Bradstreet, which report for each company
+its global ultimate owner and the owner's country. We combine the two sources into one file with
+the group, the country of the parent and the number of affiliates the group has worldwide.
 
-\subsection{Ownership records}
+Exporters are matched to this file in four steps: by tax number where the corporate records
+report it; by company name within each country, using a character-based similarity measure,
+with each candidate pair reviewed by a large language model; by company name across all countries; and, for the 500
+largest unmatched exporters of each country, by hand, using company websites and business
+registries. The tax number delivers about 60 percent of matched export value. After matching, the
+parent's country is known for 92.5 percent of the export value of foreign affiliates.
 
-Ownership comes from two commercial databases. Orbis (Bureau van Dijk) gives the ownership links
-between companies: for each subsidiary, the identity and country of its global ultimate owner at
-the 25\% control threshold. Dun \& Bradstreet gives an independent roster with the DUNS number of
-each establishment and of its global ultimate, together with names, countries and industries. We
-merge the two into one file in which each firm carries a group identifier, the parent's country
-and name, and the number of affiliates the group has worldwide, which is the measure of network
-size behind Fact~4. The two sources overlap without coinciding: Orbis covers the ownership chain
-better, Dun \& Bradstreet the operating establishments, and some exporters appear in only one.
+\subsection{Definitions}
 
-\subsection{Matching exporters to their owners}
+An exporter found in Orbis or Dun \& Bradstreet is a multinational affiliate (MNE). It is a
+\emph{domestic} MNE when its ultimate parent is located in the exporting country and a
+\emph{foreign} MNE otherwise; matched exporters without a recorded parent country are counted as
+foreign. Exporters not found in either database are \emph{local} firms. Because the match relies
+on ownership links, a group's head company exporting from its own country cannot be identified
+and appears among local firms.
 
-Customs gives a tax number and a name typed into a declaration. The corporate databases give a
-registered company name and, for some countries, the same tax number. Matching runs in four steps.
+Products are classified with the Product Complexity Index of Hausmann and Hidalgo, the technology
+classes of Lall (2000), the Rauch (1999) classification, and the end-use classes of BEC Rev.\,4.
+Sectors are defined on HS chapters: agriculture 01--24, mining and fuels 25--27 and 71,
+manufacturing 28--97 excluding 71. Distance comes from the CEPII gravity database.
 
-\begin{enumerate}[leftmargin=1.4em,itemsep=1pt,topsep=2pt]
-\item \textbf{Tax identifier.} Direct match on the national tax number wherever the corporate
-database records it. This step delivers about 60\% of matched export value.
-\item \textbf{Fuzzy name matching, country by country.} For the rest, company names are compared
-with a character-level TF--IDF trigram similarity. Character sequences survive the abbreviations
-that customs declarations make to company names; words do not. A large language model then accepts
-or rejects each candidate pair.
-\item \textbf{Fuzzy name matching, pooled.} A second pass over the firms still unmatched, this
-time against the corporate databases of all countries at once, which catches affiliates registered
-under a group name rather than a local one.
-\item \textbf{Manual review.} For the 500 largest unmatched exporters of each country, the match
-was checked by hand against company websites, corporate registries and public filings. These firms
-are few and carry a large share of export value, so they drive the aggregate shares.
-\end{enumerate}
-
-A parallel step recovers the parent's country when the ownership record names the parent but not
-its location, first from the raw Orbis links and then from a model-assisted review of the parent's
-name and registered address. After it, the country of the ultimate owner is known for 92.5\% of
-what foreign affiliates export.
-
-\subsection{Who counts as a multinational}
-
-An exporter found in Orbis or Dun \& Bradstreet is an affiliate of a multinational group. We split
-matched exporters by where the group's ultimate owner sits: a \textbf{domestic} affiliate when the
-owner is in the exporting country, a \textbf{foreign} affiliate otherwise. Matched exporters whose
-parent country is unknown count as foreign, so the foreign category is what is left of matched
-firms after the domestic ones. An exporter found in neither database is a \textbf{local} firm.
-
-Two consequences matter for reading the exhibits. Because the foreign category is a residual, the
-aggregate foreign share does not depend on how many parent countries were recovered, which is what
-Facts~1, 2, 5 and~6 need. And wherever an exhibit splits the foreign bar \emph{by} parent country,
-the 7.5\% of foreign-affiliate value with an unknown parent is allocated across parent countries
-in proportion to the recorded parents of the same group, so those shares still refer to all
-foreign affiliates and still add up with the domestic and local ones.
-
-One limit is worth stating. The match runs through ownership links, so a group's head company
-cannot be identified as an exporter: every matched exporter in the data has an ultimate owner
-different from itself, and a Latin American group's head company exporting from home falls among
-the unmatched. What the data do show is whether the group is present \emph{at the destination},
-either because the affiliate ships to its parent's country or because the group has another
-affiliate there. Facts~5 and~6 use that distinction.
-
-\subsection{Product classifications and other sources}
-
-Products carry the Hausmann--Hidalgo Product Complexity Index, the four technology categories of
-Lall (2000), the conservative Rauch (1999) split into differentiated, reference-priced and
-exchange-traded goods, BEC Rev.\,4 end use and categories, SITC Rev.\,3 divisions, NAICS codes,
-upstreamness, and the import-demand elasticities of Fontagn\'e, Guimbard and Orefice (2022), all
-mapped to HS 2007 six-digit lines. Sectors are defined on HS chapters: agriculture 01--24, mining
-and fuels 25--27 and 71, manufacturing 28--97 excluding 71. Distance, contiguity, common language
-and trade agreements come from the CEPII gravity database.
-
-\subsection{The working sample}
+\subsection{Sample}
 """
 
 
 PAPER_SAMPLE_TEXT = r"""
-Table~\ref{tab:p_sample} describes the sample country by country and Table~\ref{tab:p_counts}
-summarizes it. The nine countries contribute 5.1 million firm, destination, product and year
-records, 165,543 exporters of which 31,350 are matched to a corporate database, 5,930 HS6 lines,
-253 destinations and US\$2,394 billion of pooled export value. The matched exporters belong to
-17,094 groups whose owners sit in 165 countries. Regressions use plain logarithms, so a cell with
-a zero count drops out of that column, and cluster standard errors at the origin--destination
-level.
+Table~\ref{tab:p_sample} describes the sample by country and Table~\ref{tab:p_counts} summarizes
+it. The nine countries have 165,543 exporters, of which 31,350 are matched to a corporate record.
+They export 5,930 HS6 products to 253 destinations. The matched exporters belong to 17,094 groups
+with parents in 165 countries.
 """
 
 AGRO_SAMPLE_TEXT = r"""
-Table~\ref{tab:p_sample} describes the agricultural sample country by country and
-Table~\ref{tab:p_counts} summarizes it. Regressions use plain logarithms, so a cell with a zero
-count drops out of that column, and cluster standard errors at the origin--destination level.
+Table~\ref{tab:p_sample} describes the agricultural sample by country and Table~\ref{tab:p_counts}
+summarizes it. The nine countries have 38,832 agricultural exporters, of which 7,993 are matched to
+a corporate record, and export 1,023 HS6 products to 245 destinations.
 """
 
 
 PAPER_FACT_TEXT = {
 1: r"""
-Figure~\ref{fig:p_f1} gives, for each country, the share of export value sold by multinational
-affiliates, split into foreign and domestic owners. Multinationals sell between 47\% (Peru) and
-74\% (Colombia) of exports, and 61\% for the nine pooled. Foreign owners dominate: 46\% of total
-exports against 14\% for domestic multinationals. Colombia is the exception, where the state oil
-company and its subsidiaries push the domestic share above the foreign one, and Chile is the near
-exception, where copper and pulp do the same on a smaller scale. A large domestic multinational
-presence is a natural-resource story in two countries.
+Figure~\ref{fig:p_f1} shows the share of each country's exports accounted for by multinational
+affiliates. It ranges from 47 percent in Peru to 74 percent in Colombia and is 61 percent for the
+nine countries together. Foreign affiliates account for 46 percent of total exports and domestic
+multinationals for 14 percent. Foreign affiliates export more than domestic multinationals in every
+country except Colombia, where the state oil company and its subsidiaries are domestic
+multinationals. Chile, with copper and pulp, is the other country with a large domestic share.
 
-The United States is both the largest owner and the largest market, so it is worth separating the
-two roles at the start. Of the region's exports, 18.4\% go to the United States and 10.8\% are
-sold by affiliates of US groups. Only 2.5\% is both, and US affiliates move 13.6\% of everything
-the nine countries ship to the United States. The overlap sits in Central America and the
-Caribbean, at 19.0\% of El Salvador's exports, 15.1\% of Costa Rica's and 12.5\% of the Dominican
-Republic's, and is small everywhere else.
+Figures~\ref{fig:p_us3_total} and~\ref{fig:p_us3_origin} and Table~\ref{tab:p_us3_tab} separate
+the two roles of the United States. The United States buys 18.4 percent of the region's exports
+and US-parent affiliates ship 10.8 percent, but only 2.5 percent is both. US-parent affiliates
+account for 13.6 percent of the region's exports to the United States, and for much more in El
+Salvador, Costa Rica and the Dominican Republic.
 """,
 2: r"""
-Figure~\ref{fig:p_f2f3} sorts products by sophistication. The foreign share climbs from 0.46 in
-the least complex quintile of the Product Complexity Index to 0.65 in the most complex one, and is
-highest in high- and medium-technology manufactures. Domestic multinationals run the other way,
-concentrated in primary and resource-based goods. Figure~\ref{fig:p_f2_oecd} shows that affiliates
-of OECD-headquartered groups carry the gradient.
-
-The same ordering shows up in classifications that use no complexity index. Foreign affiliates
-hold 56\% of differentiated products and 55\% of reference-priced ones against 34\% of
-exchange-traded goods, where the domestic share is four times its average (Table~\ref{tab:p_rauch}
-and Figure~\ref{fig:p_rauch_fig}). By end use they hold 65\% of capital goods against 48\% of
-intermediates and 44\% of consumption goods (Table~\ref{tab:p_bec}).
-Table~\ref{tab:p_ladder} runs the same comparison in origin, destination, product and year cells.
-The pattern is sharpest inside manufacturing (Figure~\ref{fig:p_rauch_manuf}). It is noisy inside
-agriculture and absent inside mining, where too few products exist for the quintiles to order
-anything.
+Figure~\ref{fig:p_f2f3} sorts products by sophistication. The foreign share is 0.46 in the least
+complex quintile of the Product Complexity Index and 0.65 in the most complex one, and it is highest
+in high- and medium-technology manufactures. Domestic multinationals are concentrated in primary
+and resource-based products. The Rauch classification gives the same ordering
+(Table~\ref{tab:p_rauch} and Figure~\ref{fig:p_rauch_fig}): foreign affiliates account for 56
+percent of exports of differentiated products and 34 percent of homogeneous products, while the
+domestic shares are 6 and 23 percent. By end use, the foreign share is 65 percent in capital goods,
+48 percent in intermediate goods and 44 percent in consumption goods (Table~\ref{tab:p_bec}).
+Table~\ref{tab:p_ladder} shows the same patterns in regressions at the origin--destination--product--year
+level. The pattern is clearest within manufacturing (Figure~\ref{fig:p_rauch_manuf}); it is weak
+within agriculture and absent within mining.
 """,
 3: r"""
-Figure~\ref{fig:p_f4} ranks the owners of foreign affiliates by their share of foreign-affiliate
-export value. The United States (23\%), the United Kingdom (19\%) and Canada (8\%) account for
-half of it, the ten largest owners for more than three quarters, and the remaining 150 countries
-for the rest.
-
-Where the goods go depends on who owns the seller. Tables~\ref{tab:p_pxd} and~\ref{tab:p_pxp} give
-the destination mix of the ten largest owners, the second using the owners' own countries as
-destinations, so its diagonal is the share each group of affiliates ships home. Three routes stand
-out. British and Liechtenstein groups, concentrated in mining, sell to Asia. German and Japanese
-groups export from Argentina to Brazil, treating the region as a platform for Mercosur. And US
-groups ship home: 22.3\% of what their affiliates sell, against 0.6\% for British owners and 2.2\%
-for Dutch ones, with only Canada (19.5\%) and Brazil (18.6\%) close behind. Figure~\ref{fig:p_dest}
-looks at the same pattern from the destination side and asks, for each large market, how much of
-what arrives is carried by affiliates of groups headquartered there.
+Figure~\ref{fig:p_f4} ranks parent countries by their share of foreign-affiliate exports. The
+United States (23 percent), the United Kingdom (19 percent) and Canada (8 percent) account for
+half, and the ten largest parent countries for more than three quarters.
+Table~\ref{tab:p_pxp} shows where the affiliates of each of the ten largest parent countries sell;
+its diagonal is the share shipped to the parent's own country. The share is 22.3 percent for US
+groups, 19.5 percent for Canadian groups and 18.6 percent for Brazilian groups, but less than 3
+percent for British, Dutch or Swiss groups. Figure~\ref{fig:p_dest} shows the same pattern from the
+side of the main destination markets.
 """,
 4: r"""
-Figure~\ref{fig:p_f5} groups the owners of foreign affiliates by the number of affiliates their
-group has worldwide. Almost half of the owners have a single affiliate, while owners with more
-than a hundred are 9\% of the total and sell 56\% of foreign-affiliate export value. The region's
-foreign-owned export capacity sits inside a small number of large corporate networks.
+Figure~\ref{fig:p_f5} groups parents by the number of affiliates their group has worldwide. Almost
+half of the parents have a single affiliate, but the 9 percent with more than 100 affiliates
+account for 56 percent of foreign-affiliate exports.
 """,
 5: r"""
-Table~\ref{tab:p_t1} relates the exports of an origin, destination, product and year cell to the
-multinational presence in it, on the intensive margin (how many affiliates sell the product there)
-and on the extensive one (whether any does). Both associations are large and survive an
-increasingly demanding set of fixed effects, and both hold when the dependent variable is the
-exports of the \emph{non-multinational} firms in the same cell (Panel B).
-
-Table~\ref{tab:p_f5counts} splits the intensive margin by owner. The coefficient is about three
-times larger for foreign affiliates than for domestic ones, 1.21 against 0.44, and the same gap
-appears for the exports of local firms in the cell, 1.13 against 0.47. On the extensive margin the
-two are almost identical, 1.50 against 1.47 (Table~\ref{tab:p_ext}), so what separates foreign
-affiliates is how much presence they bring rather than whether they are there at all. Columns
-(5)--(6) split foreign affiliates further by whether the group reaches the destination through its
-own headquarters; they rest on far fewer cells and should be read as suggestive.
+Table~\ref{tab:p_t1} relates the exports of an origin--destination--product--year cell to the
+number of multinationals exporting in it (intensive margin) and to whether any does (extensive
+margin). Both relationships are positive and large, also for the exports of the local firms in the
+same cell (Panel~B). Table~\ref{tab:p_f5counts} splits the intensive margin by type of
+multinational. The coefficient is 1.21 for foreign affiliates and 0.44 for domestic ones in
+Panel~A, and 1.13 and 0.47 in Panel~B. On the extensive margin the two coefficients are almost
+equal (Table~\ref{tab:a_ext}).
 """,
 6: r"""
-Table~\ref{tab:p_t2} estimates the distance elasticity of firm-level exports and how it changes
-for multinational affiliates. The baseline elasticity is $-0.16$ and roughly a third of it goes
-away for multinationals. Table~\ref{tab:p_dist} splits that attenuation: 0.049 for foreign
-affiliates against 0.032 for domestic ones, and 0.064 for foreign affiliates whose group reaches
-the destination through its headquarters, which is to say for affiliates selling to their own
-parent's country.
+Table~\ref{tab:p_t2} estimates how firm exports fall with distance. The elasticity is $-0.16$ for
+local firms and about 0.05 smaller in absolute value for multinationals. Table~\ref{tab:p_dist}
+shows that the difference is larger for foreign affiliates (0.049) than for domestic ones (0.032),
+and largest for foreign affiliates exporting to their parent's country (0.064).
 """,
 }
 
 AGRO_FACT_TEXT = {
 1: r"""
-Figure~\ref{fig:p_f1} gives, for each country, the share of agricultural export value sold by
-multinational affiliates. Multinationals sell 48\% of the region's agricultural exports, 38\%
-foreign owned and 10\% domestically owned. The spread across countries is wide: 66\% in Paraguay
-and 62\% in Uruguay at one end, 29\% in El Salvador and 37\% in Peru at the other. Foreign owners
-are ahead of domestic ones everywhere, and the gap is narrowest in Chile (30\% against 19\%),
-where fruit and wine have domestically owned groups of some size.
+Figure~\ref{fig:p_f1} shows the share of each country's agricultural exports accounted for by
+multinational affiliates. It is 48 percent for the nine countries together, 38 percent foreign
+owned and 10 percent domestically owned. It ranges from 66 percent in Paraguay and 62 percent in
+Uruguay to 37 percent in Peru and 29 percent in El Salvador. Foreign affiliates export more than
+domestic multinationals in every country; the gap is smallest in Chile (30 against 19 percent).
 """,
 2: r"""
-This is where agriculture parts company with the rest of the region's exports. Across merchandise
-exports as a whole the foreign share rises with product complexity and is higher in differentiated
-goods. Inside agriculture neither holds. Across quintiles of the Product Complexity Index the
-foreign share reads 0.29, 0.49, 0.38, 0.42, 0.55, so the two ends go the right way and the middle
-does not (Figure~\ref{fig:p_f2f3}). By Rauch class the foreign share is 41\% in differentiated goods,
-32\% in reference-priced ones and 41\% in exchange-traded ones (Table~\ref{tab:p_rauch} and
-Figure~\ref{fig:p_rauch_fig}). The domestic share sits near 9\% in all three. By end use the
-foreign share is 41\% in intermediates against 35\% in consumption goods (Table~\ref{tab:p_bec}),
-a small difference next to the 65\% against 44\% found in manufacturing. Agricultural products
-occupy a narrow band of the complexity range, and inside that band sophistication does not sort
-owners.
+In the region's exports as a whole, the foreign share rises with product complexity and is higher
+for differentiated products. Neither pattern holds in agriculture. Across quintiles of the Product
+Complexity Index the foreign share is 0.29, 0.49, 0.38, 0.42 and 0.55 (Figure~\ref{fig:p_f2f3}).
+By Rauch class it is 41 percent for differentiated products, 32 percent for reference-priced
+products and 41 percent for homogeneous products, and the domestic share is about 9 percent in all
+three (Table~\ref{tab:p_rauch} and Figure~\ref{fig:p_rauch_fig}). By end use, the foreign share is
+41 percent for intermediate goods and 35 percent for consumption goods (Table~\ref{tab:p_bec}).
 """,
 3: r"""
-Figure~\ref{fig:p_f4} ranks the owners of foreign affiliates in agriculture by their share of
-foreign-affiliate export value. Ownership is concentrated: the ten largest owner countries account
-for roughly three quarters of it. The list is a list of the grain trade and the jurisdictions it
-holds assets through, with Switzerland (11\%), the Netherlands (9.5\%) and Liechtenstein (7.6\%)
-high in the ranking next to the United States (24\%). Where each owner's affiliates sell is in
+Figure~\ref{fig:p_f4} ranks parent countries by their share of foreign-affiliate agricultural
+exports. The ten largest parent countries account for more than 70 percent. The list reflects the
+grain trade and the jurisdictions where trading groups hold their assets: Switzerland (11 percent),
+the Netherlands (9.5 percent) and Liechtenstein (7.6 percent) rank high, together with the United
+States (24 percent). The destination of each parent country's exports is in
 Tables~\ref{tab:ap_pxd} and~\ref{tab:ap_pxp} in the appendix.
 """,
 4: r"""
-Figure~\ref{fig:p_f5} groups the owners of foreign affiliates by the size of their worldwide
-network. Agriculture has a long tail of small owners: 45\% of them have a single affiliate, a
-larger share than in the region's exports as a whole. The value still sits with the large groups,
-with owners of more than a hundred affiliates accounting for 12\% of owners and 50\% of
-foreign-affiliate export value.
+Figure~\ref{fig:p_f5} groups parents by the number of affiliates their group has worldwide. In
+agriculture 45 percent of parents have a single affiliate, but the 12 percent with more than 100
+affiliates account for half of foreign-affiliate exports.
 """,
 5: r"""
-Table~\ref{tab:p_t1} relates the agricultural exports of an origin, destination, product and year
-cell to the multinational presence in it. The associations are the same as for merchandise exports
-as a whole, and they hold for the exports of the non-multinational firms in the same cell
-(Panel~B). Table~\ref{tab:p_f5counts} splits the intensive margin by owner: 1.30 for foreign
-affiliates against 0.52 for domestic ones, the same factor of roughly three found in the region's
-exports as a whole. The extensive margin is in Table~\ref{tab:p_ext}.
+Table~\ref{tab:p_t1} relates the agricultural exports of an origin--destination--product--year cell
+to the number of multinationals exporting in it and to whether any does. The results are similar
+to those for all exports, including for the exports of local firms in the same cell (Panel~B).
+Table~\ref{tab:p_f5counts} splits the intensive margin by type of multinational: the coefficient is
+1.30 for foreign affiliates and 0.52 for domestic ones.
 """,
 6: r"""
-Table~\ref{tab:p_t2} estimates the distance elasticity of firm-level agricultural exports.
-The baseline elasticity is $-0.21$, steeper than for merchandise exports as a whole, and
-Table~\ref{tab:p_dist} shows the attenuation for multinationals: 0.037 for foreign affiliates
-against 0.019 for domestic ones. Distance matters more in agriculture, and multinational
-affiliates escape less of it than they do elsewhere, but the ordering between foreign and domestic
-owners is unchanged.
+Table~\ref{tab:p_t2} estimates how firm agricultural exports fall with distance. The elasticity is
+$-0.21$ for local firms, larger in absolute value than for all exports. Table~\ref{tab:p_dist} shows
+that it is 0.037 smaller in absolute value for foreign affiliates and 0.019 smaller for domestic
+ones.
 """,
 }
 
 PAPER_PRODUCTS_TEXT = r"""
-The facts above average over a very uneven product range.
-Figure~\ref{fig:p_hs6} shows the twenty largest HS6 lines with the foreign, domestic and local
-shares of each. Crude petroleum is three quarters domestically owned, copper concentrates are four
-fifths foreign owned, gold sits in between. Figure~\ref{fig:p_hs6_parent} splits the foreign bar
-by owner country and gives a readable map of who owns what: British groups in copper and coal,
-Canadian groups in gold, US groups in soybeans, maize and apparel, German groups in trucks, Swiss
-groups in soybean cake. Table~\ref{tab:p_sections} aggregates to HS sections with the leading
-owner of each.
-
-Tables~\ref{tab:p_agro_sitc} to~\ref{tab:p_mining_bec} give the same breakdowns within each
-sector: agriculture by SITC Rev.\,3 division, manufacturing by HS section and by BEC end use,
-mining and fuels by BEC end use.
+Figure~\ref{fig:p_hs6} shows the twenty largest export products and who exports them. Crude
+petroleum is mostly exported by domestic multinationals and copper concentrates by foreign ones.
+Figure~\ref{fig:p_hs6_parent} splits the foreign share by parent country: British groups in copper
+and coal, Canadian groups in gold, US groups in soybeans, maize and apparel, German groups in
+trucks. Table~\ref{tab:p_sections} gives the same information by HS section, and
+Tables~\ref{tab:a_agro_sitc} to~\ref{tab:a_mining_bec} in the appendix break down agriculture,
+manufacturing and mining.
 """
 
 AGRO_SUB_TEXT = r"""
-Agriculture is not one market. Table~\ref{tab:a_sitc} splits it into SITC Rev.\,3 divisions and
-Figure~\ref{fig:a_sitc} shows the same shares. Animal feed is the largest division at US\$13.8
-billion a year, followed by vegetables and fruit (10.6), cereals (10.3), oil seeds (6.7) and fixed
-vegetable oils (6.0). Foreign presence varies by a factor of four across them: 71\% in
-miscellaneous edible products, 62\% in oil seeds, 55\% in tobacco and 49\% in cereals, against
-31\% in coffee, tea and cocoa, 29\% in beverages and 19\% in sugar and honey. Domestic
-multinationals are largest in dairy (20\%), coffee (16\%) and sugar (15\%).
-
-Two other cuts are worth keeping. Table~\ref{tab:a_hssection} and Figure~\ref{fig:a_hssection}
-take the HS sections inside agriculture, which separate live animals and animal products,
-vegetable products, fats and oils, and prepared foodstuffs. Table~\ref{tab:a_inputs} and
-Figure~\ref{fig:a_inputs} split the sector into agricultural inputs and everything else, with the
-largest input lines in Table~\ref{tab:a_topinputs}. Table~\ref{tab:a_bec} adds the BEC end-use
-split, which separates what leaves the region for further processing from what leaves it ready for
-a household.
-
-At the product level, Figure~\ref{fig:a_hs6} gives the twenty largest HS6 lines in agriculture
-with the foreign, domestic and local shares of each, and Figure~\ref{fig:a_hs6_parent} splits the
-foreign bar by owner country.
+Table~\ref{tab:a_sitc} and Figure~\ref{fig:a_sitc} split agricultural exports by SITC division.
+The largest divisions are animal feed (US\$13.8 billion a year), vegetables and fruit (10.6),
+cereals (10.3), oil seeds (6.7) and vegetable oils (6.0). The foreign share is highest in miscellaneous
+edible products (71 percent), oil seeds (62 percent) and tobacco (55 percent), and lowest in coffee,
+tea and cocoa (30 percent), beverages (29 percent) and sugar (19 percent). Domestic multinationals are largest in
+dairy (20 percent), coffee (16 percent) and sugar (15 percent). Figure~\ref{fig:a_inputs} compares
+agricultural inputs with other agricultural products, and Figure~\ref{fig:a_hs6} shows the twenty
+largest agricultural export products. Other breakdowns are in the appendix.
 """
 
 PAPER_TAIL = {
 "lit": r"""
 \tbw{To be written. Three strands: firm-level evidence on multinational production and trade;
-ownership, market power and trade policy; and descriptive evidence on multinational firms in Latin
-America.}
+ownership, market power and trade policy; and evidence on multinational firms in Latin America.}
 """,
 "model": r"""
-\tbw{To be written. The framework is the companion theory paper: an oligopoly model with
-multinational ownership in which the object of interest is the ownership-weighted Herfindahl
-rather than the country-level ownership share. The section will state the environment, the
-objects the facts discipline, and how the model's ownership share maps to the measured one.}
+\tbw{To be written. The model is developed in the companion theory paper.}
 """,
 "concl": r"""
 \tbw{To be written.}
@@ -1097,11 +984,8 @@ objects the facts discipline, and how the model's ownership share maps to the me
 }
 
 REFS_BLOCK = r"""
-\tbw{To be completed with the literature section. The sources of the classifications used above
-are:}
+\tbw{To be completed.}
 \begin{list}{}{\leftmargin=1.5em \itemindent=-1.5em \itemsep=2pt \topsep=4pt}
-\item Fontagn\'e, L., Guimbard, H. and Orefice, G., 2022. Tariff-Based Product-Level Trade
-Elasticities. \emph{Journal of International Economics}, 137.
 \item Hausmann, R. and Hidalgo, C., 2011. The Network Structure of Economic Output.
 \emph{Journal of Economic Growth}, 16(4).
 \item Lall, S., 2000. The Technological Structure and Performance of Developing Country
@@ -1119,15 +1003,30 @@ APPENDIX_OPEN = ("\n" + r"\clearpage" + "\n" + r"\appendix" + "\n"
 
 REFS_HEAD = "\n" + r"\section*{References}\addcontentsline{toc}{section}{References}\label{sec:refs}" + "\n"
 
+# shared note fragments (same wording as WP_draft2)
+N_SHARES = r"Shares of export value, all available years pooled."
+N_USD = r"Values are annual averages in US\$ billion."
+N_LEAD = r"Leading parents: the three largest parent countries and their share of the row's foreign-MNE exports."
+N_RAUCH = (r"Rauch (1999) conservative classification: homogeneous goods are traded on organized exchanges, "
+           r"reference-priced goods have a price quoted in trade publications, and differentiated goods have neither.")
+N_LALL = r"Lall (2000) technology classes: primary and resource-based products, and low-, medium- and high-technology manufactures."
+N_PCI = r"Quintiles of the Hausmann--Hidalgo Product Complexity Index across HS6 products (Q1 = least complex)."
+N_CELLS = r"Observations are origin--destination--HS6--year cells."
+N_FIRMS = r"Observations are firm--destination--HS6--year cells."
+N_DEP_T1 = r"Dependent variable: $\ln$ exports of the cell (Panel A) and of the non-MNE firms in the cell (Panel B)."
+
+
+def n_cl() -> str:
+    return r"Standard errors clustered by origin--destination pair in parentheses. " + D2_STARS
+
 
 def build_paper() -> Path:
-    """The working paper for the coauthors: introduction and data written out, the [Main text]
-    exhibits of the 2026-09-21 draft in fact order with a short reading paragraph each, the
-    [Appendix] ones in the appendix, literature / model / conclusions stated but not developed."""
+    """The working paper for the coauthors, with the exhibit conventions of WP_draft2."""
     L = [paper_preamble("Multinational Firms and Trade in Latin America",
                         "Six Stylized Facts on Ownership and Exports",
                         PAPER_ABSTRACT, PAPER_KEYWORDS, PAPER_JEL)]
     A, M, MI, S = "all", "manufacturing", "mining", "sectors"
+    cl = n_cl()
 
     L.append(sec("Introduction", "intro")); L.append(par(PAPER_INTRO))
     L.append(sec("Related Literature", "lit")); L.append(par(PAPER_TAIL["lit"]))
@@ -1135,220 +1034,308 @@ def build_paper() -> Path:
     L.append(sec("Data", "data"))
     L.append(par(data_section(agro=False)))
     L.append(par(PAPER_SAMPLE_TEXT))
-    L.append(tab(A, "Tables", "tab_paper_sample.tex", "The working sample: coverage by exporting country", "p_sample", size=r"\footnotesize"))
-    L.append(tab(A, "Tables", "tab_paper_sample_counts.tex", "The working sample in figures", "p_counts"))
+    L.append(tab2(A, "Tables", "tab_paper_sample.tex", "Sample Coverage, by Exporting Country", "p_sample",
+                  f"Exporters are distinct tax identifiers within each country; matched exporters are those found in Orbis or Dun \\& Bradstreet. Records are firm--destination--HS6--year observations. {N_USD}", size=r"\footnotesize"))
+    L.append(tab2(A, "Tables", "tab_paper_sample_counts.tex", "Sample Summary", "p_counts",
+                  "Nine countries, all available years pooled. Shares are percent of total export value."))
 
-    L.append(sec("Six Stylized Facts on Multinational Firms and Trade", "facts"))
+    L.append(sec("Six Stylized Facts", "facts"))
 
-    L.append(sub("Fact 1: Multinational corporations account for a large share of export values across countries"))
+    L.append(sub("Fact 1: Multinationals Account for a Large Share of Exports"))
     L.append(par(PAPER_FACT_TEXT[1]))
-    L.append(fig(A, "fig_wp0_fig1_origin", "MNE share of export value by origin: foreign and domestic multinationals.", "p_f1", 0.8))
-    L.append(fig(A, "fig_wp3_us_three_shares_total", "Exports of the nine origins, as shares of total exports: going to the United States, carried by US-parent MNEs, and both.", "p_us3_total", 0.6,
-                 "Same denominator for the three bars: total export value of the nine origins, all firms and destinations. The second bar is the USA's share of foreign-MNE value (23.3\\,\\%, Fact 3) times the foreign-MNE share of exports (46.3\\,\\%, Figure~\\ref{fig:p_f1}); the third bar is the second times the share of US-parent exports that goes to the United States (22.3\\,\\%, the diagonal of Table~\\ref{tab:p_pxp})."))
-    L.append(fig(A, "fig_wp3_us_three_shares_origin", "The same three shares by origin (denominator: the origin's total exports).", "p_us3_origin", 1.0))
-    L.append(tab(A, "Tables", "tab_wp3_us_three_shares.tex", "Exports going to the United States, carried by US-parent MNEs, and both, as shares of total exports; and the US-parent share of the exports going to the United States", "p_us3_tab"))
+    L.append(fig2(A, "fig_wp0_fig1_origin", "Multinational Share of Export Value, by Exporting Country", "p_f1",
+                  f"{N_SHARES} The figure at the end of each bar is the total MNE share.", 0.8))
+    L.append(fig2(A, "fig_wp3_us_three_shares_total", "Exports to the United States and Exports by US-Parent Multinationals", "p_us3_total",
+                  "Shares of the total exports of the nine countries. The third bar is exports by US-parent MNEs shipped to the United States.", 0.6))
+    L.append(fig2(A, "fig_wp3_us_three_shares_origin", "Exports to the United States and Exports by US-Parent Multinationals, by Exporting Country", "p_us3_origin",
+                  "Shares of each country's total exports.", 1.0))
+    L.append(tab2(A, "Tables", "tab_wp3_us_three_shares.tex", "Exports to the United States and Exports by US-Parent Multinationals, by Exporting Country", "p_us3_tab",
+                  f"Columns (1)--(3): percent of each country's total exports. Column (4): percent of exports to the United States shipped by US-parent MNEs. Countries sorted by column (3). {N_USD}"))
 
-    L.append(sub("Fact 2: Foreign multinationals specialize in complex products, domestic ones in primary goods"))
+    L.append(sub("Fact 2: Foreign Multinationals Specialize in Complex Products, Domestic Multinationals in Primary Goods"))
     L.append(par(PAPER_FACT_TEXT[2]))
-    L.append(panel_fig([(A, "fig_wp0_fig2_pci", "By quintile of the Product Complexity Index (Q1 = least complex)"), (A, "fig_wp0_fig3_lall", "By Lall (2000) technology category")],
-                       "MNE share of export value by product sophistication: foreign and domestic multinationals.", "p_f2f3", width=0.72))
-    L.append(fig(A, "fig_wp1a_pci_lall_by_oecd", "MNE share by PCI quintile (Panel A) and Lall category (Panel B), foreign bar split into OECD-parent and non-OECD-parent multinationals.", "p_f2_oecd", 1.0,
-                 "OECD = the 38 member countries; matched firms with no recorded parent country are counted with the non-OECD parents."))
-    L.append(tab(A, "Tables", "tab_wp1b_rauch.tex", "MNE shares by Rauch (1999) class: differentiated, reference-priced, homogeneous", "p_rauch"))
-    L.append(fig(A, "fig_wp1b_rauch", "Foreign vs domestic MNE shares of export value by Rauch (1999) class.", "p_rauch_fig", 0.7))
-    L.append(tab(A, "Tables", "tab_wp1b_bec.tex", "MNE shares by BEC end use: intermediate, consumption and capital goods", "p_bec"))
-    L.append(tab(A, "Regressions", "reg_wp1b_odpy_measures.tex", "Product sophistication and MNE shares: PCI, Lall categories and Rauch classes, each in a separate regression", "p_ladder", size=r"\footnotesize"))
-    L.append(fig(M, "fig_wp1b_rauch", "Manufacturing: foreign vs domestic MNE shares by Rauch (1999) class.", "p_rauch_manuf", 0.7))
+    L.append(panel_fig2([(A, "fig_wp0_fig2_pci", "Product Complexity Index quintile"), (A, "fig_wp0_fig3_lall", "Lall (2000) technology class")],
+                        "Multinational Share of Export Value, by Product Sophistication", "p_f2f3",
+                        f"{N_SHARES} Panel A: {N_PCI} Panel B: {N_LALL}"))
+    L.append(tab2(A, "Tables", "tab_wp1b_rauch.tex", "Multinational Share of Export Value, by Rauch Product Class", "p_rauch",
+                  f"{N_SHARES} {N_RAUCH} {N_USD}"))
+    L.append(fig2(A, "fig_wp1b_rauch", "Multinational Share of Export Value, by Rauch Product Class", "p_rauch_fig",
+                  f"{N_SHARES} {N_RAUCH}", 0.7))
+    L.append(tab2(A, "Tables", "tab_wp1b_bec.tex", "Multinational Share of Export Value, by End Use", "p_bec",
+                  f"{N_SHARES} End use from BEC Rev.\\,4; HS6 products without a BEC correspondence are excluded. {N_USD}"))
+    L.append(tab2(A, "Regressions", "reg_wp1b_odpy_measures.tex", "Product Sophistication and Multinational Shares", "p_ladder",
+                  f"{N_CELLS} Dependent variable: share of the cell's export value shipped by each type of MNE. Omitted categories: primary and resource-based products (Lall) and homogeneous products (Rauch). Robust standard errors in parentheses. {D2_STARS}", size=r"\footnotesize"))
+    L.append(fig2(M, "fig_wp1b_rauch", "Manufacturing: Multinational Share of Export Value, by Rauch Product Class", "p_rauch_manuf",
+                  f"Shares of manufacturing export value (HS 28--97 excluding 71), all available years pooled. {N_RAUCH}", 0.7))
 
-    L.append(sub("Fact 3: Multinational corporations from a small set of countries dominate exports"))
+    L.append(sub("Fact 3: Multinationals from a Small Set of Countries Dominate Exports"))
     L.append(par(PAPER_FACT_TEXT[3]))
-    L.append(fig(A, "fig_wp1a_parent_share", "Foreign-MNE export value by the parent's country: top 15 and other.", "p_f4", 0.78,
-                 "Share of all foreign-MNE export value. Foreign MNEs export 46.3\\,\\% of total exports (Figure~\\ref{fig:p_f1}), so the USA's 23.3\\,\\% of foreign-MNE value is $0.233 \\times 46.3 = 10.8\\,\\%$ of total exports, the US-parent share of Table~\\ref{tab:p_us3_tab}."))
-    L.append(tab(A, "Tables", "tab_wp1c_country_rowpct.tex", "Top-10 parents $\\times$ top-10 destinations: destination mix of each parent's exports (row \\%)", "p_pxd"))
-    L.append(tab(A, "Tables", "tab_wp1c_parent_x_parentdest_rowpct.tex", "Top-10 parents $\\times$ the same ten countries as destinations (row \\%): the diagonal is the share of each parent's exports shipped to the parent's own country", "p_pxp"))
-    L.append(fig(A, "fig_wp3_dest_carriers", "The largest destination markets (EU-27 pooled): share of the value reaching each one moved by MNEs with a parent in the destination, by US-, EU-27- and CAN-parent MNEs (when the destination is not their home), other foreign MNEs, domestic MNEs and local firms.", "p_dest", 1.0,
-                 "EU-27 = the 27 member states; the United Kingdom is a separate destination and a separate parent country. The USA row's first segment is the all-goods US-parent share of exports to the United States, column (4) of Table~\\ref{tab:p_us3_tab}."))
+    L.append(fig2(A, "fig_wp1a_parent_share", "Foreign-Multinational Exports, by Parent Country", "p_f4",
+                  "Percent of foreign-MNE export value, by country of the ultimate parent.", 0.78))
+    L.append(tab2(A, "Tables", "tab_wp1c_parent_x_parentdest_rowpct.tex", "Foreign-Multinational Exports to the Parent Countries, by Parent Country", "p_pxp",
+                  "Percent of each parent country's exports, by destination (rows add to 100). Destinations are the ten largest parent countries; the diagonal is the share shipped to the parent's own country."))
+    L.append(fig2(A, "fig_wp3_dest_carriers", "Ownership of Exports to the Main Destination Markets", "p_dest",
+                  "Percent of the export value reaching each destination, by type of exporter. The first segment is exports by MNEs whose parent is located in that destination. EU-27 member states are pooled.", 1.0))
 
-    L.append(sub("Fact 4: A small set of large multinational groups accounts for the bulk of exports"))
+    L.append(sub("Fact 4: A Small Set of Large Multinational Groups Accounts for Most Exports"))
     L.append(par(PAPER_FACT_TEXT[4]))
-    L.append(fig(A, "fig_wp0_fig5_network", "Foreign-MNE export value and number of parents by size of the group's global affiliate network.", "p_f5", 0.7))
+    L.append(fig2(A, "fig_wp0_fig5_network", "Foreign-Multinational Exports and Number of Parents, by Size of the Group's Global Network", "p_f5",
+                  "Shares of foreign-MNE export value and of parents, by the number of affiliates the group has worldwide.", 0.7))
 
-    L.append(sub("Fact 5: Greater multinational presence is associated with higher trade volumes"))
+    L.append(sub("Fact 5: Multinational Presence Is Associated with Higher Exports"))
     L.append(par(PAPER_FACT_TEXT[5]))
-    L.append(tab(A, "Regressions", "reg_wp0_table1_repro.tex", "Multinational presence and trade volume: intensive and extensive margins", "p_t1"))
-    L.append(tab(A, "Regressions", "reg_wp1e_counts.tex", "Intensive margin: ln(\\# MNE firms) decomposed into foreign / domestic and foreign through HQ / not through HQ", "p_f5counts"))
-    L.append(tab(A, "Regressions", "reg_wp1e_extensive.tex", "Extensive margin: presence indicators decomposed into foreign / domestic and foreign through HQ / not through HQ", "p_ext"))
+    L.append(tab2(A, "Regressions", "reg_wp0_table1_repro.tex", "Multinational Presence and Exports", "p_t1",
+                  f"{N_CELLS} {N_DEP_T1} Intensive margin: $\\ln$ number of MNEs, cells with at least one MNE. Extensive margin: indicator for at least one MNE. {cl}"))
+    L.append(tab2(A, "Regressions", "reg_wp1e_counts.tex", "Multinational Presence and Exports: Intensive Margin, by Type of Multinational", "p_f5counts",
+                  f"{N_CELLS} {N_DEP_T1} Regressors: $\\ln$ number of MNEs of each type. Columns (5)--(6) split foreign MNEs by whether the destination is the parent's country. {cl}"))
 
-    L.append(sub("Fact 6: Distance is a weaker barrier to trade for multinational corporations"))
+    L.append(sub("Fact 6: Distance Is a Weaker Barrier for Multinationals"))
     L.append(par(PAPER_FACT_TEXT[6]))
-    L.append(tab(A, "Regressions", "reg_wp0_table2_repro.tex", "Distance and firm exports: multinationals split by presence at the destination", "p_t2"))
-    L.append(tab(A, "Regressions", "reg_wp1e_distance_hq.tex", "Distance and firm exports: foreign / domestic, then foreign through HQ / not through HQ", "p_dist"))
+    L.append(tab2(A, "Regressions", "reg_wp0_table2_repro.tex", "Distance and Firm Exports: Multinationals by Presence at the Destination", "p_t2",
+                  f"{N_FIRMS} Dependent variable: $\\ln$ exports. Non-MNE firms are the omitted group. Present: the group has an affiliate in the destination or the destination is the parent's country. {cl}"))
+    L.append(tab2(A, "Regressions", "reg_wp1e_distance_hq.tex", "Distance and Firm Exports: Foreign and Domestic Multinationals", "p_dist",
+                  f"{N_FIRMS} Dependent variable: $\\ln$ exports. Non-MNE firms are the omitted group. Columns (3)--(4) split foreign MNEs by whether the destination is the parent's country. {cl}"))
 
-    L.append(sec("Products and Sectors", "products"))
+    L.append(sec("Products", "products"))
     L.append(par(PAPER_PRODUCTS_TEXT))
-    L.append(fig(A, "fig_wp1f_top20_hs6_stacked", "Top-20 HS6 products by export value: foreign MNE, domestic MNE and local shares.", "p_hs6", 1.0))
-    L.append(fig(A, "fig_wp1f_top20_hs6_by_parent", "Top-20 HS6 products: foreign bar split by the parent's country (remainder = local firms).", "p_hs6_parent", 1.0))
-    L.append(tab(A, "Tables", "tab_wp1f_hs_sections.tex", "HS sections by export value: MNE shares and leading parent", "p_sections", size=r"\footnotesize"))
-    for sc, stem, title, lab in (("agro", "sitc2", "Agriculture by SITC Rev.\\,3 division", "p_agro_sitc"),
-                                 (M, "hs_section", "Manufacturing by HS section", "p_manuf_hs"),
-                                 (M, "bec_enduse", "Manufacturing by BEC end use", "p_manuf_bec"),
-                                 (MI, "bec_enduse", "Mining and fuels by BEC end use", "p_mining_bec")):
-        L.append(tab(sc, "Tables", f"tab_wp2_{stem}.tex", f"{title}: total and MNE exports, shares, leading parents", lab, size=r"\footnotesize"))
+    L.append(fig2(A, "fig_wp1f_top20_hs6_stacked", "Ownership of the Twenty Largest Export Products", "p_hs6",
+                  "Shares of each product's export value. Twenty largest HS6 products by export value.", 1.0))
+    L.append(fig2(A, "fig_wp1f_top20_hs6_by_parent", "Ownership of the Twenty Largest Export Products, by Parent Country", "p_hs6_parent",
+                  "Shares of each product's export value. Foreign-MNE share split by country of the ultimate parent; the unfilled part of each bar is local firms.", 1.0))
+    L.append(tab2(A, "Tables", "tab_wp1f_hs_sections.tex", "Exports and Multinational Shares, by HS Section", "p_sections",
+                  f"Foreign, domestic and local: percent of each section's export value. Leading parent: largest parent country and its share of the section's foreign-MNE exports. {N_USD}", size=r"\footnotesize"))
 
     L.append(sec("Theoretical Framework", "model")); L.append(par(PAPER_TAIL["model"]))
     L.append(sec("Concluding Remarks", "concl")); L.append(par(PAPER_TAIL["concl"]))
     L.append(REFS_HEAD); L.append(par(REFS_BLOCK))
 
+    # ---------------- appendix: same set and order as WP_draft2
     L.append(APPENDIX_OPEN)
-    L.append(sec("Appendix: Additional Exhibits", "app"))
-    L.append(par(r"""This appendix collects the exhibits that document or extend the figures and
-tables of the main text, and the numbers behind them, in the order of the facts."""))
+    L.append(sec("Additional Tables and Figures", "app"))
+    L.append(usub("Fact 1"))
+    L.append(tab2(A, "Tables", "tab_wp0_fig1_origin.tex", "Multinational Share of Export Value, by Exporting Country", "a_f1n",
+                  f"Shares of each country's export value, all available years pooled. {N_USD}"))
+    L.append(fig2(A, "fig_wp1a_origin_by_parent", "Multinational Share of Export Value, by Exporting Country and Parent Country", "a_f1_parent",
+                  "Shares of each country's export value. Foreign MNEs split by country of the ultimate parent; the ten largest parent countries are shown separately.", 0.92))
+    L.append(tab2(A, "Tables", "tab_wp1a_origin_by_parent.tex", "Multinational Share of Export Value, by Exporting Country and Parent Country", "a_f1pn",
+                  f"Shares of each country's export value. Other: all remaining foreign parents. {N_USD}"))
+    L.append(fig2(S, "fig_wp3_fig1_by_sector_panels", "Multinational Share of Export Value, by Exporting Country and Sector", "a_f1_sectors",
+                  "Shares of each country's export value in the sector. Panel A: agriculture (HS 01--24). Panel B: manufacturing (HS 28--97 excluding 71). Panel C: mining and fuels (HS 25--27 and 71).", 1.0))
+    L.append(tab2(S, "Tables", "tab_wp2_four_sectors.tex", "Exports and Multinational Shares, by Sector", "a_sectors",
+                  f"Foreign and domestic: percent of the sector's export value. Rest: HS 98--99 and unclassified codes. {N_LEAD} {N_USD}"))
 
-    L.append(sub("Fact 1"))
-    L.append(tab(A, "Tables", "tab_wp0_fig1_origin.tex", "Numbers behind Figure~\\ref{fig:p_f1}: foreign, domestic and total MNE shares by origin", "a_f1n"))
-    L.append(fig(A, "fig_wp1a_origin_by_parent", "MNE share of export value by origin, foreign bar split by the parent's country (top 10, other foreign, domestic).", "a_f1_parent", 0.92))
-    L.append(tab(A, "Tables", "tab_wp1a_origin_by_parent.tex", "Numbers behind the previous figure", "a_f1pn"))
-    L.append(fig(S, "fig_wp3_fig1_by_sector_panels", "MNE share of export value by origin within each sector: foreign and domestic multinationals (Panel A agriculture, Panel B manufacturing, Panel C mining and fuels).", "a_f1_sectors", 1.0))
-    L.append(tab(S, "Tables", "tab_wp2_four_sectors.tex", "The four sectors: total and MNE exports, foreign and domestic shares, leading parents", "a_sectors"))
+    L.append(usub("Fact 2"))
+    L.append(fig2(A, "fig_wp1a_pci_lall_by_oecd", "Multinational Share of Export Value, by Product Sophistication and Location of the Parent", "a_f2_oecd",
+                  f"{N_SHARES} Foreign MNEs are split by whether the ultimate parent is in an OECD member country. Panel A: {N_PCI} Panel B: {N_LALL}", 1.0))
+    L.append(fig2(M, "fig_wp0_fig2_pci", "Manufacturing: Multinational Share of Export Value, by Product Complexity Quintile", "a_f2_manuf",
+                  "Shares of manufacturing export value, all available years pooled. Quintiles computed over manufacturing HS6 products.", 0.78))
 
-    L.append(sub("Fact 2"))
-    L.append(fig(M, "fig_wp0_fig2_pci", "Manufacturing: MNE share of export value by PCI quintile (quintiles over manufacturing HS6 products).", "a_f2_manuf", 0.78))
+    L.append(usub("Fact 3"))
+    L.append(tab2(A, "Tables", "tab_wp1c_country_rowpct.tex", "Destination of Foreign-Multinational Exports, by Parent Country", "a_pxd",
+                  "Percent of each parent country's exports, by destination (rows add to 100). Ten largest parent countries and ten largest destinations by foreign-MNE export value."))
+    L.append(tab2(A, "Tables", "tab_wp1c_region_rowpct.tex", "Destination of Multinational Exports, by Parent Region", "a_reg",
+                  "Percent of each group's exports, by destination region (rows add to 100). Domestic MNEs and local firms are shown for comparison."))
+    L.append(fig2(A, "fig_wp1d_heatmap_country_rowpct", "Destination of Foreign-Multinational Exports: Fifteen Largest Parent Countries and Destinations", "a_hm_row",
+                  "Percent of each parent country's exports going to each destination (rows add to 100 including other destinations).", 1.0))
+    L.append(fig2(A, "fig_wp1d_home_share_by_parent", "Share of Foreign-Multinational Exports Shipped to the Parent Country", "a_home",
+                  "Percent of each parent country's exports shipped to that same country.", 0.85))
+    L.append(fig2(A, "fig_wp1d_home_share_haven_panels", "Share of Foreign-Multinational Exports Shipped to the Parent Jurisdiction", "a_home_havens",
+                  "Percent of each parent jurisdiction's exports shipped to that same jurisdiction. Panel A: largest parent countries, excluding tax havens; dependencies are assigned to their sovereign state. Panel B: largest tax-haven and conduit jurisdictions.", 1.0))
+    L.append(fig2(S, "fig_wp3_home_share_by_parent_sectors", "Share of Foreign-Multinational Exports Shipped to the Parent Country, by Sector", "a_home_sectors",
+                  "Percent of each parent country's exports shipped to that same country, by sector. Hatched bars: the parent country's exports in the sector are below US\\$1 billion over the period.", 0.95))
+    L.append(fig2(S, "fig_wp3_to_usa_carriers_total_manuf", "Exports to the United States, by Type of Exporter and Exporting Country", "a_to_usa",
+                  "Percent of each country's exports to the United States, by type of exporter. Left: all goods. Right: manufacturing.", 1.0))
+    L.append(tab2(S, "Tables", "tab_wp3_to_usa_carriers_by_sector.tex", "Exports to the United States, by Type of Exporter and Sector", "a_to_usa_sector",
+                  f"Percent of each sector's exports to the United States, by type of exporter. {N_USD}"))
+    L.append(tab2(A, "Tables", "tab_wp3_us_home_products.tex", "Main Products Shipped by US-Parent Multinationals to the United States", "a_us_prod",
+                  f"Fifteen HS6 products with the largest exports by US-parent MNEs to the United States. {N_USD}", size=r"\footnotesize"))
 
-    L.append(sub("Fact 3"))
-    L.append(tab(A, "Tables", "tab_wp1c_region_rowpct.tex", "Parent region $\\times$ destination region: destination mix of each group (row \\%)", "a_reg"))
-    L.append(fig(A, "fig_wp1d_heatmap_country_rowpct", "Top-15 parents $\\times$ top-15 destinations: \\% of the parent's export value going to each destination.", "a_hm_row", 1.0))
-    L.append(fig(A, "fig_wp1d_home_share_by_parent", "Share of each parent's export value shipped to the parent's own country, parents as recorded (the diagonal of Table~\\ref{tab:p_pxp}).", "a_home", 0.85))
-    L.append(fig(A, "fig_wp1d_home_share_haven_panels", "Share of each parent's export value shipped to the parent's own jurisdiction: Panel A, the ten largest parent countries that are not tax havens (dependencies folded into their sovereign); Panel B, the ten largest tax-haven and conduit jurisdictions.", "a_home_havens", 1.0))
-    L.append(fig(S, "fig_wp3_home_share_by_parent_sectors", "Share of each parent's export value shipped to the parent's own country: all goods and the three sectors, top-10 parents.", "a_home_sectors", 0.95,
-                 "Hatched bars: the parent's pooled exports in the sector are below \\$1bn, so the share is fragile."))
-    L.append(fig(S, "fig_wp3_to_usa_carriers_total_manuf", "Exports to the United States by origin: share moved by US-parent MNEs, other foreign MNEs, domestic MNEs and local firms: all goods (left) and manufacturing (right).", "a_to_usa", 1.0,
-                 "Denominator: the origin's exports to the United States. The US-parent bars of the left panel are column (4) of Table~\\ref{tab:p_us3_tab}."))
-    L.append(tab(S, "Tables", "tab_wp3_to_usa_carriers_by_sector.tex", "Exports to the United States by sector: who carries them (\\%)", "a_to_usa_sector"))
-    L.append(tab(A, "Tables", "tab_wp3_us_home_products.tex", "What US-parent MNEs ship to the United States: top-15 HS6 lines, the US-parent share of everything the nine origins export of the line to the USA, and the main origins", "a_us_prod", size=r"\footnotesize"))
+    L.append(usub("Fact 4"))
+    L.append(tab2(A, "Tables", "tab_wp0_fig5_network.tex", "Foreign-Multinational Exports and Number of Parents, by Size of the Group's Global Network", "a_f5_tab",
+                  "Number and share of parents, and share of foreign-MNE export value, by the number of affiliates the group has worldwide. Parents with a network record in Orbis or Dun \\& Bradstreet: 98 percent of parents and 97 percent of foreign-MNE export value."))
 
-    L.append(sub("Fact 4"))
-    L.append(tab(A, "Tables", "tab_wp0_fig5_network.tex", "Parents and foreign-MNE export value by global affiliate-network size", "a_f5_tab"))
+    L.append(usub("Fact 5"))
+    L.append(tab2(A, "Regressions", "reg_wp1e_extensive.tex", "Multinational Presence and Exports: Extensive Margin, by Type of Multinational", "a_ext",
+                  f"{N_CELLS} {N_DEP_T1} Regressors: indicators for at least one MNE of each type. Columns (5)--(6) split foreign MNEs by whether the destination is the parent's country. {cl}"))
+    L.append(tab2(A, "Tables", "tab_wp1e_presence_shares.tex", "Multinational Exports by Exporting Country and Destination Type", "a_pres",
+                  f"MNE and foreign-MNE export value by country, and the split of foreign-MNE value by destination. Parent country: exports to the country of the ultimate parent. Other: all remaining destinations; in parentheses, destinations where the group has another affiliate. {N_USD}"))
+    L.append(tab2(S, "Tables", "tab_wp3_fact5_summary.tex", "Multinational Presence and Exports by Sector: Intensive Margin", "a_f5sum",
+                  f"{N_CELLS} {N_DEP_T1} Specification of columns (3)--(4) of Table~\\ref{{tab:p_f5counts}}, estimated by sector. Blank: too few observations. {cl}"))
+    L.append(tab2(S, "Tables", "tab_wp3_fact5ext_summary.tex", "Multinational Presence and Exports by Sector: Extensive Margin", "a_f5extsum",
+                  f"{N_CELLS} {N_DEP_T1} Specification of columns (3)--(4) of Table~\\ref{{tab:a_ext}}, estimated by sector. {cl}"))
 
-    L.append(sub("Fact 5"))
-    L.append(tab(A, "Tables", "tab_wp1e_presence_shares.tex", "MNE export value by origin: domestic share, and foreign-MNE value by the group's presence at the destination", "a_pres"))
-    L.append(tab(S, "Tables", "tab_wp3_fact5_summary.tex", "Fact 5 by sector, intensive margin: number of foreign and of domestic MNEs exporting the product to the destination, all goods and the three sectors", "a_f5sum"))
-    L.append(tab(S, "Tables", "tab_wp3_fact5ext_summary.tex", "Fact 5 by sector, extensive margin: presence of foreign and of domestic MNEs exporting the product to the destination, all goods and the three sectors", "a_f5extsum"))
+    L.append(usub("Fact 6"))
+    L.append(tab2(S, "Tables", "tab_wp3_fact6_summary.tex", "Distance and Firm Exports, by Sector", "a_f6sum",
+                  f"{N_FIRMS} Dependent variable: $\\ln$ exports. Specification of columns (1)--(2) of Table~\\ref{{tab:p_dist}}, estimated by sector. {cl}"))
 
-    L.append(sub("Fact 6"))
-    L.append(tab(S, "Tables", "tab_wp3_fact6_summary.tex", "Fact 6 by sector: distance elasticity and its attenuation for foreign and domestic MNEs", "a_f6sum"))
-
-    L.append(sub("Products"))
-    L.append(fig(A, "fig_wp1f_foreign_share_distribution", "Distribution of the HS6 foreign-MNE share: share of export value and MNE share of exporting firms, by bin.", "a_dist", 0.85))
-    L.append(tab(A, "Tables", "tab_wp1f_foreign_share_distribution.tex", "Numbers behind the previous figure", "a_dist_tab"))
+    L.append(usub("Products"))
+    L.append(fig2(A, "fig_wp1f_foreign_share_distribution", "Distribution of Export Value by Product-Level Foreign-Multinational Share", "a_dist",
+                  "Share of total export value and MNE share of exporting firms, by the foreign-MNE share of each HS6 product's export value.", 0.85))
+    L.append(tab2(A, "Tables", "tab_wp1f_foreign_share_distribution.tex", "Distribution of Export Value by Product-Level Foreign-Multinational Share", "a_dist_tab",
+                  "Share of total export value and MNE share of exporting firms, by the foreign-MNE share of each HS6 product's export value. MNE share of exporting firms: MNE firm--destination--product--year observations over all observations in the bin."))
+    L.append(tab2("agro", "Tables", "tab_wp2_sitc2.tex", "Agriculture: Exports and Multinational Shares, by SITC Division", "a_agro_sitc",
+                  f"Agriculture: HS 01--24. Foreign and domestic: percent of the division's export value. HS6 products without an SITC correspondence (US\$6.0 billion a year) are excluded. {N_LEAD} {N_USD}", size=r"\footnotesize"))
+    L.append(tab2(M, "Tables", "tab_wp2_hs_section.tex", "Manufacturing: Exports and Multinational Shares, by HS Section", "a_manuf_hs",
+                  f"Manufacturing: HS 28--97 excluding 71. Foreign and domestic: percent of the section's export value. {N_LEAD} {N_USD}", size=r"\footnotesize"))
+    L.append(tab2(M, "Tables", "tab_wp2_bec_enduse.tex", "Manufacturing: Exports and Multinational Shares, by End Use", "a_manuf_bec",
+                  f"End use from BEC Rev.\\,4. Foreign and domestic: percent of the category's export value. {N_LEAD} {N_USD}", size=r"\footnotesize"))
+    L.append(tab2(MI, "Tables", "tab_wp2_bec_enduse.tex", "Mining and Fuels: Exports and Multinational Shares, by End Use", "a_mining_bec",
+                  f"Mining and fuels: HS 25--27 and 71. End use from BEC Rev.\\,4. Foreign and domestic: percent of the category's export value. {N_LEAD} {N_USD}", size=r"\footnotesize"))
 
     L.append(r"\end{document}" + "\n")
     return write_main(L)
 
 
 def build_paper_agro() -> Path:
-    """The agriculture-only companion: the same six facts and the same data section, computed
-    within HS 01--24 for the nine origins pooled. No United States section and no country-specific
-    or destination-specific analysis; everything is region-wide and sectoral."""
+    """The agriculture-only companion (HS 01--24, nine origins pooled), with the exhibit
+    conventions of WP_draft2. No United States section and no US-specific exhibits."""
     G = "agro"
     L = [paper_preamble("Multinational Firms and Agricultural Trade in Latin America",
-                        "Ownership and Exports in HS 01--24",
+                        "Ownership and Exports in Agriculture",
                         AGRO_ABSTRACT, AGRO_KEYWORDS, AGRO_JEL)]
+    cl = n_cl()
+    sh = r"Shares of agricultural export value (HS 01--24), all available years pooled."
 
     L.append(sec("Introduction", "intro")); L.append(par(AGRO_INTRO))
-    L.append(sec("Related Literature", "lit")); L.append(par(PAPER_TAIL["lit"]))
+    L.append(sec("Related Literature", "lit")); L.append(par(PAGE_LIT_AGRO))
 
     L.append(sec("Data", "data"))
     L.append(par(data_section(agro=True)))
     L.append(par(AGRO_SAMPLE_TEXT))
-    L.append(tab(G, "Tables", "tab_paper_sample.tex", "The agricultural sample: coverage by exporting country", "p_sample", size=r"\footnotesize"))
-    L.append(tab(G, "Tables", "tab_paper_sample_counts.tex", "The agricultural sample in figures", "p_counts"))
+    L.append(tab2(G, "Tables", "tab_paper_sample.tex", "Agricultural Sample Coverage, by Exporting Country", "p_sample",
+                  f"Agricultural exports: HS 01--24. Exporters are distinct tax identifiers within each country; matched exporters are those found in Orbis or Dun \\& Bradstreet. Records are firm--destination--HS6--year observations. {N_USD}", size=r"\footnotesize"))
+    L.append(tab2(G, "Tables", "tab_paper_sample_counts.tex", "Agricultural Sample Summary", "p_counts",
+                  "Agricultural exports of the nine countries, all available years pooled. Shares are percent of agricultural export value."))
 
-    L.append(sec("The Six Facts within Agriculture", "facts"))
+    L.append(sec("Stylized Facts in Agriculture", "facts"))
 
-    L.append(sub("Fact 1: Multinational corporations account for a large share of agricultural export values"))
+    L.append(sub("Fact 1: Multinationals Account for a Large Share of Agricultural Exports"))
     L.append(par(AGRO_FACT_TEXT[1]))
-    L.append(fig(G, "fig_wp0_fig1_origin", "Agriculture: MNE share of export value by origin, foreign and domestic multinationals.", "p_f1", 0.8))
-    L.append(tab(G, "Tables", "tab_wp0_fig1_origin.tex", "Numbers behind the previous figure", "p_f1n"))
+    L.append(fig2(G, "fig_wp0_fig1_origin", "Multinational Share of Agricultural Export Value, by Exporting Country", "p_f1",
+                  f"{sh} The figure at the end of each bar is the total MNE share.", 0.8))
 
-    L.append(sub("Fact 2: Inside agriculture, sophistication does not sort owners"))
+    L.append(sub("Fact 2: Product Sophistication Does Not Sort Owners in Agriculture"))
     L.append(par(AGRO_FACT_TEXT[2]))
-    L.append(panel_fig([(G, "fig_wp0_fig2_pci", "By quintile of the Product Complexity Index (Q1 = least complex)"), (G, "fig_wp0_fig3_lall", "By Lall (2000) technology category")],
-                       "Agriculture: MNE share of export value by product sophistication.", "p_f2f3", width=0.72))
-    L.append(tab(G, "Tables", "tab_wp1b_rauch.tex", "Agriculture: MNE shares by Rauch (1999) class", "p_rauch"))
-    L.append(fig(G, "fig_wp1b_rauch", "Agriculture: foreign vs domestic MNE shares of export value by Rauch (1999) class.", "p_rauch_fig", 0.7))
-    L.append(tab(G, "Tables", "tab_wp1b_bec.tex", "Agriculture: MNE shares by BEC end use", "p_bec"))
-    L.append(tab(G, "Regressions", "reg_wp1b_odpy_measures.tex", "Agriculture: product sophistication and MNE shares, each measure in its own regression", "p_ladder", size=r"\footnotesize"))
+    L.append(panel_fig2([(G, "fig_wp0_fig2_pci", "Product Complexity Index quintile"), (G, "fig_wp0_fig3_lall", "Lall (2000) technology class")],
+                        "Multinational Share of Agricultural Export Value, by Product Sophistication", "p_f2f3",
+                        f"{sh} Panel A: {N_PCI} Panel B: {N_LALL}"))
+    L.append(tab2(G, "Tables", "tab_wp1b_rauch.tex", "Multinational Share of Agricultural Export Value, by Rauch Product Class", "p_rauch",
+                  f"{sh} {N_RAUCH} {N_USD}"))
+    L.append(fig2(G, "fig_wp1b_rauch", "Multinational Share of Agricultural Export Value, by Rauch Product Class", "p_rauch_fig",
+                  f"{sh} {N_RAUCH}", 0.7))
+    L.append(tab2(G, "Tables", "tab_wp1b_bec.tex", "Multinational Share of Agricultural Export Value, by End Use", "p_bec",
+                  f"{sh} End use from BEC Rev.\\,4; HS6 products without a BEC correspondence are excluded. {N_USD}"))
+    L.append(tab2(G, "Regressions", "reg_wp1b_odpy_measures.tex", "Product Sophistication and Multinational Shares in Agriculture", "p_ladder",
+                  f"{N_CELLS} Agricultural products only. Dependent variable: share of the cell's export value shipped by each type of MNE. Omitted categories: primary and resource-based products (Lall) and homogeneous products (Rauch). Robust standard errors in parentheses. {D2_STARS}", size=r"\footnotesize"))
 
-    L.append(sub("Fact 3: Ownership is concentrated in a few countries"))
+    L.append(sub("Fact 3: Multinationals from a Small Set of Countries Dominate Exports"))
     L.append(par(AGRO_FACT_TEXT[3]))
-    L.append(fig(G, "fig_wp1a_parent_share", "Agriculture: foreign-MNE export value by the parent's country, top 15 and other.", "p_f4", 0.78))
-    L.append(tab(G, "Tables", "tab_wp1a_parent_share.tex", "Numbers behind the previous figure", "p_f4n"))
+    L.append(fig2(G, "fig_wp1a_parent_share", "Foreign-Multinational Agricultural Exports, by Parent Country", "p_f4",
+                  "Percent of foreign-MNE agricultural export value, by country of the ultimate parent.", 0.78))
 
-    L.append(sub("Fact 4: A small set of large groups accounts for the bulk of exports"))
+    L.append(sub("Fact 4: A Small Set of Large Multinational Groups Accounts for Most Exports"))
     L.append(par(AGRO_FACT_TEXT[4]))
-    L.append(fig(G, "fig_wp0_fig5_network", "Agriculture: foreign-MNE export value and number of parents by size of the group's global affiliate network.", "p_f5", 0.7))
-    L.append(tab(G, "Tables", "tab_wp0_fig5_network.tex", "Numbers behind the previous figure", "p_f5_tab"))
+    L.append(fig2(G, "fig_wp0_fig5_network", "Foreign-Multinational Agricultural Exports and Number of Parents, by Size of the Group's Global Network", "p_f5",
+                  "Shares of foreign-MNE agricultural export value and of parents, by the number of affiliates the group has worldwide.", 0.7))
 
-    L.append(sub("Fact 5: Greater multinational presence is associated with higher trade volumes"))
+    L.append(sub("Fact 5: Multinational Presence Is Associated with Higher Exports"))
     L.append(par(AGRO_FACT_TEXT[5]))
-    L.append(tab(G, "Regressions", "reg_wp0_table1_repro.tex", "Agriculture: multinational presence and trade volume, intensive and extensive margins", "p_t1"))
-    L.append(tab(G, "Regressions", "reg_wp1e_counts.tex", "Agriculture, intensive margin: ln(\\# MNE firms) decomposed into foreign / domestic", "p_f5counts"))
-    L.append(tab(G, "Regressions", "reg_wp1e_extensive.tex", "Agriculture, extensive margin: presence indicators decomposed into foreign / domestic", "p_ext"))
+    L.append(tab2(G, "Regressions", "reg_wp0_table1_repro.tex", "Multinational Presence and Agricultural Exports", "p_t1",
+                  f"{N_CELLS} Agricultural products only. {N_DEP_T1} Intensive margin: $\\ln$ number of MNEs, cells with at least one MNE. Extensive margin: indicator for at least one MNE. {cl}"))
+    L.append(tab2(G, "Regressions", "reg_wp1e_counts.tex", "Multinational Presence and Agricultural Exports: Intensive Margin, by Type of Multinational", "p_f5counts",
+                  f"{N_CELLS} Agricultural products only. {N_DEP_T1} Regressors: $\\ln$ number of MNEs of each type. Columns (5)--(6) split foreign MNEs by whether the destination is the parent's country. {cl}"))
 
-    L.append(sub("Fact 6: Distance is a weaker barrier to trade for multinational corporations"))
+    L.append(sub("Fact 6: Distance Is a Weaker Barrier for Multinationals"))
     L.append(par(AGRO_FACT_TEXT[6]))
-    L.append(tab(G, "Regressions", "reg_wp0_table2_repro.tex", "Agriculture: distance and firm exports, multinationals split by presence at the destination", "p_t2"))
-    L.append(tab(G, "Regressions", "reg_wp1e_distance_hq.tex", "Agriculture: distance and firm exports, foreign / domestic", "p_dist"))
+    L.append(tab2(G, "Regressions", "reg_wp0_table2_repro.tex", "Distance and Firm Agricultural Exports: Multinationals by Presence at the Destination", "p_t2",
+                  f"{N_FIRMS} Agricultural products only. Dependent variable: $\\ln$ exports. Non-MNE firms are the omitted group. Present: the group has an affiliate in the destination or the destination is the parent's country. {cl}"))
+    L.append(tab2(G, "Regressions", "reg_wp1e_distance_hq.tex", "Distance and Firm Agricultural Exports: Foreign and Domestic Multinationals", "p_dist",
+                  f"{N_FIRMS} Agricultural products only. Dependent variable: $\\ln$ exports. Non-MNE firms are the omitted group. Columns (3)--(4) split foreign MNEs by whether the destination is the parent's country. {cl}"))
 
-    L.append(sec("Inside Agriculture", "sub"))
+    L.append(sec("Product Groups within Agriculture", "sub"))
     L.append(par(AGRO_SUB_TEXT))
-    L.append(tab(G, "Tables", "tab_wp2_sitc2.tex", "Agriculture by SITC Rev.\\,3 division: total and MNE exports, shares, leading parents", "a_sitc", size=r"\footnotesize"))
-    L.append(fig(G, "fig_wp2_sitc2", "Agriculture by SITC Rev.\\,3 division: foreign and domestic MNE shares of export value.", "a_sitc", 0.9))
-    L.append(tab(G, "Tables", "tab_wp2_hs_section.tex", "Agriculture by HS section: total and MNE exports, shares, leading parents", "a_hssection", size=r"\footnotesize"))
-    L.append(fig(G, "fig_wp2_hs_section", "Agriculture by HS section: foreign and domestic MNE shares of export value.", "a_hssection", 0.9))
-    L.append(tab(G, "Tables", "tab_wp2_bec_enduse.tex", "Agriculture by BEC end use: total and MNE exports, shares, leading parents", "a_bec", size=r"\footnotesize"))
-    L.append(tab(G, "Tables", "tab_wp2_inputs.tex", "Agricultural inputs vs other agricultural goods: total and MNE exports, shares, leading parents", "a_inputs", size=r"\footnotesize"))
-    L.append(fig(G, "fig_wp2_inputs", "Agricultural inputs vs other agricultural goods: foreign and domestic MNE shares.", "a_inputs", 0.7))
-    L.append(tab(G, "Tables", "tab_wp2_top_inputs_hs6.tex", "The largest agricultural-input HS6 lines", "a_topinputs", size=r"\footnotesize"))
-    L.append(fig(G, "fig_wp1f_top20_hs6_stacked", "Agriculture, top-20 HS6 products by export value: foreign MNE, domestic MNE and local shares.", "a_hs6", 1.0))
-    L.append(fig(G, "fig_wp1f_top20_hs6_by_parent", "Agriculture, top-20 HS6 products: foreign bar split by the parent's country (remainder = local firms).", "a_hs6_parent", 1.0))
+    L.append(tab2(G, "Tables", "tab_wp2_sitc2.tex", "Agricultural Exports and Multinational Shares, by SITC Division", "a_sitc",
+                  f"Foreign and domestic: percent of the division's export value. HS6 products without an SITC correspondence (US\$6.0 billion a year) are excluded. {N_LEAD} {N_USD}", size=r"\footnotesize"))
+    L.append(fig2(G, "fig_wp2_sitc2", "Multinational Share of Agricultural Export Value, by SITC Division", "a_sitc",
+                  "Shares of each division's export value, all available years pooled. Divisions ordered by export value.", 0.9))
+    L.append(fig2(G, "fig_wp2_inputs", "Multinational Share of Agricultural Export Value: Inputs and Other Products", "a_inputs",
+                  "Shares of export value, all available years pooled. Inputs: seeds, animal feed and live animals.", 0.7))
+    L.append(fig2(G, "fig_wp1f_top20_hs6_stacked", "Ownership of the Twenty Largest Agricultural Export Products", "a_hs6",
+                  "Shares of each product's export value. Twenty largest agricultural HS6 products by export value.", 1.0))
 
     L.append(sec("Theoretical Framework", "model")); L.append(par(PAPER_TAIL["model"]))
     L.append(sec("Concluding Remarks", "concl")); L.append(par(PAPER_TAIL["concl"]))
     L.append(REFS_HEAD); L.append(par(REFS_BLOCK))
 
     L.append(APPENDIX_OPEN)
-    L.append(sec("Appendix: Additional Exhibits", "app"))
-    L.append(par(r"""This appendix collects the exhibits that document or extend those of the main
-text, all of them computed within agriculture for the nine origins pooled."""))
+    L.append(sec("Additional Tables and Figures", "app"))
+    L.append(usub("Fact 1"))
+    L.append(tab2(G, "Tables", "tab_wp0_fig1_origin.tex", "Multinational Share of Agricultural Export Value, by Exporting Country", "ap_f1n",
+                  f"Shares of each country's agricultural export value, all available years pooled. {N_USD}"))
+    L.append(fig2(G, "fig_wp1a_origin_by_parent", "Multinational Share of Agricultural Export Value, by Exporting Country and Parent Country", "ap_f1_parent",
+                  "Shares of each country's agricultural export value. Foreign MNEs split by country of the ultimate parent; the ten largest parent countries are shown separately.", 0.92))
+    L.append(tab2(G, "Tables", "tab_wp1a_origin_by_parent.tex", "Multinational Share of Agricultural Export Value, by Exporting Country and Parent Country", "ap_f1pn",
+                  f"Shares of each country's agricultural export value. Other: all remaining foreign parents. {N_USD}"))
 
-    L.append(sub("Fact 1"))
-    L.append(fig(G, "fig_wp1a_origin_by_parent", "Agriculture: MNE share of export value by origin, foreign bar split by the parent's country.", "ap_f1_parent", 0.92))
-    L.append(tab(G, "Tables", "tab_wp1a_origin_by_parent.tex", "Numbers behind the previous figure", "ap_f1pn"))
+    L.append(usub("Fact 2"))
+    L.append(tab2(G, "Tables", "tab_wp1b_quintile_shares.tex", "Multinational Share of Agricultural Export Value, by Quintile of Each Sophistication Measure", "ap_quint",
+                  "Shares of export value within each quintile of HS6 products. --: fewer than 30 HS6 products carry the measure.", size=r"\footnotesize"))
 
-    L.append(sub("Fact 2"))
-    L.append(tab(G, "Tables", "tab_wp1b_quintile_shares.tex", "Agriculture: foreign and domestic MNE shares by quintile of each sophistication measure", "ap_quint", size=r"\footnotesize"))
+    L.append(usub("Fact 3"))
+    L.append(tab2(G, "Tables", "tab_wp1a_parent_share.tex", "Foreign-Multinational Agricultural Exports, by Parent Country", "ap_f4n",
+                  f"Percent of foreign-MNE agricultural export value, by country of the ultimate parent. {N_USD}"))
+    L.append(tab2(G, "Tables", "tab_wp1c_country_rowpct.tex", "Destination of Foreign-Multinational Agricultural Exports, by Parent Country", "ap_pxd",
+                  "Percent of each parent country's agricultural exports, by destination (rows add to 100). Ten largest parent countries and ten largest destinations."))
+    L.append(tab2(G, "Tables", "tab_wp1c_parent_x_parentdest_rowpct.tex", "Foreign-Multinational Agricultural Exports to the Parent Countries, by Parent Country", "ap_pxp",
+                  "Percent of each parent country's agricultural exports, by destination (rows add to 100). Destinations are the ten largest parent countries; the diagonal is the share shipped to the parent's own country."))
+    L.append(tab2(G, "Tables", "tab_wp1c_region_rowpct.tex", "Destination of Multinational Agricultural Exports, by Parent Region", "ap_reg",
+                  "Percent of each group's agricultural exports, by destination region (rows add to 100). Domestic MNEs and local firms are shown for comparison."))
+    L.append(fig2(G, "fig_wp1d_heatmap_country_rowpct", "Destination of Foreign-Multinational Agricultural Exports: Fifteen Largest Parent Countries and Destinations", "ap_hm",
+                  "Percent of each parent country's agricultural exports going to each destination (rows add to 100 including other destinations).", 1.0))
+    L.append(fig2(G, "fig_wp1d_home_share_by_parent", "Share of Foreign-Multinational Agricultural Exports Shipped to the Parent Country", "ap_home",
+                  "Percent of each parent country's agricultural exports shipped to that same country.", 0.85))
 
-    L.append(sub("Fact 3"))
-    L.append(tab(G, "Tables", "tab_wp1c_country_rowpct.tex", "Agriculture, top-10 parents $\\times$ top-10 destinations: destination mix of each parent's exports (row \\%)", "ap_pxd"))
-    L.append(tab(G, "Tables", "tab_wp1c_parent_x_parentdest_rowpct.tex", "Agriculture, top-10 parents $\\times$ the same ten countries as destinations (row \\%)", "ap_pxp"))
-    L.append(tab(G, "Tables", "tab_wp1c_region_rowpct.tex", "Agriculture, parent region $\\times$ destination region: destination mix of each group (row \\%)", "ap_reg"))
-    L.append(fig(G, "fig_wp1d_heatmap_country_rowpct", "Agriculture, top-15 parents $\\times$ top-15 destinations: \\% of the parent's export value going to each destination.", "ap_hm", 1.0))
-    L.append(fig(G, "fig_wp1d_home_share_by_parent", "Agriculture: share of each parent's export value shipped to the parent's own country.", "ap_home", 0.85))
+    L.append(usub("Fact 4"))
+    L.append(tab2(G, "Tables", "tab_wp0_fig5_network.tex", "Foreign-Multinational Agricultural Exports and Number of Parents, by Size of the Group's Global Network", "ap_f5_tab",
+                  "Number and share of parents, and share of foreign-MNE agricultural export value, by the number of affiliates the group has worldwide."))
 
-    L.append(sub("Fact 5"))
-    L.append(tab(G, "Tables", "tab_wp1e_presence_shares.tex", "Agriculture: MNE export value by origin, domestic share and foreign-MNE value by the group's presence at the destination", "ap_pres"))
+    L.append(usub("Fact 5"))
+    L.append(tab2(G, "Regressions", "reg_wp1e_extensive.tex", "Multinational Presence and Agricultural Exports: Extensive Margin, by Type of Multinational", "ap_ext",
+                  f"{N_CELLS} Agricultural products only. {N_DEP_T1} Regressors: indicators for at least one MNE of each type. Columns (5)--(6) split foreign MNEs by whether the destination is the parent's country. {cl}"))
+    L.append(tab2(G, "Tables", "tab_wp1e_presence_shares.tex", "Multinational Agricultural Exports by Exporting Country and Destination Type", "ap_pres",
+                  f"MNE and foreign-MNE agricultural export value by country, and the split of foreign-MNE value by destination. Parent country: exports to the country of the ultimate parent. Other: all remaining destinations; in parentheses, destinations where the group has another affiliate. {N_USD}"))
 
-    L.append(sub("Inside agriculture"))
-    L.append(fig(G, "fig_wp2_origin_x_sitc2", "Agriculture: origin $\\times$ SITC division, foreign-MNE share of export value.", "ap_oxs", 1.0))
-    L.append(tab(G, "Tables", "tab_wp2_origin_x_sitc2.tex", "Numbers behind the previous figure", "ap_oxs_tab", size=r"\footnotesize"))
-    L.append(tab(G, "Tables", "tab_wp2_sitc2_by_parent.tex", "Agriculture by SITC division: parent-country composition of foreign-MNE exports", "ap_sitc_par", size=r"\footnotesize"))
-    L.append(tab(G, "Tables", "tab_wp1f_hs_sections.tex", "Agriculture: HS sections by export value, MNE shares and leading parent", "ap_sections", size=r"\footnotesize"))
-    L.append(fig(G, "fig_wp1f_foreign_share_distribution", "Agriculture: distribution of the HS6 foreign-MNE share.", "ap_dist", 0.85))
-    L.append(tab(G, "Tables", "tab_wp1f_foreign_share_distribution.tex", "Numbers behind the previous figure", "ap_dist_tab"))
+    L.append(usub("Product groups"))
+    L.append(tab2(G, "Tables", "tab_wp2_hs_section.tex", "Agricultural Exports and Multinational Shares, by HS Section", "ap_hssection",
+                  f"Foreign and domestic: percent of the section's export value. {N_LEAD} {N_USD}", size=r"\footnotesize"))
+    L.append(fig2(G, "fig_wp2_hs_section", "Multinational Share of Agricultural Export Value, by HS Section", "ap_hssection",
+                  "Shares of each section's export value, all available years pooled.", 0.9))
+    L.append(tab2(G, "Tables", "tab_wp2_bec_enduse.tex", "Agricultural Exports and Multinational Shares, by End Use", "ap_bec",
+                  f"End use from BEC Rev.\\,4. Foreign and domestic: percent of the category's export value. {N_LEAD} {N_USD}", size=r"\footnotesize"))
+    L.append(tab2(G, "Tables", "tab_wp2_inputs.tex", "Agricultural Exports and Multinational Shares: Inputs and Other Products", "ap_inputs",
+                  f"Foreign and domestic: percent of the group's export value. {N_LEAD} {N_USD}", size=r"\footnotesize"))
+    L.append(tab2(G, "Tables", "tab_wp2_top_inputs_hs6.tex", "Largest Agricultural Input Products", "ap_topinputs",
+                  f"HS6 input products with the largest export value. Foreign and domestic: percent of the product's export value. {N_USD}", size=r"\footnotesize"))
+    L.append(fig2(G, "fig_wp1f_top20_hs6_by_parent", "Ownership of the Twenty Largest Agricultural Export Products, by Parent Country", "ap_hs6_parent",
+                  "Shares of each product's export value. Foreign-MNE share split by country of the ultimate parent; the unfilled part of each bar is local firms.", 1.0))
+    L.append(fig2(G, "fig_wp2_origin_x_sitc2", "Foreign-Multinational Share of Agricultural Export Value, by Exporting Country and SITC Division", "ap_oxs",
+                  "Percent of each division's export value in each country shipped by foreign MNEs.", 1.0))
+    L.append(tab2(G, "Tables", "tab_wp2_origin_x_sitc2.tex", "Foreign-Multinational Share of Agricultural Export Value, by Exporting Country and SITC Division", "ap_oxs_tab",
+                  "Percent of each division's export value in each country shipped by foreign MNEs.", size=r"\footnotesize"))
+    L.append(tab2(G, "Tables", "tab_wp2_sitc2_by_parent.tex", "Foreign-Multinational Agricultural Exports by SITC Division and Parent Country", "ap_sitc_par",
+                  "Shares of each division's export value, by country of the ultimate parent of foreign MNEs; domestic MNEs shown for comparison.", size=r"\footnotesize"))
+    L.append(fig2(G, "fig_wp1f_foreign_share_distribution", "Distribution of Agricultural Export Value by Product-Level Foreign-Multinational Share", "ap_dist",
+                  "Share of agricultural export value and MNE share of exporting firms, by the foreign-MNE share of each HS6 product's export value.", 0.85))
 
     L.append(r"\end{document}" + "\n")
     return write_main(L)
+
+
+PAGE_LIT_AGRO = r"""
+\tbw{To be written. Three strands: firm-level evidence on multinational production and trade;
+multinationals in agricultural and food trade; and evidence on multinational firms in Latin
+America.}
+"""
 
 
 # =====================================================================
@@ -1398,6 +1385,8 @@ D2_RELABEL = [
     (r"through headquarters", r"parent country"),
     (r"not through HQ (of which via another affiliate)", r"other (of which: group affiliate there)"),
     (r"(\$bn/yr)", r"(US\$bn/yr)"),
+    (r"The working sample & \\", r"Statistic & Value \\"),
+    (r"Export value, pooled (\$bn)", r"Export value, all years (US\$ billion)"),
 ]
 
 
@@ -1620,7 +1609,7 @@ def build_draft_v2() -> Path:
     L.append(tab2(A, "Tables", "tab_wp1f_foreign_share_distribution.tex", "Distribution of Export Value by Product-Level Foreign-Multinational Share", "a_dist_tab",
                   "Share of total export value and MNE share of exporting firms, by the foreign-MNE share of each HS6 product's export value. MNE share of exporting firms: MNE firm--destination--product--year observations over all observations in the bin."))
     L.append(tab2("agro", "Tables", "tab_wp2_sitc2.tex", "Agriculture: Exports and Multinational Shares, by SITC Division", "a_agro_sitc",
-                  f"Agriculture: HS 01--24. Foreign and domestic: percent of the division's export value. {lead} {usd}", size=r"\footnotesize"))
+                  f"Agriculture: HS 01--24. Foreign and domestic: percent of the division's export value. HS6 products without an SITC correspondence (US\$6.0 billion a year) are excluded. {lead} {usd}", size=r"\footnotesize"))
     L.append(tab2(M, "Tables", "tab_wp2_hs_section.tex", "Manufacturing: Exports and Multinational Shares, by HS Section", "a_manuf_hs",
                   f"Manufacturing: HS 28--97 excluding 71. Foreign and domestic: percent of the section's export value. {lead} {usd}", size=r"\footnotesize"))
     L.append(tab2(M, "Tables", "tab_wp2_bec_enduse.tex", "Manufacturing: Exports and Multinational Shares, by End Use", "a_manuf_bec",

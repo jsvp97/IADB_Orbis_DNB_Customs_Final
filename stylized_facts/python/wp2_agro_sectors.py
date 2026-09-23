@@ -103,7 +103,7 @@ def hbar_2def(g: pd.DataFrame, labels, fname: str, gdir: Path, xmax: float = 1.0
         ax.text(r.sh_ext + 0.006, yi + bh / 2, f"{r.sh_ext:.2f}", va="center", fontsize=8)
         ax.text(r.sh_dom + 0.006, yi - bh / 2, f"{r.sh_dom:.2f}", va="center", fontsize=8)
     ax.set_yticks(y); ax.set_yticklabels([textwrap.fill(str(l), 40) for l in labels], fontsize=9); ax.set_xlim(0, xmax)
-    ax.set_xlabel("Share in export value (value-weighted); rows ordered by export value", fontsize=10)
+    ax.set_xlabel("Share of export value", fontsize=10)
     h, l = ax.get_legend_handles_labels()
     fig.legend(h, l, frameon=False, fontsize=9, loc="lower center", ncol=2, bbox_to_anchor=(0.5, 0.0))
     fig.tight_layout(rect=(0, 0.5 / fig.get_figheight(), 1, 1))   # leave a strip under the x-label for the legend
@@ -126,9 +126,9 @@ def origin_table_and_heatmap(dd: pd.DataFrame, by: str, fname: str, gdir: Path, 
     if keep:
         hm = (100 * fsh[keep]).reindex((ovs["val_ext"] / ovs["value"]).sort_values(ascending=False).index)
         if wide:
-            W.heatmap(hm.T, fname, gdir, cbar_label="foreign-MNE share of export value (%)", fmt="{:.0f}", vmin=0, vmax=100, cmap="Blues", xlabel="exporting country", ylabel="")
+            W.heatmap(hm.T, fname, gdir, cbar_label="Foreign-MNE share of export value (%)", fmt="{:.0f}", vmin=0, vmax=100, cmap="Blues", xlabel="Exporting country", ylabel="")
         else:
-            W.heatmap(hm, fname, gdir, cbar_label="foreign-MNE share of export value (%)", fmt="{:.0f}", vmin=0, vmax=100, cmap="Blues", xlabel="", ylabel="exporting country")
+            W.heatmap(hm, fname, gdir, cbar_label="Foreign-MNE share of export value (%)", fmt="{:.0f}", vmin=0, vmax=100, cmap="Blues", xlabel="", ylabel="Exporting country")
 
     def row(lab, vals, extra):
         return W.tex_escape(str(lab)) + " & " + " & ".join("--" if pd.isna(v) else f"{v:.1f}" for v in vals) + f" & {extra:.1f}" + r" \\"
