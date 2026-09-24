@@ -61,7 +61,7 @@ MIN_HS6_MEASURE = 30   # a measure enters a scope's quintile figures/tables only
 
 def _insufficient(ax, short, n):
     ax.set_axis_off()
-    ax.text(0.5, 0.5, f"{short}\nnot shown: only {n} HS6 products\nwith this measure in the scope", ha="center", va="center", fontsize=10, color="#555555", transform=ax.transAxes)
+    ax.text(0.5, 0.5, f"{short}\nnot shown: only {n} HS6 products\ncarry this measure in the sector", ha="center", va="center", fontsize=10, color="#555555", transform=ax.transAxes)
 
 
 def hs6_cross_section(d: pd.DataFrame, cls: pd.DataFrame) -> pd.DataFrame:

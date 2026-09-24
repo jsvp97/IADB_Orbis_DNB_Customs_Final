@@ -108,14 +108,14 @@ def fig6_hhi(f: pd.DataFrame, G: Path, T: Path, scope: str) -> None:
     for ax, (title, d) in zip(axes, panels):
         vals = [wm(d, "hhi"), wm(d, "hhi_w"), wm(d, "hhi_c")]
         ax.bar(range(3), vals, color=[W.C_MNE_DOM, W.BLUE_SHADES[6], W.C_MNE_EXT], width=0.6)
-        ax.set_xticks(range(3)); ax.set_xticklabels(["Naive\n(each affiliate\na firm)", "Grouped by parent\nwithin country", "Grouped by parent\nacross countries"], fontsize=9)
+        ax.set_xticks(range(3)); ax.set_xticklabels(["Each affiliate\nseparately", "Grouped by parent\nwithin country", "Grouped by parent\nacross countries"], fontsize=9)
         ax.set_title(f"{title.replace(chr(92) + 'geq', '>=').replace(chr(92) + '%', '%').replace('$', '')}\n({len(d):,} HS6, {d['hstot'].sum() / M['hstot'].sum():.0%} of value)", fontsize=10)
         for i, v in enumerate(vals):
             ax.text(i, v + 0.004, f"{v:.3f}", ha="center", fontsize=9)
         ax.set_ylim(0, max(vals) * 1.18)
         rows.append((title, len(d), d["hstot"].sum() / M["hstot"].sum(), vals, [wm(d, "top1"), wm(d, "top1_w"), wm(d, "top1_c")],
                      [wm(d.assign(e=1 / d["hhi"]), "e"), wm(d.assign(e=1 / d["hhi_w"]), "e"), wm(d.assign(e=1 / d["hhi_c"]), "e")]))
-    axes[0].set_ylabel("Value-weighted mean product HHI")
+    axes[0].set_ylabel("Mean product HHI (weighted by export value)")
     fig.tight_layout()
     W.savefig(fig, "fig_wp0_fig6_hhi", G)
     lines = [r"\begin{tabular}{llrrr}", r"\toprule", r"Sample & Measure & Naive & Within country & Across countries \\", r"\midrule"]

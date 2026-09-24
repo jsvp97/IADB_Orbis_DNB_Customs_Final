@@ -218,11 +218,11 @@ def run_scope(cube: pd.DataFrame, scope: str) -> None:
     rowpct_c = 100 * core.div(mat_m.loc[top_p].sum(axis=1), axis=0)
     W.heatmap(rowpct_c, "fig_wp1d_heatmap_country_rowpct", G,
               cbar_label="Share of the parent country's exports (%)", fmt="{:.0f}", vmin=0,
-              xlabel="destination country", ylabel="parent country of the MNE")
+              xlabel="Destination", ylabel="Parent country")
     cellpct = 100 * core / mat_m.values.sum()
     W.heatmap(cellpct, "fig_wp1d_heatmap_country_cellpct", G,
               cbar_label="Share of foreign-MNE export value (%)", fmt="{:.1f}", vmin=0, cmap="Blues",
-              xlabel="destination country", ylabel="parent country of the MNE", annotate_thresh=0.05)
+              xlabel="Destination", ylabel="Parent country", annotate_thresh=0.05)
 
     # --- 1d companion: share shipped to the parent's own country, by parent -----------------
     home = home_share_figure(ext, top_p, "fig_wp1d_home_share_by_parent", G, "LAC")
@@ -238,8 +238,8 @@ def run_scope(cube: pd.DataFrame, scope: str) -> None:
             m_o = two_way(e_o, e_o["iso3_parent"].where(e_o["iso3_parent"].isin(p_o), "Other"),
                           e_o["country_dest"].where(e_o["country_dest"].isin(d_o), "Other"), p_o + ["Other"], d_o + ["Other"])
             W.heatmap(100 * m_o.loc[p_o, d_o] / m_o.values.sum(), f"fig_wp1d_heatmap_country_cellpct_{o}", G,
-                      cbar_label=f"% of all foreign-MNE export value from {o}", fmt="{:.1f}", vmin=0, cmap="Blues",
-                      xlabel="destination country", ylabel=f"parent country of the MNE (exports from {o})", annotate_thresh=0.05)
+                      cbar_label=f"Share of foreign-MNE export value from {o} (%)", fmt="{:.1f}", vmin=0, cmap="Blues",
+                      xlabel="Destination", ylabel="Parent country", annotate_thresh=0.05)
             home_share_figure(e_o, list(tp_o.index[:TOP_TAB]), f"fig_wp1d_home_share_by_parent_{o}", G, o)
     print(f"   share to parent's own country, all known-parent foreign MNEs: {overall_home:.3f}")
     hs_ = home.groupby("iso3_parent").agg(value=("value", "sum"), home=("home", "sum")).reindex(top_p[:8]); hs_["share"] = hs_["home"] / hs_["value"]
