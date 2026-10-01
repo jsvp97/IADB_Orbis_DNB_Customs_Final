@@ -70,7 +70,13 @@ FDPY_DTA = WP_INT / "fdpy_base.dta"          # written by src/15_wp_extract_fdpy
 FDPY_PQ  = WP_INT / "fdpy_base.parquet"      # pandas cache of the same
 CUBE_PQ  = WP_INT / "odpy_parent_cube.parquet"
 CLASS_PQ = WP_INT / "hs6_classifications.parquet"
-WP_OUT   = OUTPUT / "wp"
+# Year window (2026-10-02, agriculture paper): WP_YEARS="2012-2018" restricts every exhibit to those years (the window in
+# which all nine origins are observed) and writes to output/wp_2012_2018/ so the all-years outputs stay untouched.
+# The cached cube / firm-level parquet are read in full and filtered; nothing is cached under a window.
+import os as _os
+_YW = _os.environ.get("WP_YEARS", "").strip()
+YEAR_WINDOW = tuple(int(x) for x in _YW.split("-")) if _YW else None
+WP_OUT   = OUTPUT / ("wp" if YEAR_WINDOW is None else f"wp_{YEAR_WINDOW[0]}_{YEAR_WINDOW[1]}")
 F_FGO    = RAW / "ProTEE_0_1.csv"                              # CEPII, Fontagne-Guimbard-Orefice (2022), HS6 rev. 2007
 F_BEC    = RAW / "UNSD_HS-SITC-BEC_Correlations_2022.xlsx"     # UNSD: HS92..HS22 x BEC4/BEC5 x SITC1-4
 for _d in (WP_INT, WP_OUT):
@@ -86,7 +92,41 @@ def outdirs(scope: str) -> tuple[Path, Path, Path]:
     return g, t, r
 
 
+def legend_below(fig) -> None:
+    """2026-10-01 (agro paper): every legend goes under the figure, centred, in as few rows as fit the figure's
+    width. Axes legends and figure legends are merged into one figure legend (labels deduplicated) and placed just
+    below the lowest tick labels / axis title. Set fig._keep_legend = True to leave a figure's legend alone."""
+    if getattr(fig, "_keep_legend", False):
+        return
+    legs = [a.get_legend() for a in fig.axes if a.get_legend() is not None] + list(fig.legends)
+    if not legs:
+        return
+    H, L = [], []
+    for lg in legs:
+        for h, t in zip(lg.legend_handles, lg.get_texts()):
+            if t.get_text() and t.get_text() not in L:
+                H.append(h); L.append(t.get_text())
+    fs = legs[0].get_texts()[0].get_fontsize() if legs[0].get_texts() else 9
+    for lg in legs:
+        lg.remove()
+    fig.canvas.draw()
+    r = fig.canvas.get_renderer()
+    inv = fig.transFigure.inverted()
+    y0 = min(inv.transform(a.get_tightbbox(r))[0][1] for a in fig.axes if a.get_visible())
+    avail = fig.get_size_inches()[0] * fig.dpi
+    n = len(L)
+    for nc in range(n, 0, -1):
+        rows = -(-n // nc); nc = -(-n // rows)             # balanced rows
+        lg = fig.legend(H, L, loc="upper center", bbox_to_anchor=(0.5, y0 - 0.01), bbox_transform=fig.transFigure,
+                        ncol=nc, frameon=False, fontsize=fs)
+        fig.canvas.draw()
+        if lg.get_window_extent(r).width <= avail or nc == 1:
+            return
+        lg.remove()
+
+
 def savefig(fig, name: str, gdir: Path) -> None:
+    legend_below(fig)
     save_figure(fig, name, gdir, OVERLEAF_WP)
 
 
@@ -182,6 +222,8 @@ SCOPE_OF_SECTOR = {"Agriculture": "agro", "Mining & fuels": "mining", "Manufactu
 SECTOR_OF_SCOPE = {v: k for k, v in SCOPE_OF_SECTOR.items()}
 SCOPES_SECTORS = ["agro", "manufacturing", "mining", "rest"]
 SCOPES_ALL = ["all"] + SCOPES_SECTORS
+if _os.environ.get("WP_SCOPES", "").strip():   # e.g. WP_SCOPES=agro: run the scope loops for these scopes only
+    SCOPES_ALL = [x.strip() for x in _os.environ["WP_SCOPES"].split(",") if x.strip()]
 SCOPE_LABEL = {"all": "All goods", "agro": "Agriculture (HS 01--24)", "mining": "Mining \\& fuels (HS 25--27, 71)",
                "manufacturing": "Manufacturing (HS 28--97 excl. 71)", "rest": "Rest (HS 98--99 and unclassified codes; services are not in customs data)"}
 AGRO_SECTION_LABEL = {1: "I Live animals & products (01-05)", 2: "II Vegetable products (06-14)",
@@ -394,10 +436,19 @@ FDPY_COLS = ["country_orig", "Tax_ID", "country_dest", "hs07_6d", "year", "value
              "has_aff_in_neighbor", "naics_aff_2"]
 
 
+def _in_window(df: pd.DataFrame) -> pd.DataFrame:
+    """Rows inside YEAR_WINDOW (all rows when no window is set)."""
+    if YEAR_WINDOW is None:
+        return df
+    y = pd.to_numeric(df["year"], errors="coerce")
+    return df[y.between(*YEAR_WINDOW)].reset_index(drop=True)
+
+
 def load_fdpy() -> pd.DataFrame:
     """Firm x origin x dest x HS6 x year rows from src/15's cache (parquet copy made on first use)."""
     if FDPY_PQ.exists():
-        return pd.read_parquet(FDPY_PQ)
+        return _in_window(pd.read_parquet(FDPY_PQ))
+    assert YEAR_WINDOW is None, "build the full fdpy parquet cache before using WP_YEARS"
     import pyreadstat
     assert FDPY_DTA.exists(), f"run src/15_wp_extract_fdpy.do first -> {FDPY_DTA}"
     print(f">>> reading {FDPY_DTA} (first time; parquet cache written)")
@@ -438,7 +489,8 @@ def build_cube(force: bool = False) -> pd.DataFrame:
     """origin x dest x HS6 x year x iso3_parent x m_dnb x m_fr  ->  value, n_firms, and the
     HQ / presence sub-sums. Both conventions can be recomposed from it."""
     if CUBE_PQ.exists() and not force:
-        return pd.read_parquet(CUBE_PQ)
+        return _in_window(pd.read_parquet(CUBE_PQ))
+    assert YEAR_WINDOW is None, "build the full cube before using WP_YEARS"
     df = load_fdpy()
     print(f">>> building parent cube from {len(df):,} FDPY rows")
     df = df[df["value_fob"] > 0]

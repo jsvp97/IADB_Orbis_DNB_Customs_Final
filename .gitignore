@@ -85,3 +85,6 @@ data/samples/
 docs/agro/*.pdf
 # Local Overleaf stand-in
 output/overleaf_mirror/
+
+# Overleaf upload zips (rebuilt by stylized_facts/python/wp_export_overleaf.py)
+docs/overleaf_projects/*.zip

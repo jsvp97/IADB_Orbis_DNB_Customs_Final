@@ -1,0 +1,1178 @@
+% Multinational Firms and Trade in Latin America -- WP_countries (reference document: the nine exporting countries)
+% Overleaf project exported 2026-09-24 from the build of 2026-09-23 (stylized_facts/python/wp_export_overleaf.py).
+% Compile with pdfLaTeX, the Overleaf default. Figures are in figures/<scope>/ and tables in tables/<scope>/,
+% where <scope> is the sample: all = all goods; agro, manufacturing, mining, rest = the sectors;
+% sectors = exhibits that compare the sectors. Each figure and table below starts with a '% ----' line.
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{mathptmx}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{graphicx,booktabs,amsmath,amssymb,adjustbox,float,caption,hyperref,xcolor,enumitem}
+\captionsetup{font=small,labelfont=bf,skip=4pt}
+\hypersetup{colorlinks,linkcolor=blue!50!black,urlcolor=blue!50!black}
+\setlength{\parskip}{4pt}
+\title{Multinational Firms and Trade in Latin America\\[4pt]\large Stylized Facts by Exporting Country: All Tables and Figures}
+\author{Ignacio Marra de Arti\~nano \and Gabriel Scattolo \and Sebasti\'an Vel\'asquez \and Christian Volpe Martincus}
+\date{September 2026}
+\begin{document}
+\maketitle
+\tableofcontents
+\clearpage
+
+\section*{Data}
+\addcontentsline{toc}{section}{Data}
+
+The data are the customs export records of nine Latin American countries at the firm, destination,
+HS6 product and year level, matched to the ownership records of Orbis and Dun \& Bradstreet. The
+years covered are Argentina 2011--2019, Chile 2009--2022, Colombia 2010--2021, Costa Rica
+2010--2019, the Dominican Republic 2012--2019, El Salvador 2006--2018, Paraguay 2012--2020, Peru
+2010--2019 and Uruguay 2010--2019.
+
+An exporter found in Orbis or Dun \& Bradstreet is a multinational affiliate (MNE). It is a
+\emph{domestic} MNE when its ultimate parent is located in the exporting country and a
+\emph{foreign} MNE otherwise; matched exporters without a recorded parent country (7.5 percent of
+foreign-MNE export value) are counted as foreign. Exporters not found in either database are
+\emph{local} firms. Sectors are defined on HS chapters: agriculture 01--24, mining and fuels
+25--27 and 71, manufacturing 28--97 excluding 71.
+Each section of this document reports, for one exporting country, where the exports of its
+multinational affiliates go by parent region and parent country, how much of each parent's exports
+goes to the parent's own country, and the largest export products, for all goods and by sector.
+
+
+\section{Argentina}\label{sec:c_ARG}
+
+\subsection{Parents and Destinations}
+% ---- Table: Argentina: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Argentina: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_ARG}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1c_byorigin_ARG}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's exports from Argentina, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Argentina: Foreign-Multinational Exports by Parent Country and Destination
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_heatmap_country_cellpct_ARG.pdf}%
+  \caption{Argentina: Foreign-Multinational Exports by Parent Country and Destination}%
+  \label{fig:c_hm_ARG}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of the foreign-MNE export value of Argentina in each parent country and destination pair; fifteen largest parent countries and destinations.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Figure: Argentina: Share of Foreign-Multinational Exports Shipped to the Parent Country
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.85\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_home_share_by_parent_ARG.pdf}%
+  \caption{Argentina: Share of Foreign-Multinational Exports Shipped to the Parent Country}%
+  \label{fig:c_home_ARG}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of each parent country's exports from Argentina shipped to that same country; ten largest parent countries.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Argentina, Agriculture: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Argentina, Agriculture: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_ARG_agro}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/tab_wp1c_byorigin_ARG}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's agricultural exports from Argentina, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Argentina, Manufacturing: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Argentina, Manufacturing: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_ARG_manufacturing}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/manufacturing/tab_wp1c_byorigin_ARG}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's manufacturing exports from Argentina, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Argentina, Mining and Fuels: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Argentina, Mining and Fuels: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_ARG_mining}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/mining/tab_wp1c_byorigin_ARG}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's mining and fuels exports from Argentina, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\subsection{Products}
+% ---- Table: Argentina: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Argentina: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_ARG}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1f_top_hs6_ARG}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest HS6 products exported by Argentina. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Argentina, Agriculture: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Argentina, Agriculture: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_ARG_agro}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/tab_wp1f_top_hs6_ARG}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest agricultural HS6 products exported by Argentina. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Argentina, Manufacturing: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Argentina, Manufacturing: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_ARG_manufacturing}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/manufacturing/tab_wp1f_top_hs6_ARG}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest manufacturing HS6 products exported by Argentina. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Argentina, Mining and Fuels: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Argentina, Mining and Fuels: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_ARG_mining}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/mining/tab_wp1f_top_hs6_ARG}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest mining and fuels HS6 products exported by Argentina. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\section{Chile}\label{sec:c_CHL}
+
+\subsection{Parents and Destinations}
+% ---- Table: Chile: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Chile: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_CHL}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1c_byorigin_CHL}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's exports from Chile, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Chile: Foreign-Multinational Exports by Parent Country and Destination
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_heatmap_country_cellpct_CHL.pdf}%
+  \caption{Chile: Foreign-Multinational Exports by Parent Country and Destination}%
+  \label{fig:c_hm_CHL}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of the foreign-MNE export value of Chile in each parent country and destination pair; fifteen largest parent countries and destinations.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Figure: Chile: Share of Foreign-Multinational Exports Shipped to the Parent Country
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.85\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_home_share_by_parent_CHL.pdf}%
+  \caption{Chile: Share of Foreign-Multinational Exports Shipped to the Parent Country}%
+  \label{fig:c_home_CHL}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of each parent country's exports from Chile shipped to that same country; ten largest parent countries.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Chile, Agriculture: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Chile, Agriculture: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_CHL_agro}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/tab_wp1c_byorigin_CHL}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's agricultural exports from Chile, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Chile, Manufacturing: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Chile, Manufacturing: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_CHL_manufacturing}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/manufacturing/tab_wp1c_byorigin_CHL}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's manufacturing exports from Chile, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Chile, Mining and Fuels: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Chile, Mining and Fuels: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_CHL_mining}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/mining/tab_wp1c_byorigin_CHL}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's mining and fuels exports from Chile, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Chile, Other Goods: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Chile, Other Goods: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_CHL_rest}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/rest/tab_wp1c_byorigin_CHL}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's exports from Chile, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\subsection{Products}
+% ---- Table: Chile: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Chile: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_CHL}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1f_top_hs6_CHL}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest HS6 products exported by Chile. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Chile, Agriculture: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Chile, Agriculture: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_CHL_agro}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/tab_wp1f_top_hs6_CHL}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest agricultural HS6 products exported by Chile. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Chile, Manufacturing: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Chile, Manufacturing: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_CHL_manufacturing}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/manufacturing/tab_wp1f_top_hs6_CHL}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest manufacturing HS6 products exported by Chile. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Chile, Mining and Fuels: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Chile, Mining and Fuels: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_CHL_mining}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/mining/tab_wp1f_top_hs6_CHL}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest mining and fuels HS6 products exported by Chile. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Chile, Other Goods: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Chile, Other Goods: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_CHL_rest}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/rest/tab_wp1f_top_hs6_CHL}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest HS6 products exported by Chile. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\section{Colombia}\label{sec:c_COL}
+
+\subsection{Parents and Destinations}
+% ---- Table: Colombia: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Colombia: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_COL}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1c_byorigin_COL}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's exports from Colombia, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Colombia: Foreign-Multinational Exports by Parent Country and Destination
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_heatmap_country_cellpct_COL.pdf}%
+  \caption{Colombia: Foreign-Multinational Exports by Parent Country and Destination}%
+  \label{fig:c_hm_COL}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of the foreign-MNE export value of Colombia in each parent country and destination pair; fifteen largest parent countries and destinations.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Figure: Colombia: Share of Foreign-Multinational Exports Shipped to the Parent Country
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.85\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_home_share_by_parent_COL.pdf}%
+  \caption{Colombia: Share of Foreign-Multinational Exports Shipped to the Parent Country}%
+  \label{fig:c_home_COL}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of each parent country's exports from Colombia shipped to that same country; ten largest parent countries.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Colombia, Agriculture: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Colombia, Agriculture: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_COL_agro}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/tab_wp1c_byorigin_COL}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's agricultural exports from Colombia, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Colombia, Manufacturing: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Colombia, Manufacturing: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_COL_manufacturing}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/manufacturing/tab_wp1c_byorigin_COL}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's manufacturing exports from Colombia, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Colombia, Mining and Fuels: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Colombia, Mining and Fuels: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_COL_mining}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/mining/tab_wp1c_byorigin_COL}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's mining and fuels exports from Colombia, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Colombia, Other Goods: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Colombia, Other Goods: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_COL_rest}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/rest/tab_wp1c_byorigin_COL}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's exports from Colombia, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\subsection{Products}
+% ---- Table: Colombia: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Colombia: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_COL}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1f_top_hs6_COL}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest HS6 products exported by Colombia. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Colombia, Agriculture: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Colombia, Agriculture: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_COL_agro}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/tab_wp1f_top_hs6_COL}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest agricultural HS6 products exported by Colombia. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Colombia, Manufacturing: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Colombia, Manufacturing: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_COL_manufacturing}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/manufacturing/tab_wp1f_top_hs6_COL}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest manufacturing HS6 products exported by Colombia. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Colombia, Mining and Fuels: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Colombia, Mining and Fuels: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_COL_mining}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/mining/tab_wp1f_top_hs6_COL}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest mining and fuels HS6 products exported by Colombia. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Colombia, Other Goods: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Colombia, Other Goods: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_COL_rest}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/rest/tab_wp1f_top_hs6_COL}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest HS6 products exported by Colombia. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\section{Costa Rica}\label{sec:c_CRI}
+
+\subsection{Parents and Destinations}
+% ---- Table: Costa Rica: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Costa Rica: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_CRI}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1c_byorigin_CRI}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's exports from Costa Rica, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Costa Rica: Foreign-Multinational Exports by Parent Country and Destination
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_heatmap_country_cellpct_CRI.pdf}%
+  \caption{Costa Rica: Foreign-Multinational Exports by Parent Country and Destination}%
+  \label{fig:c_hm_CRI}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of the foreign-MNE export value of Costa Rica in each parent country and destination pair; fifteen largest parent countries and destinations.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Figure: Costa Rica: Share of Foreign-Multinational Exports Shipped to the Parent Country
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.85\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_home_share_by_parent_CRI.pdf}%
+  \caption{Costa Rica: Share of Foreign-Multinational Exports Shipped to the Parent Country}%
+  \label{fig:c_home_CRI}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of each parent country's exports from Costa Rica shipped to that same country; ten largest parent countries.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Costa Rica, Agriculture: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Costa Rica, Agriculture: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_CRI_agro}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/tab_wp1c_byorigin_CRI}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's agricultural exports from Costa Rica, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Costa Rica, Manufacturing: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Costa Rica, Manufacturing: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_CRI_manufacturing}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/manufacturing/tab_wp1c_byorigin_CRI}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's manufacturing exports from Costa Rica, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Costa Rica, Mining and Fuels: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Costa Rica, Mining and Fuels: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_CRI_mining}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/mining/tab_wp1c_byorigin_CRI}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's mining and fuels exports from Costa Rica, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Costa Rica, Other Goods: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Costa Rica, Other Goods: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_CRI_rest}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/rest/tab_wp1c_byorigin_CRI}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's exports from Costa Rica, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\subsection{Products}
+% ---- Table: Costa Rica: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Costa Rica: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_CRI}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1f_top_hs6_CRI}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest HS6 products exported by Costa Rica. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Costa Rica, Agriculture: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Costa Rica, Agriculture: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_CRI_agro}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/tab_wp1f_top_hs6_CRI}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest agricultural HS6 products exported by Costa Rica. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Costa Rica, Manufacturing: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Costa Rica, Manufacturing: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_CRI_manufacturing}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/manufacturing/tab_wp1f_top_hs6_CRI}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest manufacturing HS6 products exported by Costa Rica. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Costa Rica, Mining and Fuels: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Costa Rica, Mining and Fuels: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_CRI_mining}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/mining/tab_wp1f_top_hs6_CRI}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest mining and fuels HS6 products exported by Costa Rica. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Costa Rica, Other Goods: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Costa Rica, Other Goods: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_CRI_rest}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/rest/tab_wp1f_top_hs6_CRI}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest HS6 products exported by Costa Rica. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\section{Dominican Republic}\label{sec:c_DOM}
+
+\subsection{Parents and Destinations}
+% ---- Table: Dominican Republic: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Dominican Republic: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_DOM}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1c_byorigin_DOM}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's exports from Dominican Republic, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Dominican Republic: Foreign-Multinational Exports by Parent Country and Destination
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_heatmap_country_cellpct_DOM.pdf}%
+  \caption{Dominican Republic: Foreign-Multinational Exports by Parent Country and Destination}%
+  \label{fig:c_hm_DOM}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of the foreign-MNE export value of Dominican Republic in each parent country and destination pair; fifteen largest parent countries and destinations.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Figure: Dominican Republic: Share of Foreign-Multinational Exports Shipped to the Parent Country
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.85\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_home_share_by_parent_DOM.pdf}%
+  \caption{Dominican Republic: Share of Foreign-Multinational Exports Shipped to the Parent Country}%
+  \label{fig:c_home_DOM}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of each parent country's exports from Dominican Republic shipped to that same country; ten largest parent countries.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Dominican Republic, Agriculture: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Dominican Republic, Agriculture: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_DOM_agro}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/tab_wp1c_byorigin_DOM}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's agricultural exports from Dominican Republic, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Dominican Republic, Manufacturing: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Dominican Republic, Manufacturing: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_DOM_manufacturing}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/manufacturing/tab_wp1c_byorigin_DOM}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's manufacturing exports from Dominican Republic, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Dominican Republic, Mining and Fuels: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Dominican Republic, Mining and Fuels: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_DOM_mining}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/mining/tab_wp1c_byorigin_DOM}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's mining and fuels exports from Dominican Republic, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\subsection{Products}
+% ---- Table: Dominican Republic: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Dominican Republic: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_DOM}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1f_top_hs6_DOM}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest HS6 products exported by Dominican Republic. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Dominican Republic, Agriculture: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Dominican Republic, Agriculture: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_DOM_agro}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/tab_wp1f_top_hs6_DOM}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest agricultural HS6 products exported by Dominican Republic. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Dominican Republic, Manufacturing: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Dominican Republic, Manufacturing: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_DOM_manufacturing}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/manufacturing/tab_wp1f_top_hs6_DOM}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest manufacturing HS6 products exported by Dominican Republic. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Dominican Republic, Mining and Fuels: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Dominican Republic, Mining and Fuels: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_DOM_mining}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/mining/tab_wp1f_top_hs6_DOM}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest mining and fuels HS6 products exported by Dominican Republic. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\section{Peru}\label{sec:c_PER}
+
+\subsection{Parents and Destinations}
+% ---- Table: Peru: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Peru: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_PER}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1c_byorigin_PER}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's exports from Peru, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Peru: Foreign-Multinational Exports by Parent Country and Destination
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_heatmap_country_cellpct_PER.pdf}%
+  \caption{Peru: Foreign-Multinational Exports by Parent Country and Destination}%
+  \label{fig:c_hm_PER}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of the foreign-MNE export value of Peru in each parent country and destination pair; fifteen largest parent countries and destinations.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Figure: Peru: Share of Foreign-Multinational Exports Shipped to the Parent Country
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.85\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_home_share_by_parent_PER.pdf}%
+  \caption{Peru: Share of Foreign-Multinational Exports Shipped to the Parent Country}%
+  \label{fig:c_home_PER}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of each parent country's exports from Peru shipped to that same country; ten largest parent countries.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Peru, Agriculture: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Peru, Agriculture: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_PER_agro}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/tab_wp1c_byorigin_PER}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's agricultural exports from Peru, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Peru, Manufacturing: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Peru, Manufacturing: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_PER_manufacturing}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/manufacturing/tab_wp1c_byorigin_PER}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's manufacturing exports from Peru, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Peru, Mining and Fuels: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Peru, Mining and Fuels: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_PER_mining}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/mining/tab_wp1c_byorigin_PER}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's mining and fuels exports from Peru, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Peru, Other Goods: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Peru, Other Goods: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_PER_rest}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/rest/tab_wp1c_byorigin_PER}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's exports from Peru, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\subsection{Products}
+% ---- Table: Peru: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Peru: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_PER}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1f_top_hs6_PER}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest HS6 products exported by Peru. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Peru, Agriculture: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Peru, Agriculture: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_PER_agro}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/tab_wp1f_top_hs6_PER}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest agricultural HS6 products exported by Peru. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Peru, Manufacturing: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Peru, Manufacturing: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_PER_manufacturing}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/manufacturing/tab_wp1f_top_hs6_PER}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest manufacturing HS6 products exported by Peru. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Peru, Mining and Fuels: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Peru, Mining and Fuels: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_PER_mining}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/mining/tab_wp1f_top_hs6_PER}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest mining and fuels HS6 products exported by Peru. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Peru, Other Goods: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Peru, Other Goods: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_PER_rest}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/rest/tab_wp1f_top_hs6_PER}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest HS6 products exported by Peru. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\section{Paraguay}\label{sec:c_PRY}
+
+\subsection{Parents and Destinations}
+% ---- Table: Paraguay: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Paraguay: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_PRY}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1c_byorigin_PRY}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's exports from Paraguay, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Paraguay: Foreign-Multinational Exports by Parent Country and Destination
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_heatmap_country_cellpct_PRY.pdf}%
+  \caption{Paraguay: Foreign-Multinational Exports by Parent Country and Destination}%
+  \label{fig:c_hm_PRY}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of the foreign-MNE export value of Paraguay in each parent country and destination pair; fifteen largest parent countries and destinations.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Figure: Paraguay: Share of Foreign-Multinational Exports Shipped to the Parent Country
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.85\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_home_share_by_parent_PRY.pdf}%
+  \caption{Paraguay: Share of Foreign-Multinational Exports Shipped to the Parent Country}%
+  \label{fig:c_home_PRY}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of each parent country's exports from Paraguay shipped to that same country; ten largest parent countries.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Paraguay, Agriculture: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Paraguay, Agriculture: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_PRY_agro}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/tab_wp1c_byorigin_PRY}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's agricultural exports from Paraguay, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Paraguay, Manufacturing: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Paraguay, Manufacturing: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_PRY_manufacturing}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/manufacturing/tab_wp1c_byorigin_PRY}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's manufacturing exports from Paraguay, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Paraguay, Mining and Fuels: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Paraguay, Mining and Fuels: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_PRY_mining}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/mining/tab_wp1c_byorigin_PRY}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's mining and fuels exports from Paraguay, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\subsection{Products}
+% ---- Table: Paraguay: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Paraguay: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_PRY}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1f_top_hs6_PRY}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest HS6 products exported by Paraguay. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Paraguay, Agriculture: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Paraguay, Agriculture: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_PRY_agro}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/tab_wp1f_top_hs6_PRY}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest agricultural HS6 products exported by Paraguay. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Paraguay, Manufacturing: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Paraguay, Manufacturing: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_PRY_manufacturing}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/manufacturing/tab_wp1f_top_hs6_PRY}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest manufacturing HS6 products exported by Paraguay. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Paraguay, Mining and Fuels: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Paraguay, Mining and Fuels: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_PRY_mining}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/mining/tab_wp1f_top_hs6_PRY}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest mining and fuels HS6 products exported by Paraguay. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\section{El Salvador}\label{sec:c_SLV}
+
+\subsection{Parents and Destinations}
+% ---- Table: El Salvador: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{El Salvador: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_SLV}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1c_byorigin_SLV}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's exports from El Salvador, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: El Salvador: Foreign-Multinational Exports by Parent Country and Destination
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_heatmap_country_cellpct_SLV.pdf}%
+  \caption{El Salvador: Foreign-Multinational Exports by Parent Country and Destination}%
+  \label{fig:c_hm_SLV}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of the foreign-MNE export value of El Salvador in each parent country and destination pair; fifteen largest parent countries and destinations.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Figure: El Salvador: Share of Foreign-Multinational Exports Shipped to the Parent Country
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.85\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_home_share_by_parent_SLV.pdf}%
+  \caption{El Salvador: Share of Foreign-Multinational Exports Shipped to the Parent Country}%
+  \label{fig:c_home_SLV}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of each parent country's exports from El Salvador shipped to that same country; ten largest parent countries.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: El Salvador, Agriculture: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{El Salvador, Agriculture: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_SLV_agro}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/tab_wp1c_byorigin_SLV}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's agricultural exports from El Salvador, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: El Salvador, Manufacturing: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{El Salvador, Manufacturing: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_SLV_manufacturing}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/manufacturing/tab_wp1c_byorigin_SLV}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's manufacturing exports from El Salvador, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: El Salvador, Mining and Fuels: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{El Salvador, Mining and Fuels: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_SLV_mining}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/mining/tab_wp1c_byorigin_SLV}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's mining and fuels exports from El Salvador, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: El Salvador, Other Goods: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{El Salvador, Other Goods: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_SLV_rest}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/rest/tab_wp1c_byorigin_SLV}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's exports from El Salvador, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\subsection{Products}
+% ---- Table: El Salvador: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{El Salvador: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_SLV}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1f_top_hs6_SLV}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest HS6 products exported by El Salvador. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: El Salvador, Agriculture: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{El Salvador, Agriculture: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_SLV_agro}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/tab_wp1f_top_hs6_SLV}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest agricultural HS6 products exported by El Salvador. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: El Salvador, Manufacturing: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{El Salvador, Manufacturing: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_SLV_manufacturing}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/manufacturing/tab_wp1f_top_hs6_SLV}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest manufacturing HS6 products exported by El Salvador. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: El Salvador, Mining and Fuels: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{El Salvador, Mining and Fuels: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_SLV_mining}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/mining/tab_wp1f_top_hs6_SLV}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest mining and fuels HS6 products exported by El Salvador. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: El Salvador, Other Goods: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{El Salvador, Other Goods: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_SLV_rest}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/rest/tab_wp1f_top_hs6_SLV}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest HS6 products exported by El Salvador. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\section{Uruguay}\label{sec:c_URY}
+
+\subsection{Parents and Destinations}
+% ---- Table: Uruguay: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Uruguay: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_URY}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1c_byorigin_URY}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's exports from Uruguay, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Uruguay: Foreign-Multinational Exports by Parent Country and Destination
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_heatmap_country_cellpct_URY.pdf}%
+  \caption{Uruguay: Foreign-Multinational Exports by Parent Country and Destination}%
+  \label{fig:c_hm_URY}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of the foreign-MNE export value of Uruguay in each parent country and destination pair; fifteen largest parent countries and destinations.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Figure: Uruguay: Share of Foreign-Multinational Exports Shipped to the Parent Country
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.85\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_home_share_by_parent_URY.pdf}%
+  \caption{Uruguay: Share of Foreign-Multinational Exports Shipped to the Parent Country}%
+  \label{fig:c_home_URY}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of each parent country's exports from Uruguay shipped to that same country; ten largest parent countries.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Uruguay, Agriculture: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Uruguay, Agriculture: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_URY_agro}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/tab_wp1c_byorigin_URY}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's agricultural exports from Uruguay, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Uruguay, Manufacturing: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Uruguay, Manufacturing: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_URY_manufacturing}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/manufacturing/tab_wp1c_byorigin_URY}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's manufacturing exports from Uruguay, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Uruguay, Mining and Fuels: Multinational Exports by Parent Region and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Uruguay, Mining and Fuels: Multinational Exports by Parent Region and Destination Region}%
+  \label{tab:c_reg_URY_mining}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/mining/tab_wp1c_byorigin_URY}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's mining and fuels exports from Uruguay, by destination region (rows add to 100). Last column: the group's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\subsection{Products}
+% ---- Table: Uruguay: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Uruguay: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_URY}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1f_top_hs6_URY}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest HS6 products exported by Uruguay. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Uruguay, Agriculture: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Uruguay, Agriculture: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_URY_agro}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/tab_wp1f_top_hs6_URY}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest agricultural HS6 products exported by Uruguay. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Uruguay, Manufacturing: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Uruguay, Manufacturing: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_URY_manufacturing}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/manufacturing/tab_wp1f_top_hs6_URY}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest manufacturing HS6 products exported by Uruguay. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Uruguay, Mining and Fuels: Fifteen Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Uruguay, Mining and Fuels: Fifteen Largest Export Products}%
+  \label{tab:c_hs6_URY_mining}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/mining/tab_wp1f_top_hs6_URY}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest mining and fuels HS6 products exported by Uruguay. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+\end{document}

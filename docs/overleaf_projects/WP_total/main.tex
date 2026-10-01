@@ -1,0 +1,1058 @@
+% Multinational Firms and Trade in Latin America -- WP_total (reference document: all goods)
+% Overleaf project exported 2026-09-24 from the build of 2026-09-23 (stylized_facts/python/wp_export_overleaf.py).
+% Compile with pdfLaTeX, the Overleaf default. Figures are in figures/<scope>/ and tables in tables/<scope>/,
+% where <scope> is the sample: all = all goods; agro, manufacturing, mining, rest = the sectors;
+% sectors = exhibits that compare the sectors. Each figure and table below starts with a '% ----' line.
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{mathptmx}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{graphicx,booktabs,amsmath,amssymb,adjustbox,float,caption,hyperref,xcolor,enumitem}
+\captionsetup{font=small,labelfont=bf,skip=4pt}
+\hypersetup{colorlinks,linkcolor=blue!50!black,urlcolor=blue!50!black}
+\setlength{\parskip}{4pt}
+\title{Multinational Firms and Trade in Latin America\\[4pt]\large Stylized Facts: All Tables and Figures, All Goods}
+\author{Ignacio Marra de Arti\~nano \and Gabriel Scattolo \and Sebasti\'an Vel\'asquez \and Christian Volpe Martincus}
+\date{September 2026}
+\begin{document}
+\maketitle
+\tableofcontents
+\clearpage
+
+\section*{Data}
+\addcontentsline{toc}{section}{Data}
+
+The data are the customs export records of nine Latin American countries at the firm, destination,
+HS6 product and year level, matched to the ownership records of Orbis and Dun \& Bradstreet. The
+years covered are Argentina 2011--2019, Chile 2009--2022, Colombia 2010--2021, Costa Rica
+2010--2019, the Dominican Republic 2012--2019, El Salvador 2006--2018, Paraguay 2012--2020, Peru
+2010--2019 and Uruguay 2010--2019.
+
+An exporter found in Orbis or Dun \& Bradstreet is a multinational affiliate (MNE). It is a
+\emph{domestic} MNE when its ultimate parent is located in the exporting country and a
+\emph{foreign} MNE otherwise; matched exporters without a recorded parent country (7.5 percent of
+foreign-MNE export value) are counted as foreign. Exporters not found in either database are
+\emph{local} firms. Sectors are defined on HS chapters: agriculture 01--24, mining and fuels
+25--27 and 71, manufacturing 28--97 excluding 71.
+
+\section{Fact 1: Multinationals Account for a Large Share of Exports}\label{sec:f1_all}
+% ---- Figure: Multinational Share of Export Value, by Exporting Country
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.8\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp0_fig1_origin.pdf}%
+  \caption{Multinational Share of Export Value, by Exporting Country}%
+  \label{fig:f1_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Shares of export value, all available years pooled. The figure at the end of each bar is the total MNE share.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Multinational Share of Export Value, by Exporting Country
+\begin{table}[H]\centering\small%
+  \caption{Multinational Share of Export Value, by Exporting Country}%
+  \label{tab:f1n_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp0_fig1_origin}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Shares of export value, all available years pooled. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\subsection{By Parent Country}
+% ---- Figure: Multinational Share of Export Value, by Exporting Country and Parent Country
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.92\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1a_origin_by_parent.pdf}%
+  \caption{Multinational Share of Export Value, by Exporting Country and Parent Country}%
+  \label{fig:f1p_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Shares of export value, all available years pooled. Foreign MNEs split by country of the ultimate parent; the ten largest parent countries are shown separately.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Multinational Share of Export Value, by Exporting Country and Parent Country
+\begin{table}[H]\centering\small%
+  \caption{Multinational Share of Export Value, by Exporting Country and Parent Country}%
+  \label{tab:f1pn_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1a_origin_by_parent}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Shares of export value, all available years pooled. Other: all remaining foreign parents. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Export Value by Exporting Country and Parent Country
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.9\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1a_origin_x_parent_heatmap.pdf}%
+  \caption{Export Value by Exporting Country and Parent Country}%
+  \label{fig:f1hm_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of each country's export value, by country of the ultimate parent of the exporter.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+
+\subsection{The United States}
+% ---- Figure: Exports by US-Parent Multinationals, by Exporting Country and Sector
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/sectors/fig_wp3_us_share_origin_sector.pdf}%
+  \caption{Exports by US-Parent Multinationals, by Exporting Country and Sector}%
+  \label{fig:us_ox_sector}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of each country's exports in each sector shipped by US-parent MNEs, to all destinations.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Exports by US-Parent Multinationals, by Exporting Country and Sector
+\begin{table}[H]\centering\small%
+  \caption{Exports by US-Parent Multinationals, by Exporting Country and Sector}%
+  \label{tab:us_ox_sector_t}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/sectors/tab_wp3_us_share_origin_sector}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Left panel: percent of each country's exports in the sector shipped by US-parent MNEs. Right panel: exports by US-parent MNEs. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Exports to the United States and Exports by US-Parent Multinationals
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.6\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp3_us_three_shares_total.pdf}%
+  \caption{Exports to the United States and Exports by US-Parent Multinationals}%
+  \label{fig:us3_total}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Shares of the total exports of the nine countries. The third bar is exports by US-parent MNEs shipped to the United States.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Figure: Exports to the United States and Exports by US-Parent Multinationals, by Exporting Country
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp3_us_three_shares_origin.pdf}%
+  \caption{Exports to the United States and Exports by US-Parent Multinationals, by Exporting Country}%
+  \label{fig:us3_origin}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Shares of each country's total exports.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Exports to the United States and Exports by US-Parent Multinationals, by Exporting Country
+\begin{table}[H]\centering\small%
+  \caption{Exports to the United States and Exports by US-Parent Multinationals, by Exporting Country}%
+  \label{tab:us3_tab}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp3_us_three_shares}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Columns (1)--(3): percent of each country's total exports. Column (4): percent of exports to the United States shipped by US-parent MNEs. Countries sorted by column (3). Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\section{Fact 2: Foreign Multinationals Specialize in Complex Products, Domestic Multinationals in Primary Goods}\label{sec:f2_all}
+
+\subsection{Product Complexity and Technology}
+% ---- Figure: Multinational Share of Export Value, by Product Complexity Quintile
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.78\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp0_fig2_pci.pdf}%
+  \caption{Multinational Share of Export Value, by Product Complexity Quintile}%
+  \label{fig:pci_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Shares of export value, all available years pooled. Quintiles of the Hausmann--Hidalgo Product Complexity Index across HS6 products (Q1 = least complex).\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Figure: Multinational Share of Export Value, by Technology Class
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.78\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp0_fig3_lall.pdf}%
+  \caption{Multinational Share of Export Value, by Technology Class}%
+  \label{fig:lall_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Shares of export value, all available years pooled. Lall (2000) technology classes: primary and resource-based products, and low-, medium- and high-technology manufactures.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+
+\subsection{By Parent Country}
+% ---- Figure: Multinational Share of Export Value, by Product Complexity Quintile and Parent Country
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.92\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1a_pci_by_parent.pdf}%
+  \caption{Multinational Share of Export Value, by Product Complexity Quintile and Parent Country}%
+  \label{fig:pci_p_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Shares of export value, all available years pooled. Foreign MNEs split by country of the ultimate parent. Quintiles of the Hausmann--Hidalgo Product Complexity Index across HS6 products (Q1 = least complex).\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Multinational Share of Export Value, by Product Complexity Quintile and Parent Country
+\begin{table}[H]\centering\small%
+  \caption{Multinational Share of Export Value, by Product Complexity Quintile and Parent Country}%
+  \label{tab:pci_pn_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1a_pci_by_parent}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Shares of export value, all available years pooled. Other: all remaining foreign parents. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Multinational Share of Export Value, by Technology Class and Parent Country
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.92\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1a_lall_by_parent.pdf}%
+  \caption{Multinational Share of Export Value, by Technology Class and Parent Country}%
+  \label{fig:lall_p_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Shares of export value, all available years pooled. Foreign MNEs split by country of the ultimate parent. Lall (2000) technology classes: primary and resource-based products, and low-, medium- and high-technology manufactures.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Multinational Share of Export Value, by Technology Class and Parent Country
+\begin{table}[H]\centering\small%
+  \caption{Multinational Share of Export Value, by Technology Class and Parent Country}%
+  \label{tab:lall_pn_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1a_lall_by_parent}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Shares of export value, all available years pooled. Other: all remaining foreign parents. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Multinational Share of Export Value, by Product Sophistication and Location of the Parent
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1a_pci_lall_by_oecd.pdf}%
+  \caption{Multinational Share of Export Value, by Product Sophistication and Location of the Parent}%
+  \label{fig:oecd_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Shares of export value, all available years pooled. Foreign MNEs are split by whether the ultimate parent is in an OECD member country. Panel A: Quintiles of the Hausmann--Hidalgo Product Complexity Index across HS6 products (Q1 = least complex). Panel B: Lall (2000) technology classes: primary and resource-based products, and low-, medium- and high-technology manufactures.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+
+\subsection{Other Measures of Product Sophistication}
+% ---- Figure: Multinational Share of Export Value, by Quintile of Six Sophistication Measures
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1b_panel_quintiles.pdf}%
+  \caption{Multinational Share of Export Value, by Quintile of Six Sophistication Measures}%
+  \label{fig:six_q_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Shares of export value, all available years pooled. Quintiles computed over HS6 products. The six measures are the Product Complexity Index, the absolute import-demand elasticity of Fontagn\'e, Guimbard and Orefice (2022), the elasticity of substitution of Broda and Weinstein, upstreamness, the quality ladder and the revealed human-capital intensity of UNCTAD.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Figure: Multinational Share of Export Value, by Quintile of the Import-Demand Elasticity
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.78\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1b_sigma_fgo_abs_quintile.pdf}%
+  \caption{Multinational Share of Export Value, by Quintile of the Import-Demand Elasticity}%
+  \label{fig:fgo_q_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Shares of export value, all available years pooled. Quintiles of the absolute import-demand elasticity of Fontagn\'e, Guimbard and Orefice (2022) across HS6 products; higher quintiles are more substitutable products.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Figure: Distribution of Export Value across Six Sophistication Measures
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1b_panel_hist.pdf}%
+  \caption{Distribution of Export Value across Six Sophistication Measures}%
+  \label{fig:six_h_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Bars: export value in each bin, by type of exporter. Line (right axis): foreign-MNE share of each bin. The six measures are the Product Complexity Index, the absolute import-demand elasticity of Fontagn\'e, Guimbard and Orefice (2022), the elasticity of substitution of Broda and Weinstein, upstreamness, the quality ladder and the revealed human-capital intensity of UNCTAD.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Figure: Distribution of Export Value across the Import-Demand Elasticity
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1b_hist_sigma_fgo_abs.pdf}%
+  \caption{Distribution of Export Value across the Import-Demand Elasticity}%
+  \label{fig:fgo_h_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Left: export value in each bin, by type of exporter, and the foreign-MNE share of each bin. Right: number of HS6 products in each bin.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Figure: Distribution of Export Value across the Product Complexity Index
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1b_hist_complexity.pdf}%
+  \caption{Distribution of Export Value across the Product Complexity Index}%
+  \label{fig:pci_h_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Left: export value in each bin, by type of exporter, and the foreign-MNE share of each bin. Right: number of HS6 products in each bin.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Multinational Share of Export Value, by Quintile of Six Sophistication Measures
+\begin{table}[H]\centering\small%
+  \caption{Multinational Share of Export Value, by Quintile of Six Sophistication Measures}%
+  \label{tab:six_t_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1b_quintile_shares}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Shares of export value, all available years pooled. Quintiles computed over HS6 products. --: fewer than 30 HS6 products carry the measure.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Correlations between Sophistication Measures
+\begin{table}[H]\centering\small%
+  \caption{Correlations between Sophistication Measures}%
+  \label{tab:corr_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1b_measure_corr}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Correlations across HS6 products, weighted by export value.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\subsection{Rauch Classes and End Use}
+% ---- Table: Multinational Share of Export Value, by Rauch Product Class
+\begin{table}[H]\centering\small%
+  \caption{Multinational Share of Export Value, by Rauch Product Class}%
+  \label{tab:rauch_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1b_rauch}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Shares of export value, all available years pooled. Rauch (1999) conservative classification: homogeneous goods are traded on organized exchanges, reference-priced goods have a price quoted in trade publications, and differentiated goods have neither. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Multinational Share of Export Value, by Rauch Product Class
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.7\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1b_rauch.pdf}%
+  \caption{Multinational Share of Export Value, by Rauch Product Class}%
+  \label{fig:rauch_f_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Shares of export value, all available years pooled. Rauch (1999) conservative classification: homogeneous goods are traded on organized exchanges, reference-priced goods have a price quoted in trade publications, and differentiated goods have neither.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Multinational Share of Export Value: Differentiated and Other Products
+\begin{table}[H]\centering\small%
+  \caption{Multinational Share of Export Value: Differentiated and Other Products}%
+  \label{tab:rauch2_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1b_rauch2}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Shares of export value, all available years pooled. Rauch (1999) conservative classification; other products are reference-priced and homogeneous goods. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Multinational Share of Export Value: Differentiated and Other Products
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.7\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1b_rauch2.pdf}%
+  \caption{Multinational Share of Export Value: Differentiated and Other Products}%
+  \label{fig:rauch2_f_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Shares of export value, all available years pooled. Rauch (1999) conservative classification; other products are reference-priced and homogeneous goods.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Multinational Share of Export Value, by End Use
+\begin{table}[H]\centering\small%
+  \caption{Multinational Share of Export Value, by End Use}%
+  \label{tab:bec_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1b_bec}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Shares of export value, all available years pooled. End use from BEC Rev.\,4; HS6 products without a BEC correspondence are excluded. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\subsection{Regressions}
+% ---- Table: Product Characteristics and Multinational Shares
+\begin{table}[H]\centering\small%
+  \caption{Product Characteristics and Multinational Shares}%
+  \label{tab:fgo_r_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/reg_wp1b_odpy_fgo}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Observations are origin--destination--HS6--year cells. Dependent variable: share of the cell's export value shipped by each type of MNE. The import-demand elasticity is standardized (mean 0, standard deviation 1). Regressions weighted by the cell's export value. Robust standard errors in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Product Sophistication and Multinational Shares
+\begin{table}[H]\centering\footnotesize%
+  \caption{Product Sophistication and Multinational Shares}%
+  \label{tab:meas_r_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/reg_wp1b_odpy_measures}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Observations are origin--destination--HS6--year cells. Dependent variable: share of the cell's export value shipped by each type of MNE. Omitted categories: primary and resource-based products (Lall) and homogeneous products (Rauch). Robust standard errors in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\section{Fact 3: Multinationals from a Small Set of Countries Dominate Exports}\label{sec:f3_all}
+
+\subsection{Parent Countries}
+% ---- Figure: Foreign-Multinational Exports, by Parent Country
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.78\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1a_parent_share.pdf}%
+  \caption{Foreign-Multinational Exports, by Parent Country}%
+  \label{fig:f4_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of foreign-MNE export value, by country of the ultimate parent.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Foreign-Multinational Exports, by Parent Country
+\begin{table}[H]\centering\small%
+  \caption{Foreign-Multinational Exports, by Parent Country}%
+  \label{tab:f4n_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1a_parent_share}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of foreign-MNE export value, by country of the ultimate parent. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Share of Total Exports, by Parent Country
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.85\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1a_parent_share_total.pdf}%
+  \caption{Share of Total Exports, by Parent Country}%
+  \label{fig:f4t_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of total export value shipped by foreign MNEs of each parent country, other foreign MNEs and domestic MNEs; the remainder is local firms.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Share of Total Exports, by Parent Country
+\begin{table}[H]\centering\small%
+  \caption{Share of Total Exports, by Parent Country}%
+  \label{tab:f4tn_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1a_parent_share_total}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of total export value, by type of exporter and parent country.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\subsection{Parent Region and Destination Region}
+% ---- Table: Multinational Exports by Parent Region and Destination Region: Export Value
+\begin{table}[H]\centering\small%
+  \caption{Multinational Exports by Parent Region and Destination Region: Export Value}%
+  \label{tab:reg_value_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1c_region_value}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Values are annual averages in US\$ billion. Rows: region of the ultimate parent; columns: destination region.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Multinational Exports by Parent Region and Destination Region: Row Percentages
+\begin{table}[H]\centering\small%
+  \caption{Multinational Exports by Parent Region and Destination Region: Row Percentages}%
+  \label{tab:reg_rowpct_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1c_region_rowpct}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each group's exports, by destination region (rows add to 100). Domestic MNEs and local firms are shown for comparison.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Multinational Exports by Parent Region and Destination Region: Column Percentages
+\begin{table}[H]\centering\small%
+  \caption{Multinational Exports by Parent Region and Destination Region: Column Percentages}%
+  \label{tab:reg_colpct_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1c_region_colpct}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of the exports reaching each destination region, by parent region (columns add to 100).\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Multinational Exports by Parent Region and Destination Region
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.9\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_heatmap_region_rowpct.pdf}%
+  \caption{Multinational Exports by Parent Region and Destination Region}%
+  \label{fig:reg_hm_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of each group's exports, by destination region (rows add to 100).\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Foreign-Multinational Exports by Exporting Country and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Foreign-Multinational Exports by Exporting Country and Destination Region}%
+  \label{tab:odr_f_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1c_origin_x_destregion_foreign}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each country's foreign-MNE exports, by destination region (rows add to 100). Last column: foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Local-Firm Exports by Exporting Country and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Local-Firm Exports by Exporting Country and Destination Region}%
+  \label{tab:odr_l_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1c_origin_x_destregion_local}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each country's exports by local firms, by destination region (rows add to 100). Last column: local-firm exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\subsection{Parent Country and Destination Country}
+% ---- Table: Foreign-Multinational Exports by Parent Country and Destination: Export Value
+\begin{table}[H]\centering\small%
+  \caption{Foreign-Multinational Exports by Parent Country and Destination: Export Value}%
+  \label{tab:cty_value_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1c_country_value}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Values are annual averages in US\$ billion. Ten largest parent countries and ten largest destinations by foreign-MNE export value.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Foreign-Multinational Exports by Parent Country and Destination: Row Percentages
+\begin{table}[H]\centering\small%
+  \caption{Foreign-Multinational Exports by Parent Country and Destination: Row Percentages}%
+  \label{tab:cty_rowpct_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1c_country_rowpct}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each parent country's exports, by destination (rows add to 100). Ten largest parent countries and destinations.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Foreign-Multinational Exports by Parent Country and Destination: Column Percentages
+\begin{table}[H]\centering\small%
+  \caption{Foreign-Multinational Exports by Parent Country and Destination: Column Percentages}%
+  \label{tab:cty_colpct_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1c_country_colpct}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of the foreign-MNE exports reaching each destination, by parent country (columns add to 100). Ten largest parent countries and destinations.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Destination of Foreign-Multinational Exports: Fifteen Largest Parent Countries and Destinations
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_heatmap_country_rowpct.pdf}%
+  \caption{Destination of Foreign-Multinational Exports: Fifteen Largest Parent Countries and Destinations}%
+  \label{fig:hm_row_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of each parent country's exports going to each destination (rows add to 100 including other destinations).\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Figure: Foreign-Multinational Exports by Parent Country and Destination: Share of the Total
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_heatmap_country_cellpct.pdf}%
+  \caption{Foreign-Multinational Exports by Parent Country and Destination: Share of the Total}%
+  \label{fig:hm_cell_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of all foreign-MNE export value in each parent country and destination pair; fifteen largest parent countries and destinations.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+
+\subsection{Exports to the Parent Country}
+% ---- Figure: Share of Foreign-Multinational Exports Shipped to the Parent Country
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.85\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_home_share_by_parent.pdf}%
+  \caption{Share of Foreign-Multinational Exports Shipped to the Parent Country}%
+  \label{fig:home_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of each parent country's exports shipped to that same country.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Foreign-Multinational Exports to the Parent Countries, by Parent Country
+\begin{table}[H]\centering\small%
+  \caption{Foreign-Multinational Exports to the Parent Countries, by Parent Country}%
+  \label{tab:pxp_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1c_parent_x_parentdest_rowpct}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each parent country's exports, by destination (rows add to 100). Destinations are the ten largest parent countries; the diagonal is the share shipped to the parent's own country.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Share of Foreign-Multinational Exports Shipped to the Parent Jurisdiction, Consolidated Parents
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.85\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_home_share_by_parent_consolidated.pdf}%
+  \caption{Share of Foreign-Multinational Exports Shipped to the Parent Jurisdiction, Consolidated Parents}%
+  \label{fig:homec_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of each parent's exports shipped to its own jurisdiction. Dependencies are assigned to their sovereign state and tax havens and conduit jurisdictions are pooled.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Share of Foreign-Multinational Exports Shipped to the Parent Jurisdiction, Consolidated Parents
+\begin{table}[H]\centering\small%
+  \caption{Share of Foreign-Multinational Exports Shipped to the Parent Jurisdiction, Consolidated Parents}%
+  \label{tab:homec_t_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1d_home_share_by_parent_consolidated}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Home share: percent of the parent's exports shipped to its own jurisdiction. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Share of Foreign-Multinational Exports Shipped to the Parent Jurisdiction
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1d_home_share_haven_panels.pdf}%
+  \caption{Share of Foreign-Multinational Exports Shipped to the Parent Jurisdiction}%
+  \label{fig:homeh_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of each parent jurisdiction's exports shipped to that same jurisdiction. Panel A: largest parent countries, excluding tax havens; dependencies are assigned to their sovereign state. Panel B: largest tax-haven and conduit jurisdictions.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Share of Foreign-Multinational Exports Shipped to the Parent Jurisdiction
+\begin{table}[H]\centering\small%
+  \caption{Share of Foreign-Multinational Exports Shipped to the Parent Jurisdiction}%
+  \label{tab:homeh_t_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1d_home_share_haven_panels}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Home share: percent of the parent's exports shipped to its own jurisdiction. Panel A: largest parent countries, excluding tax havens. Panel B: largest tax-haven and conduit jurisdictions. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Share of Foreign-Multinational Exports Shipped to the Parent Country, by Sector
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.95\textwidth,height=0.8\textheight,keepaspectratio]{figures/sectors/fig_wp3_home_share_by_parent_sectors.pdf}%
+  \caption{Share of Foreign-Multinational Exports Shipped to the Parent Country, by Sector}%
+  \label{fig:home_sectors}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of each parent country's exports shipped to that same country, by sector. Hatched bars: the parent country's exports in the sector are below US\$1 billion over the period.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Share of Foreign-Multinational Exports Shipped to the Parent Country, by Sector
+\begin{table}[H]\centering\footnotesize%
+  \caption{Share of Foreign-Multinational Exports Shipped to the Parent Country, by Sector}%
+  \label{tab:home_sectors_t}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/sectors/tab_wp3_home_share_by_parent_sectors}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Left panel: percent of each parent country's exports shipped to that same country. Right panel: the parent country's exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\subsection{Destination Markets}
+% ---- Figure: Exports to the United States, by Type of Exporter and Exporting Country
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/sectors/fig_wp3_to_usa_carriers_total_manuf.pdf}%
+  \caption{Exports to the United States, by Type of Exporter and Exporting Country}%
+  \label{fig:to_usa_tm}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of each country's exports to the United States, by type of exporter. Left: all goods. Right: manufacturing.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Exports to the United States, by Type of Exporter and Sector
+\begin{table}[H]\centering\small%
+  \caption{Exports to the United States, by Type of Exporter and Sector}%
+  \label{tab:to_usa_sec}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/sectors/tab_wp3_to_usa_carriers_by_sector}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each sector's exports to the United States, by type of exporter. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Exports to the United States, by Type of Exporter and Exporting Country
+\begin{table}[H]\centering\small%
+  \caption{Exports to the United States, by Type of Exporter and Exporting Country}%
+  \label{tab:to_usa_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp3_to_usa_carriers}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each country's exports to the United States, by type of exporter. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Ownership of Exports to the Main Destination Markets
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.95\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp3_dest_carriers.pdf}%
+  \caption{Ownership of Exports to the Main Destination Markets}%
+  \label{fig:dest_f_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of the export value reaching each destination, by type of exporter. The first segment is exports by MNEs whose parent is located in that destination. EU-27 member states are pooled.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Ownership of Exports to the Main Destination Markets
+\begin{table}[H]\centering\footnotesize%
+  \caption{Ownership of Exports to the Main Destination Markets}%
+  \label{tab:dest_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp3_dest_carriers}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of the export value reaching each destination, by type of exporter. EU-27 member states are pooled. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Main Products Shipped by US-Parent Multinationals to the United States
+\begin{table}[H]\centering\footnotesize%
+  \caption{Main Products Shipped by US-Parent Multinationals to the United States}%
+  \label{tab:us_home_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp3_us_home_products}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen HS6 products with the largest exports by US-parent MNEs to the United States. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: US-Parent Share of Exports to the United States, Main Products Shipped by US-Parent Multinationals
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.95\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp3_us_home_products.pdf}%
+  \caption{US-Parent Share of Exports to the United States, Main Products Shipped by US-Parent Multinationals}%
+  \label{fig:us_home_f_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of the nine countries' exports of each product to the United States shipped by US-parent MNEs; the fifteen products with the largest US-parent exports to the United States.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Largest Export Products to the United States, by Type of Exporter
+\begin{table}[H]\centering\footnotesize%
+  \caption{Largest Export Products to the United States, by Type of Exporter}%
+  \label{tab:to_usa_prod_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp3_to_usa_top_products}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Fifteen largest HS6 products exported to the United States; percent of each product's exports to the United States by type of exporter. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\section{Fact 4: A Small Set of Large Multinational Groups Accounts for Most Exports}\label{sec:f4s_all}
+
+\subsection{Size of the Group's Global Network}
+% ---- Figure: Foreign-Multinational Exports and Number of Parents, by Size of the Group's Global Network
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.7\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp0_fig5_network.pdf}%
+  \caption{Foreign-Multinational Exports and Number of Parents, by Size of the Group's Global Network}%
+  \label{fig:net_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Shares of foreign-MNE export value and of parents, by the number of affiliates the group has worldwide.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Foreign-Multinational Exports and Number of Parents, by Size of the Group's Global Network
+\begin{table}[H]\centering\small%
+  \caption{Foreign-Multinational Exports and Number of Parents, by Size of the Group's Global Network}%
+  \label{tab:net_t_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp0_fig5_network}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Number and share of parents, and share of foreign-MNE export value, by the number of affiliates the group has worldwide.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\subsection{Concentration within Products}
+% ---- Figure: Export Concentration within Products: Firms and Groups
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.9\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp0_fig6_hhi.pdf}%
+  \caption{Export Concentration within Products: Firms and Groups}%
+  \label{fig:hhi_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Mean Herfindahl index of exporters within each HS6 product, weighted by export value, counting each affiliate separately or grouping affiliates by parent within or across countries. Right panel: products where MNEs account for at least half of exports.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Export Concentration within Products: Firms and Groups
+\begin{table}[H]\centering\small%
+  \caption{Export Concentration within Products: Firms and Groups}%
+  \label{tab:hhi_t_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp0_fig6_hhi}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Means across HS6 products, weighted by export value. Firm level: each affiliate counted separately. Groups: affiliates grouped by ultimate parent within each exporting country or across countries.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\subsection{Groups and Affiliates}
+% ---- Table: Multinational Affiliates and Groups in Origin--Destination--Product--Year Cells
+\begin{table}[H]\centering\small%
+  \caption{Multinational Affiliates and Groups in Origin--Destination--Product--Year Cells}%
+  \label{tab:grp_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1e_groups_vs_affiliates}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Cells with at least one MNE. Group: ultimate parent in Orbis or Dun \& Bradstreet (parent name when the identifier is missing).\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Multinational Presence and Exports: Affiliates and Groups
+\begin{table}[H]\centering\small%
+  \caption{Multinational Presence and Exports: Affiliates and Groups}%
+  \label{tab:grp_r_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/reg_wp1e_groups}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Observations are origin--destination--HS6--year cells. Dependent variable: $\ln$ exports of the cell (Panel A) and of the non-MNE firms in the cell (Panel B). Regressors: $\ln$ number of MNE affiliates or $\ln$ number of MNE groups (distinct ultimate parents). Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\section{Fact 5: Multinational Presence Is Associated with Higher Exports}\label{sec:f5_all}
+% ---- Table: Multinational Presence and Exports
+\begin{table}[H]\centering\small%
+  \caption{Multinational Presence and Exports}%
+  \label{tab:t1_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/reg_wp0_table1_repro}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Observations are origin--destination--HS6--year cells. Dependent variable: $\ln$ exports of the cell (Panel A) and of the non-MNE firms in the cell (Panel B). Intensive margin: $\ln$ number of MNEs, cells with at least one MNE. Extensive margin: indicator for at least one MNE. Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Multinational Exports by Exporting Country and Destination Type
+\begin{table}[H]\centering\small%
+  \caption{Multinational Exports by Exporting Country and Destination Type}%
+  \label{tab:pres_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1e_presence_shares}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} MNE and foreign-MNE export value by country, and the split of foreign-MNE value by destination. Parent country: exports to the country of the ultimate parent. Other: all remaining destinations; in parentheses, destinations where the group has another affiliate. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Multinational Presence and Exports: Intensive Margin, by Type of Multinational
+\begin{table}[H]\centering\small%
+  \caption{Multinational Presence and Exports: Intensive Margin, by Type of Multinational}%
+  \label{tab:cnt_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/reg_wp1e_counts}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Observations are origin--destination--HS6--year cells. Dependent variable: $\ln$ exports of the cell (Panel A) and of the non-MNE firms in the cell (Panel B). Regressors: $\ln$ number of MNEs of each type. Columns (5)--(6) split foreign MNEs by whether the destination is the parent's country. Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Multinational Presence and Exports: Extensive Margin, by Type of Multinational
+\begin{table}[H]\centering\small%
+  \caption{Multinational Presence and Exports: Extensive Margin, by Type of Multinational}%
+  \label{tab:ext_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/reg_wp1e_extensive}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Observations are origin--destination--HS6--year cells. Dependent variable: $\ln$ exports of the cell (Panel A) and of the non-MNE firms in the cell (Panel B). Regressors: indicators for at least one MNE of each type. Columns (5)--(6) split foreign MNEs by whether the destination is the parent's country. Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Multinational Presence and Exports by Sector: Intensive Margin
+\begin{table}[H]\centering\small%
+  \caption{Multinational Presence and Exports by Sector: Intensive Margin}%
+  \label{tab:f5sum}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/sectors/tab_wp3_fact5_summary}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Observations are origin--destination--HS6--year cells. Dependent variable: $\ln$ exports of the cell (Panel A) and of the non-MNE firms in the cell (Panel B). Specification of columns (3)--(4) of Table~\ref{tab:cnt_all}, estimated by sector. Blank: too few observations. Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\section{Fact 6: Distance Is a Weaker Barrier for Multinationals}\label{sec:f6_all}
+% ---- Table: Distance and Firm Exports: Multinationals by Presence at the Destination
+\begin{table}[H]\centering\small%
+  \caption{Distance and Firm Exports: Multinationals by Presence at the Destination}%
+  \label{tab:t2_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/reg_wp0_table2_repro}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Observations are firm--destination--HS6--year cells. Dependent variable: $\ln$ exports. Non-MNE firms are the omitted group. Present: the group has an affiliate in the destination or the destination is the parent's country. Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Distance and Firm Exports: Foreign and Domestic Multinationals
+\begin{table}[H]\centering\small%
+  \caption{Distance and Firm Exports: Foreign and Domestic Multinationals}%
+  \label{tab:dist_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/reg_wp1e_distance_hq}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Observations are firm--destination--HS6--year cells. Dependent variable: $\ln$ exports. Non-MNE firms are the omitted group. Columns (3)--(4) split foreign MNEs by whether the destination is the parent's country. Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Distance and Firm Exports, by Sector
+\begin{table}[H]\centering\small%
+  \caption{Distance and Firm Exports, by Sector}%
+  \label{tab:f6sum}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/sectors/tab_wp3_fact6_summary}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Observations are firm--destination--HS6--year cells. Dependent variable: $\ln$ exports. Specification of columns (1)--(2) of Table~\ref{tab:dist_all}, estimated by sector. Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\section{Products}\label{sec:hs6_all}
+% ---- Figure: Ownership of the Twenty Largest Export Products
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1f_top20_hs6_stacked.pdf}%
+  \caption{Ownership of the Twenty Largest Export Products}%
+  \label{fig:hs_st_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Shares of each product's export value. Twenty largest HS6 products by export value.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Figure: Ownership of the Twenty Largest Export Products, by Parent Country
+\begin{figure}[H]\centering%
+  \includegraphics[width=1.0\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1f_top20_hs6_by_parent.pdf}%
+  \caption{Ownership of the Twenty Largest Export Products, by Parent Country}%
+  \label{fig:hs_par_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Shares of each product's export value. Foreign-MNE share split by country of the ultimate parent; the unfilled part of each bar is local firms.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Figure: Distribution of Export Value by Product-Level Foreign-Multinational Share
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.85\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1f_foreign_share_distribution.pdf}%
+  \caption{Distribution of Export Value by Product-Level Foreign-Multinational Share}%
+  \label{fig:hs_dist_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Share of export value and MNE share of exporting firms, by the foreign-MNE share of each HS6 product's export value.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Distribution of Export Value by Product-Level Foreign-Multinational Share
+\begin{table}[H]\centering\small%
+  \caption{Distribution of Export Value by Product-Level Foreign-Multinational Share}%
+  \label{tab:hs_dist_t_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1f_foreign_share_distribution}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Share of export value and MNE share of exporting firms, by the foreign-MNE share of each HS6 product's export value. MNE share of exporting firms: MNE firm--destination--product--year observations over all observations in the bin.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Concentration of Exports across Products
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.6\textwidth,height=0.8\textheight,keepaspectratio]{figures/all/fig_wp1f_lorenz_foreign.pdf}%
+  \caption{Concentration of Exports across Products}%
+  \label{fig:hs_lor_all}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Cumulative share of export value against the cumulative share of HS6 products, ranked by value, for foreign-MNE exports and for all exports.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Exports and Multinational Shares, by HS Section
+\begin{table}[H]\centering\footnotesize%
+  \caption{Exports and Multinational Shares, by HS Section}%
+  \label{tab:hs_sec_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1f_hs_sections}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Foreign, domestic and local: percent of each section's export value. Leading parent: largest parent country and its share of the section's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Thirty Largest Export Products
+\begin{table}[H]\centering\footnotesize%
+  \caption{Thirty Largest Export Products}%
+  \label{tab:hs_by_value_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1f_top_hs6_by_value}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Thirty largest HS6 products by export value. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Thirty Largest Export Products of Foreign Multinationals
+\begin{table}[H]\centering\footnotesize%
+  \caption{Thirty Largest Export Products of Foreign Multinationals}%
+  \label{tab:hs_by_foreign_value_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1f_top_hs6_by_foreign_value}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Thirty largest HS6 products by foreign-MNE export value. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Products with the Highest Foreign-Multinational Share
+\begin{table}[H]\centering\footnotesize%
+  \caption{Products with the Highest Foreign-Multinational Share}%
+  \label{tab:hs_by_foreign_share_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1f_top_hs6_by_foreign_share}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} HS6 products with exports of at least US\$500 million over the period, ranked by foreign-MNE share. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Products with the Highest Domestic-Multinational Share
+\begin{table}[H]\centering\footnotesize%
+  \caption{Products with the Highest Domestic-Multinational Share}%
+  \label{tab:hs_by_domestic_share_all}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/all/tab_wp1f_top_hs6_by_domestic_share}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} HS6 products with exports of at least US\$500 million over the period, ranked by domestic-MNE share. Foreign, domestic and local: percent of the product's export value. Leading parent: largest parent country and its share of the product's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+
+\section{Sectors}\label{sec:sectors}
+% ---- Table: Exports and Multinational Shares, by Sector
+\begin{table}[H]\centering\small%
+  \caption{Exports and Multinational Shares, by Sector}%
+  \label{tab:four}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/sectors/tab_wp2_four_sectors}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Foreign and domestic: percent of the sector's export value. Other goods: HS 98--99 and unclassified codes. Leading parents: the three largest parent countries and their share of the row's foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Multinational Share of Export Value, by Sector
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.8\textwidth,height=0.8\textheight,keepaspectratio]{figures/sectors/fig_wp2_four_sectors.pdf}%
+  \caption{Multinational Share of Export Value, by Sector}%
+  \label{fig:four_f}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Shares of export value, all available years pooled. Agriculture: HS 01--24. Mining and fuels: HS 25--27 and 71. Manufacturing: HS 28--97 excluding 71.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Figure: Foreign-Multinational Share of Export Value, by Exporting Country and Sector
+\begin{figure}[H]\centering%
+  \includegraphics[width=0.8\textwidth,height=0.8\textheight,keepaspectratio]{figures/sectors/fig_wp2_origin_x_sector.pdf}%
+  \caption{Foreign-Multinational Share of Export Value, by Exporting Country and Sector}%
+  \label{fig:ox_f}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of each country's export value in each sector shipped by foreign MNEs.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}%
+  \end{figure}
+% ---- Table: Exports by Exporting Country and Sector
+\begin{table}[H]\centering\small%
+  \caption{Exports by Exporting Country and Sector}%
+  \label{tab:ox_t}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/sectors/tab_wp2_origin_x_sector}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Panel A: composition of each country's exports by sector (rows add to 100). Panel B: percent of each cell's export value shipped by foreign MNEs.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Industry of Matched Exporting Affiliates
+\begin{table}[H]\centering\small%
+  \caption{Industry of Matched Exporting Affiliates}%
+  \label{tab:services}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/sectors/memo_wp2_services}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of matched export value, by NAICS sector of the exporting affiliate. Services are not observed in customs records; the table shows how much of goods exports is shipped by affiliates classified in service industries.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+% ---- Table: Foreign-Multinational Exports by Sector and Destination Region
+\begin{table}[H]\centering\small%
+  \caption{Foreign-Multinational Exports by Sector and Destination Region}%
+  \label{tab:sdr}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/sectors/tab_wp2_sector_x_destregion_foreign}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of each sector's foreign-MNE exports, by destination region (rows add to 100). Last column: foreign-MNE exports. Values are annual averages in US\$ billion.\\[3pt]%
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.%
+  \end{minipage}%
+  \end{table}
+\end{document}

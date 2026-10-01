@@ -92,6 +92,20 @@ python/wp_build_overleaf.py          assembles SIX Overleaf projects (output/wp/
                                      `paperagro` = the agriculture-only companion (HS 01-24, region-wide). NO US section,
                                                    no three-share / to-USA / US-home-products exhibits; parent x
                                                    destination tables moved to the appendix. Keep it that way.
+python/wp_agro_paper.py             exhibits for the restructured agriculture paper (2026-10-01): coverage by country, sample
+                                     summary in annual averages, exporters by type of owner, exports by owner 2012-2018,
+                                     destination regions, Figure 1 with a LAC9 bar, parent countries split into regular
+                                     countries and tax havens -> output/wp/agro/{Graphs,Tables}/*agp*
+python/wp_common.legend_below        every saved figure gets its legend under the plot, centred, in the fewest rows that fit
+                                     (2026-10-01); set fig._keep_legend = True to opt out. WP_SCOPES=agro limits the scope loops.
+python/wp_agro_refresh_overleaf.py  re-copies every exhibit the hand-edited WP_paperagro/main.tex uses from a wp output
+                                     folder (default output/wp_2012_2018/agro), relabelled; never touches main.tex.
+                                     Year window for any wp_* script: set WP_YEARS=2012-2018 (wp_common.YEAR_WINDOW;
+                                     outputs go to output/wp_2012_2018/).
+python/wp_export_overleaf.py         copies each build into an editable Overleaf project, docs/overleaf_projects/WP_<name>/
+                                     (main.tex with one line per float element and a "% ----" title comment;
+                                     figures/<scope>/, tables/<scope>/, only the files used) + WP_<name>.zip.
+                                     Same PDF as the build. Refuses to overwrite a hand-edited folder without --force.
 ```
 
 Outputs: `output/wp/<scope>/{Graphs,Tables,Regressions}/` with scope ∈ {all, agro, mining,
