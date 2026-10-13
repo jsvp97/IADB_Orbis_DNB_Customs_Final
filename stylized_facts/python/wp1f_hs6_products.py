@@ -106,7 +106,8 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
         write_hs6_table(go.sort_values("total_value", ascending=False).head(15), T / f"tab_wp1f_top_hs6_{o}.tex", f"Top 15 HS6 products exported by {o}.")
 
     # figure: top 20 by value, stacked local / domestic / foreign -------------------------------------
-    t20 = g.sort_values("total_value", ascending=False).head(20).iloc[::-1]
+    t20 = g.sort_values("total_value", ascending=False).head(20)
+    t20 = t20.assign(_mne=t20["sh_ext"] + t20["sh_dom"]).sort_values("_mne")   # 2026-10-13: largest MNE share at the top
     labels = [f"{r['hs07_6d']} {short(r['hs6_desc'], 40)}" for _, r in t20.iterrows()]
     y = np.arange(len(t20))
     fig, ax = plt.subplots(figsize=(9, 9.5))

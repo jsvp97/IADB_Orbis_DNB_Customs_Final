@@ -172,6 +172,10 @@ def parent_x_parentdest(ext: pd.DataFrame, top_p: list, T: Path, note: str) -> N
     W.write_matrix_tex(100 * mat.div(mat.sum(axis=1), axis=0), T / "tab_wp1c_parent_x_parentdest_rowpct.tex", fmt="{:.1f}",
                        corner="Parent / Destination", row_total=pd.Series(100.0, index=mat.index),
                        note="Row percentages: destination mix of each parent's exports, with the ten parent countries themselves as the destination columns, so the diagonal is the share shipped to the parent's own country. " + note)
+    # 2026-10-13: the complementary table, columns add to 100 (who supplies each destination)
+    W.write_matrix_tex(100 * mat.div(mat.sum(axis=0), axis=1), T / "tab_wp1c_parent_x_parentdest_colpct.tex", fmt="{:.1f}",
+                       corner="Parent / Destination", col_total=pd.Series(100.0, index=mat.columns),
+                       note="Column percentages: parent-country mix of the foreign-MNE exports going to each destination. " + note)
 
 
 def run_scope(cube: pd.DataFrame, scope: str) -> None:

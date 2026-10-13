@@ -8,6 +8,9 @@ replaces only its exhibit files: every table and figure that main.tex uses is co
 (fragment note removed, internal labels replaced by D2_RELABEL) plus the paper's own label edits below.
 main.tex is never touched.
 
+2026-10-13: exhibits under tables/agro2018/ and figures/agro2018/ come from output/wp_2018_2018/agro (the 2018-only
+run: WP_YEARS=2018-2018 WP_SCOPES=agro python wp_run_all.py 0 1a 1cd 2 1f, then wp_agro_paper.py).
+
     WP_YEARS=2012-2018 python wp_run_all.py 0 1a 1b 1cd 1e 1f 2 3   (then wp_agro_paper.py)
     python wp_agro_refresh_overleaf.py [source_folder]
 """
@@ -23,9 +26,10 @@ import wp_common as W  # noqa: E402
 import wp_build_overleaf as B  # noqa: E402
 
 SRC = Path(sys.argv[1]) if len(sys.argv) > 1 else W.OUTPUT / "wp_2012_2018" / "agro"
+SOURCES = {"agro": SRC, "agro2018": W.OUTPUT / "wp_2018_2018" / "agro"}
 DST = W.ROOT / "docs" / "overleaf_projects" / "WP_paperagro"
 
-# label edits made for this paper on top of D2_RELABEL (products instead of HS6, local firms instead of non-MNE)
+# label edits made for this paper on top of D2_RELABEL (products instead of HS6; Panel B keeps "non-MNE firms", 2026-10-05)
 PAPER_RELABEL = [
     ("& HS6 products & Value", "& Products & Value"),
     (r"HS6 & Description & \$bn/yr", r"Product code & Description & US\$bn/yr"),
@@ -35,42 +39,44 @@ PAPER_RELABEL = [
     (r"Panel B: foreign-MNE share of export value within the cell, \%",
      r"Panel B. Foreign-MNE share of the division's exports in the country (\%)"),
     ("All sub-sectors &", "All divisions &"),
-    ("ln exports, non-MNE firms", "ln exports, local firms"),
-    ("$\\ln$ exports, non-MNE firms", "$\\ln$ exports, local firms"),
     ("HS6 product lines", "Products"),
     ("HS6 lines", "Products"),
 ]
 
 
-def table_body(name: str) -> str:
+def table_body(name: str, src: Path = SRC) -> str:
     for kind in ("Tables", "Regressions"):
-        p = SRC / kind / f"{name}.tex"
+        p = src / kind / f"{name}.tex"
         if p.exists():
             body, _ = B.split_note(B.sanitize(p.read_text(encoding="utf-8")))
             body = B.d2_relabel(body)
             for a, b in PAPER_RELABEL:
                 body = body.replace(a, b)
             return body
-    raise FileNotFoundError(f"{name}.tex not in {SRC}")
+    raise FileNotFoundError(f"{name}.tex not in {src}")
 
 
 def main() -> None:
-    tex = (DST / "main.tex").read_text(encoding="utf-8")
-    tabs = sorted(set(re.findall(r"\\input\{tables/agro/([^}]+)\}", tex)))
-    figs = sorted(set(re.findall(r"\{figures/agro/([^}]+)\.pdf\}", tex)))
-    for t in tabs:
-        body = table_body(t)
-        left = [w for w in ("HS6", "non-MNE", "scope") if w in body]
-        (DST / "tables" / "agro" / f"{t}.tex").write_text(body, encoding="utf-8")
-        if left:
-            print(f"   check {t}: still contains {left}")
-    for f in figs:
-        shutil.copy2(SRC / "Graphs" / f"{f}.pdf", DST / "figures" / "agro" / f"{f}.pdf")
-    used = {f"{t}.tex" for t in tabs} | {f"{f}.pdf" for f in figs}
-    stale = [p.name for d in ("tables", "figures") for p in (DST / d / "agro").iterdir() if p.name not in used]
-    print(f"   refreshed {len(tabs)} tables and {len(figs)} figures from {SRC}")
-    if stale:
-        print("   files not used by main.tex:", ", ".join(stale))
+    # every .tex in the folder (main.tex and main_revised.tex share the exhibit folders)
+    tex = "\n".join(f.read_text(encoding="utf-8") for f in sorted(DST.glob("main*.tex")))
+    for sub, src in SOURCES.items():
+        tabs = sorted(set(re.findall(r"\\input\{tables/" + sub + r"/([^}]+)\}", tex)))
+        figs = sorted(set(re.findall(r"\{figures/" + sub + r"/([^}]+)\.pdf\}", tex)))
+        for d in ("tables", "figures"):
+            (DST / d / sub).mkdir(parents=True, exist_ok=True)
+        for t in tabs:
+            body = table_body(t, src)
+            left = [w for w in ("HS6", "scope") if w in body]
+            (DST / "tables" / sub / f"{t}.tex").write_text(body, encoding="utf-8")
+            if left:
+                print(f"   check {sub}/{t}: still contains {left}")
+        for f in figs:
+            shutil.copy2(src / "Graphs" / f"{f}.pdf", DST / "figures" / sub / f"{f}.pdf")
+        used = {f"{t}.tex" for t in tabs} | {f"{f}.pdf" for f in figs}
+        stale = [p.name for d in ("tables", "figures") for p in (DST / d / sub).iterdir() if p.name not in used]
+        print(f"   {sub}: refreshed {len(tabs)} tables and {len(figs)} figures from {src}")
+        if stale:
+            print(f"   {sub}: files not used by main.tex:", ", ".join(stale))
 
 
 if __name__ == "__main__":

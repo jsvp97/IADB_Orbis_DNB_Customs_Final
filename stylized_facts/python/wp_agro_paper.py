@@ -38,6 +38,26 @@ C_LOCAL = "#e8e8e8"
 PERIOD = "2006--2022" if W.YEAR_WINDOW is None else f"{W.YEAR_WINDOW[0]}--{W.YEAR_WINDOW[1]}"
 COUNTRY = {"ARG": "Argentina", "CHL": "Chile", "COL": "Colombia", "CRI": "Costa Rica", "DOM": "Dominican Republic",
            "PER": "Peru", "PRY": "Paraguay", "SLV": "El Salvador", "URY": "Uruguay"}
+ONE_YEAR = W.YEAR_WINDOW is not None and W.YEAR_WINDOW[0] == W.YEAR_WINDOW[1]
+PER_YR = "" if ONE_YEAR else "/yr"
+OLD_ISO = {"ANT": "CUW", "ROM": "ROU", "ZAR": "COD", "SCG": "SRB", "BLX": "BEL"}   # retired codes -> successor
+
+
+def _iso3() -> set:
+    import pycountry
+    return {c.alpha_3 for c in pycountry.countries}
+
+
+ISO3 = _iso3()
+
+
+def real_dest(dest: pd.Series, orig: pd.Series) -> pd.Series:
+    """Destination as a real country (2026-10-13): valid ISO3 (retired codes mapped), not the origin itself; NaN
+    otherwise (free zones such as XCF in Colombia, unidentified codes)."""
+    c = dest.replace(OLD_ISO)
+    return c.where(c.isin(ISO3) & (c != orig))
+
+
 DEST_ORDER = ["Latin America and the Caribbean", "United States and Canada", "Europe", "China", "Rest of Asia",
               "Africa", "Other"]
 
@@ -65,6 +85,7 @@ def load():
     a["otype"] = W.owner_type(a).replace({"ext_unknown": "ext"})      # sf convention: unknown parent = foreign
     a["fid"] = a["country_orig"] + "|" + a["Tax_ID"]
     a["matched"] = W.matched_flag(a).astype(bool)
+    a["dest_real"] = real_dest(a["country_dest"], a["country_orig"])
     return a, tot_all
 
 
@@ -74,12 +95,12 @@ def sample_tables(a: pd.DataFrame, tot_all: pd.Series) -> None:
     for o, d in a.groupby("country_orig"):
         rows.append(dict(o=o, exp=d["fid"].nunique(),
                          mne=d.loc[d["matched"], "fid"].nunique(), prod=d["hs07_6d"].nunique(),
-                         dest=d["country_dest"].nunique(), val=d["value_fob"].sum() / ny[o] / 1e9,
+                         dest=d["dest_real"].nunique(), val=d["value_fob"].sum() / ny[o] / 1e9,
                          agsh=100 * d["value_fob"].sum() / tot_all[o],
                          mnesh=100 * d.loc[d["matched"], "value_fob"].sum() / d["value_fob"].sum()))
     t = pd.DataFrame(rows).sort_values("val", ascending=False)
     L = [r"\begin{tabular}{lrrrrrrr}", r"\toprule",
-         r"Country & Exporters & MNE affiliates & Products & Destinations & Exports (US\$bn/yr) & "
+         r"Country & Exporters & MNE affiliates & Products & Destinations & Exports (US\$bn" + PER_YR + ") & "
          r"Agriculture in total exports (\%) & MNE share (\%) \\", r"\midrule"]
     for r in t.itertuples():
         L.append(f"{COUNTRY[r.o]} & {r.exp:,} & {r.mne:,} & {r.prod:,} & {r.dest:,} & {r.val:,.1f} & "
@@ -87,7 +108,7 @@ def sample_tables(a: pd.DataFrame, tot_all: pd.Series) -> None:
     all_ag = (a.groupby("country_orig")["value_fob"].sum()).sum()
     L += [r"\midrule",
           f"LAC9 & {a['fid'].nunique():,} & {a.loc[a['matched'], 'fid'].nunique():,} & "
-          f"{a['hs07_6d'].nunique():,} & {a['country_dest'].nunique():,} & {t['val'].sum():,.1f} & "
+          f"{a['hs07_6d'].nunique():,} & {a['dest_real'].nunique():,} & {t['val'].sum():,.1f} & "
           f"{100 * all_ag / tot_all.sum():.1f} & {100 * a.loc[a['matched'], 'value_fob'].sum() / all_ag:.1f} \\\\",
           r"\bottomrule", r"\end{tabular}"]
     W.write_tex(L, T / "tab_agp_sample.tex")
@@ -101,16 +122,16 @@ def sample_tables(a: pd.DataFrame, tot_all: pd.Series) -> None:
     fy = a.groupby(["country_orig", "year"])["fid"].nunique().groupby("country_orig").mean().sum()
     L = [r"\begin{tabular}{lr}", r"\toprule", r"Statistic & Value \\", r"\midrule",
          r"Exporting countries & 9 \\",
-         f"Years & {PERIOD} \\\\",
+         (f"Year & {W.YEAR_WINDOW[0]} \\\\" if ONE_YEAR else f"Years & {PERIOD} \\\\"),
          f"Products & {a['hs07_6d'].nunique():,} \\\\",
-         f"Destination markets & {a['country_dest'].nunique():,} \\\\",
+         f"Destination countries & {a['dest_real'].nunique():,} \\\\",
          f"Exporters & {a['fid'].nunique():,} \\\\",
          f"\\quad of which multinational affiliates & {a.loc[a['matched'], 'fid'].nunique():,} \\\\",
-         f"Exporters per year & {fy:,.0f} \\\\",
+         *([] if ONE_YEAR else [f"Exporters per year & {fy:,.0f} \\\\"]),
          f"Parent countries of foreign multinationals & {a.loc[ext & (a['iso3_parent'] != ''), 'iso3_parent'].nunique():,} \\\\",
          f"Multinational groups & {a.loc[a['matched'], 'parent_key'].replace('', pd.NA).nunique():,} \\\\",
          r"\midrule",
-         f"Exports per year (US\\$bn) & {v / 1e9:,.1f} \\\\",
+         f"Exports{'' if ONE_YEAR else ' per year'} (US\\$bn) & {v / 1e9:,.1f} \\\\",
          f"\\quad foreign multinationals (\\%) & {100 * a.loc[ext, 'value_fob'].sum() / a['value_fob'].sum():.1f} \\\\",
          f"\\quad domestic multinationals (\\%) & {100 * a.loc[dom, 'value_fob'].sum() / a['value_fob'].sum():.1f} \\\\",
          f"\\quad local firms (\\%) & {100 * a.loc[a['otype'] == 'local', 'value_fob'].sum() / a['value_fob'].sum():.1f} \\\\",
@@ -232,8 +253,7 @@ def destinations(a: pd.DataFrame) -> None:
     ax.barh(y, out["dom"] / 100, left=out["ext"] / 100, color=W.C_MNE_DOM, edgecolor="white", linewidth=0.6,
             label="Domestic MNEs")
     for yi, r in zip(y, out.itertuples()):
-        ax.text((r.ext + r.dom) / 100 + 0.006, yi, f"{(r.ext + r.dom) / 100:.2f}", va="center", fontsize=8,
-                fontweight="bold")
+        ax.text((r.ext + r.dom) / 100 + 0.006, yi, f"{(r.ext + r.dom) / 100:.2f}", va="center", fontsize=8)
     ax.set_yticks(y); ax.set_yticklabels([f"{i} ({r.share:.0f}%)" for i, r in out.iterrows()], fontsize=9)
     ax.set_xlabel("Share of export value"); ax.set_xlim(0, 0.85)
     ax.legend(frameon=False, fontsize=9, loc="lower right")
@@ -241,7 +261,7 @@ def destinations(a: pd.DataFrame) -> None:
         ax.spines[s].set_visible(False)
     W.savefig(fig, "fig_agp_dest", G)
     L = [r"\begin{tabular}{lrrrrr}", r"\toprule",
-         r"Destination & Share of exports (\%) & Foreign MNEs (\%) & Domestic MNEs (\%) & Local firms (\%) & Exports (US\$bn/yr) \\",
+         r"Destination & Share of exports (\%) & Foreign MNEs (\%) & Domestic MNEs (\%) & Local firms (\%) & Exports (US\$bn" + PER_YR + r") \\",
          r"\midrule"]
     for i, r in out.iterrows():
         L.append(f"{i} & {r['share']:.1f} & {r['ext']:.1f} & {r['dom']:.1f} & {r['local']:.1f} & {r['bn']:,.1f} \\\\")
@@ -270,10 +290,9 @@ def origin_lac9(d: pd.DataFrame) -> None:
             ax.text(r.sh_ext / 2, yi, f"{r.sh_ext:.2f}", va="center", ha="center", color="white", fontsize=8)
         if r.sh_dom > 0.04:
             ax.text(r.sh_ext + r.sh_dom / 2, yi, f"{r.sh_dom:.2f}", va="center", ha="center", color="black", fontsize=8)
-        ax.text(r.sh_total + 0.006, yi, f"{r.sh_total:.2f}", va="center", ha="left", fontsize=8, fontweight="bold")
+        ax.text(r.sh_total + 0.006, yi, f"{r.sh_total:.2f}", va="center", ha="left", fontsize=8)
     ax.axhline((y[0] + y[1]) / 2, color="#9e9e9e", lw=0.6, ls="--")
     ax.set_yticks(y); ax.set_yticklabels(sub.index)
-    ax.get_yticklabels()[0].set_fontweight("bold")
     ax.set_xlabel("Share of export value"); ax.set_xlim(0, 0.85); ax.set_xticks(np.arange(0, 0.851, 0.1))
     ax.legend(frameon=False, fontsize=9, loc="upper right")
     for s in ("top", "right"):
@@ -318,6 +337,50 @@ def parent_panels(d: pd.DataFrame, k: int = 10) -> None:
     print("   panel B: " + ", ".join(f"{i} {v:.1f}" for i, v in tb.items()) + f" | total {b.sum():.1f}")
 
 
+def parent_all(d: pd.DataFrame, k: int = 15) -> None:
+    """One ranking of parent countries, tax havens included (2026-10-13; replaces the two panels in the paper)."""
+    ext = d[d["owner_type"] == "ext"]
+    s = ext.groupby("iso3_parent")["value"].sum()
+    s = (100 * s / s.sum()).sort_values(ascending=False)
+    top = s.head(k)
+    fig, ax = plt.subplots(figsize=(8, 5.6))
+    yy = np.arange(len(top))[::-1]
+    ax.barh(yy, top.values, color=W.C_MNE_EXT, height=0.7)
+    xmax = top.max() * 1.15
+    for yi, v in zip(yy, top.values):
+        ax.text(v + xmax * 0.01, yi, f"{v:.1f}%", va="center", fontsize=9)
+    ax.set_yticks(yy); ax.set_yticklabels(top.index)
+    ax.set_xlim(0, xmax); ax.set_xlabel("Share of foreign-MNE agricultural exports (%)")
+    for sp in ("top", "right"):
+        ax.spines[sp].set_visible(False)
+    W.savefig(fig, "fig_agp_parent_all", G)
+    L = [r"\begin{tabular}{lr}", r"\toprule", r"Parent country & Share (\%) \\", r"\midrule"]
+    L += [f"{i} & {v:.1f} \\\\" for i, v in top.items()]
+    L += [f"Other & {s.iloc[k:].sum():.1f} \\\\", r"\midrule", f"Total & {s.sum():.1f} \\\\", r"\bottomrule", r"\end{tabular}"]
+    W.write_tex(L, T / "tab_agp_parent_all.tex")
+    print("   parents: " + ", ".join(f"{i} {v:.1f}" for i, v in top.items()))
+
+
+def country_year(a: pd.DataFrame) -> None:
+    """MNE share of agricultural exports by exporting country and year (2026-10-13), for the stability claim."""
+    if ONE_YEAR:
+        return
+    v = a.pivot_table(index="country_orig", columns="year", values="value_fob", aggfunc="sum")
+    m = a[a["matched"]].pivot_table(index="country_orig", columns="year", values="value_fob", aggfunc="sum")
+    order = list(v.sum(axis=1).sort_values(ascending=False).index)
+    sh = (100 * m / v).reindex(order)
+    sh.loc["LAC9"] = 100 * m.sum() / v.sum()
+    yrs = [int(c) for c in sh.columns]
+    L = [r"\begin{tabular}{l" + "r" * len(yrs) + "}", r"\toprule", "Country & " + " & ".join(map(str, yrs)) + r" \\", r"\midrule"]
+    for o, r in sh.iterrows():
+        if o == "LAC9":
+            L.append(r"\midrule")
+        L.append(f"{COUNTRY.get(o, o)} & " + " & ".join(f"{x:.1f}" for x in r) + r" \\")
+    L += [r"\bottomrule", r"\end{tabular}"]
+    W.write_tex(L, T / "tab_agp_country_year.tex")
+    print(sh.round(1).to_string())
+
+
 def main():
     a, tot_all = load()
     print(f"agro rows {len(a):,}, value {a['value_fob'].sum() / 1e9:,.0f} bn pooled")
@@ -325,10 +388,12 @@ def main():
     firm_table(a)
     trend(a)
     destinations(a)
+    country_year(a)
     d = W.scope_filter(W.mne_flags(W.build_cube()), SCOPE)
     d = d[d["value"] > 0]
     origin_lac9(d)
     parent_panels(d)
+    parent_all(d)
     print(">>> wp_agro_paper done ->", G.parent)
 
 

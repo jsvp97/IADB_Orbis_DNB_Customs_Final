@@ -240,7 +240,10 @@ def sector_subclassifications(cube: pd.DataFrame, cls: pd.DataFrame, scope: str)
         stem = col.replace("_lab", "")
         leads = lead_parents(dd, col, 3)
         write_split_table(g, col, hdr, T / f"tab_wp2_{stem}.tex", leads, note)
-        hbar_2def(g, g[col], f"fig_wp2_{stem}", G)
+        gf = g
+        if stem == "sitc2":   # 2026-10-13: product groups ordered by MNE share, largest first; "Other" last
+            gf = pd.concat([g[g[col] != "Other"].sort_values("sh_total", ascending=False), g[g[col] == "Other"]])
+        hbar_2def(gf, gf[col], f"fig_wp2_{stem}", G)
         origin_table_and_heatmap(dd, col, f"fig_wp2_origin_x_{stem}", G, T, list(g[col]))
         parent_composition_table(dd, col, list(g[col]), T / f"tab_wp2_{stem}_by_parent.tex", top, hdr)
         print(f"   {hdr:28s}: " + "; ".join(f"{str(r[col])[:28]} ext {r['sh_ext']:.2f}/dom {r['sh_dom']:.2f} ({100 * r['sh_of_scope']:.0f}%)" for _, r in g.head(6).iterrows()))

@@ -1,0 +1,66 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{mathptmx}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{booktabs,amsmath,amssymb,adjustbox,float,caption}
+\captionsetup{font=small,skip=4pt}
+\renewcommand{\tablename}{Tabla}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
+\title{Distancia}
+\date{}
+\begin{document}
+\maketitle
+\vspace{-2em}
+
+La tabla de distancia (Tabla 2 de la nota de julio, y la misma tabla en los working papers) estima,
+a nivel de firma, destino, producto y año,
+\[
+\ln x_{fodpy} = \alpha \ln D_{od} + \gamma \,(\text{MNE}_f \times \ln D_{od}) + \delta_{oy} + \delta_{dy} + \delta_p + u_{fodpy}.
+\]
+Como no entra la dummy $\text{MNE}_f$, sino solo las interacciones, y las multinacionales
+exportan más que las firmas a cualquier distancia, sin esa dummy la diferencia de niveles solo se
+ve en la interacción. Además, $\ln D_{od}$ es siempre grande y positivo (en promedio 7.8 en todos
+los bienes y 8.5 en agro), así que $\text{MNE}_f \times \ln D_{od}$ se comporta casi como
+$\text{MNE}_f$ por una constante. Por eso la interacción sale positiva aunque la distancia no
+afecte menos a las multinacionales.
+
+Esto se arregla agregando la dummy $\text{MNE}_f$ junto a la interacción y, en la separación por
+presencia, las dummies de presente y no presente junto a sus interacciones.
+
+Con el arreglo, el signo de la interacción cambia. En agro (2012--2018), $\ln$ distance $\times$
+MNE pasa de 0.034*** a $-0.059$** (columna 2), y la interacción con ``present at destination'' pasa
+de 0.087*** a $-0.125$** (columna 4). En todos los bienes (2006--2022) pasa de 0.046*** a $-0.028$,
+que no es significativo, y la de ``present at destination'' de 0.068*** a $-0.048$*. Las Tablas 1 y
+2 son las mismas tablas del paper con las filas nuevas de las dummies. Con efecto fijo de firma, la
+interacción es prácticamente cero en las dos muestras.
+
+Lo que sí muestran los datos es la diferencia de nivel: las multinacionales exportan 0.80 log
+puntos más en agro y 0.59 en todos los bienes, a cualquier distancia. La afirmación de que la
+distancia es una barrera menor para las multinacionales no se sostiene con la especificación
+corregida. Propongo reestimar esta tabla con las dummies en la nota de julio y en los working
+papers, y revisar el texto de ese hecho.
+
+\clearpage
+\begin{table}[H]\centering\footnotesize\renewcommand{\arraystretch}{0.92}
+  \caption{Distance and Firm Agricultural Exports: Multinationals by Presence at the Destination (con las dummies en nivel)}
+  \adjustbox{max width=\textwidth}{\input{tab_distancia_agro}}
+  \par\vspace{3pt}
+  \begin{minipage}{0.95\textwidth}\footnotesize
+  \textit{Notes:} Regression at the firm, destination country, product and year level; agricultural products, 2012--2018. Dependent variable: $\ln$ exports. Local (non-MNE) firms are the omitted group. Present: the group has an affiliate in the destination or the destination is the parent's country. New rows: MNE; MNE, present at destination; MNE, not present at destination. Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.
+  \end{minipage}
+\end{table}
+
+\begin{table}[H]\centering\footnotesize\renewcommand{\arraystretch}{0.92}
+  \caption{Distance and Firm Exports, All Goods: Multinationals by Presence at the Destination (con las dummies en nivel)}
+  \adjustbox{max width=\textwidth}{\input{tab_distancia_total}}
+  \par\vspace{3pt}
+  \begin{minipage}{0.95\textwidth}\footnotesize
+  \textit{Notes:} Regression at the firm, destination country, product and year level; all goods, 2006--2022. Dependent variable: $\ln$ exports. Local (non-MNE) firms are the omitted group. Present: the group has an affiliate in the destination or the destination is the parent's country. New rows: MNE; MNE, present at destination; MNE, not present at destination. Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]
+  \textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.
+  \end{minipage}
+\end{table}
+
+\end{document}

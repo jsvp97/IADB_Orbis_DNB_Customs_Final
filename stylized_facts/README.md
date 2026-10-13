@@ -98,6 +98,11 @@ python/wp_agro_paper.py             exhibits for the restructured agriculture pa
                                      countries and tax havens -> output/wp/agro/{Graphs,Tables}/*agp*
 python/wp_common.legend_below        every saved figure gets its legend under the plot, centred, in the fewest rows that fit
                                      (2026-10-01); set fig._keep_legend = True to opt out. WP_SCOPES=agro limits the scope loops.
+python/wp_agro_paper_regs.py        2026-10-13 regressions of the agro paper (WP_YEARS=2012-2018): Table 4 with origin x product x year +
+                                    destination x product x year FE; MNE share as dependent variable; distance with firm FE and stricter
+                                    sets (Panel B: non-MNE firms x any MNE in the market); distance by presence with the same columns
+python/wp_agro_croptype.py          2026-10-13 agro products by type of production (field crops / horticultural and plantation crops /
+                                    livestock and fisheries / other processed), FAO ICC groups by HS heading; table + figure
 python/wp_agro_refresh_overleaf.py  re-copies every exhibit the hand-edited WP_paperagro/main.tex uses from a wp output
                                      folder (default output/wp_2012_2018/agro), relabelled; never touches main.tex.
                                      Year window for any wp_* script: set WP_YEARS=2012-2018 (wp_common.YEAR_WINDOW;

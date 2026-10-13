@@ -357,6 +357,10 @@ def run_scope(cube: pd.DataFrame, cls: pd.DataFrame, scope: str) -> None:
                  axis_label="Share of export value")
     write_share_table(sh1.sort_values("sh_total", ascending=False), groups, T / "tab_wp1a_origin_by_parent.tex",
                       "Origin", "Figure 1 split by parent country. " + note_conv)
+    # 2026-10-14: the same figure with a LAC9 bar (the nine origins together) at the bottom, for the agro paper
+    sh9 = shares_by(d.assign(lac9="LAC9"), "lac9", groups)
+    stacked_bars(pd.concat([sh9, sh1]), groups, "fig_wp1a_origin_by_parent_lac9", G, horizontal=True,
+                 axis_label="Share of export value")
 
     # --- Figure 2 by parent: PCI quintiles (quintiles over HS6 products, as in the document) --
     hs6 = d.groupby("hs07_6d", as_index=False)["value"].sum().merge(
