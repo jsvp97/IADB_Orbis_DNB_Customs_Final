@@ -52,6 +52,8 @@ def table_body(name: str, src: Path = SRC) -> str:
             body = B.d2_relabel(body)
             for a, b in PAPER_RELABEL:
                 body = body.replace(a, b)
+            if name.startswith("tab_wp1c_country_"):   # 2026-10-20: say why these countries are shown
+                body = body.replace("Parent / Destination &", "Top 10 parents / Top 10 destinations &")
             return body
     raise FileNotFoundError(f"{name}.tex not in {src}")
 

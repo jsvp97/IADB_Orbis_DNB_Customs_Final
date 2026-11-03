@@ -1,29 +1,23 @@
-\begin{tabular}{lcccc} \hline
- & (1) & (2) & (3) & (4) \\ \hline
-\multicolumn{5}{l}{\textit{Panel A: share of all MNEs}} \\
-$\ln$(\# MNE firms) & -0.0507*** & -0.0502*** & 0.0738*** & 0.0866*** \\
- & (0.0037) & (0.0037) & (0.0033) & (0.0064) \\
+\begin{tabular}{lcccccc} \hline
+ & (1) & (2) & (3) & (4) & (5) & (6) \\ \hline
+\multicolumn{7}{l}{\textit{Panel A. Dependent variable: $\ln$ exports, all firms}} \\
+MNE share of exports & -1.1041*** & -1.0671*** & -0.7234*** &  &  &  \\
+ & (0.0427) & (0.0425) & (0.0792) &  &  &  \\
+MNE share of exports, all observations &  &  &  & 0.1365*** & 0.1472*** & 0.1784*** \\
+ &  &  &  & (0.0399) & (0.0398) & (0.0582) \\
 \midrule
-\multicolumn{5}{l}{\textit{Panel B: share of foreign MNEs}} \\
-$\ln$(\# MNE firms) & -0.0337*** & -0.0335*** & 0.0703*** & 0.0769*** \\
- & (0.0039) & (0.0039) & (0.0036) & (0.0069) \\
-\midrule
-\multicolumn{5}{l}{\textit{Panel C: share of domestic MNEs}} \\
-$\ln$(\# MNE firms) & -0.0170*** & -0.0167*** & 0.0035 & 0.0096** \\
- & (0.0029) & (0.0029) & (0.0023) & (0.0043) \\
+\multicolumn{7}{l}{\textit{Panel B. Dependent variable: $\ln$ exports, non-MNE firms}} \\
+MNE share of exports & -3.3017*** & -3.3141*** & -3.0880*** &  &  &  \\
+ & (0.0610) & (0.0643) & (0.1114) &  &  &  \\
+MNE share of exports, all observations &  &  &  & -1.6053*** & -1.6424*** & -1.9963*** \\
+ &  &  &  & (0.0497) & (0.0494) & (0.0837) \\
 \hline
-Origin FE & $\checkmark$ &  &  &  \\
-Destination FE & $\checkmark$ &  &  &  \\
-Product FE & $\checkmark$ & $\checkmark$ &  &  \\
-Year FE & $\checkmark$ &  &  &  \\
-Origin $\times$ year FE &  & $\checkmark$ &  &  \\
-Destination $\times$ year FE &  & $\checkmark$ &  &  \\
-Origin $\times$ dest.\ $\times$ product FE &  &  & $\checkmark$ & $\checkmark$ \\
-Origin $\times$ dest.\ $\times$ year FE &  &  & $\checkmark$ & $\checkmark$ \\
-Origin $\times$ product $\times$ year FE &  &  &  & $\checkmark$ \\
-Destination $\times$ product $\times$ year FE &  &  &  & $\checkmark$ \\
-Observations (share of all MNEs) & 101,098 & 100,983 & 88,037 & 30,271 \\
-Observations (share of foreign MNEs) & 101,098 & 100,983 & 88,037 & 30,271 \\
-Observations (share of domestic MNEs) & 101,098 & 100,983 & 88,037 & 30,271 \\
+Year FE & $\checkmark$ &  &  & $\checkmark$ &  &  \\
+Origin $\times$ dest.\ $\times$ product FE & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+Origin $\times$ dest.\ $\times$ year FE &  & $\checkmark$ & $\checkmark$ &  & $\checkmark$ & $\checkmark$ \\
+Origin $\times$ product $\times$ year FE &  &  & $\checkmark$ &  &  & $\checkmark$ \\
+Destination $\times$ product $\times$ year FE &  &  & $\checkmark$ &  &  & $\checkmark$ \\
+Observations (Panel A) & 89,828 & 88,037 & 30,271 & 177,525 & 175,847 & 85,000 \\
+Observations (Panel B) & 54,234 & 52,515 & 16,372 & 138,938 & 137,240 & 58,746 \\
 \hline
 \end{tabular}

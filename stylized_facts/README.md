@@ -103,6 +103,11 @@ python/wp_agro_paper_regs.py        2026-10-13 regressions of the agro paper (WP
                                     sets (Panel B: non-MNE firms x any MNE in the market); distance by presence with the same columns
 python/wp_agro_croptype.py          2026-10-13 agro products by type of production (field crops / horticultural and plantation crops /
                                     livestock and fisheries / other processed), FAO ICC groups by HS heading; table + figure
+python/wp_agro_capital.py           2026-11-02 capital intensity of agro HS6 products: USDA Census of Agriculture 2017 (machinery per
+                                    hired worker by NAICS farm type) and NBER-CES (equipment per employee, NAICS 311/312, 2012-18);
+                                    high/low within each stage -> data/intermediate/wp/hs6_capital_intensity.{parquet,csv}
+python/wp_agro_note_v3.py           2026-11-02 every exhibit of WP_paperagro/Note_v3.tex (tables/v3/) with fixed effects added
+                                    progressively, plus the master workbook docs/notes/WP_paperagro_v3_master_estimates.xlsx
 python/wp_agro_refresh_overleaf.py  re-copies every exhibit the hand-edited WP_paperagro/main.tex uses from a wp output
                                      folder (default output/wp_2012_2018/agro), relabelled; never touches main.tex.
                                      Year window for any wp_* script: set WP_YEARS=2012-2018 (wp_common.YEAR_WINDOW;

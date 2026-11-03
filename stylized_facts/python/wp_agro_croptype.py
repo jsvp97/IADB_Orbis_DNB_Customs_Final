@@ -45,6 +45,7 @@ ORDER = ["Field crops", "Horticultural and plantation crops", "Livestock and fis
 FIELD = ({"10", "11"} | {f"12{k:02d}" for k in range(1, 10)} | {"1212", "1213", "1214", "0713", "0714"}
          | {f"15{k:02d}" for k in range(7, 19)} | {"1701", "1702", "1703"} | {f"23{k:02d}" for k in range(2, 9)})
 HORTI = {"06", "08", "09", "18", "20", "24", "1210", "1211", "2204", "2205", "2206"} | {f"07{k:02d}" for k in range(1, 15)} - {"0713", "0714"}
+FIELD6 = {"200811"}
 LIVE = {"01", "02", "03", "04", "05", "16", "2301"} | {f"15{k:02d}" for k in range(1, 7)}
 
 
@@ -57,6 +58,7 @@ def crop_type(hs6: pd.Series) -> pd.Series:
     out[pick(LIVE)] = "Livestock and fisheries"
     out[pick(HORTI)] = "Horticultural and plantation crops"
     out[pick(FIELD)] = "Field crops"
+    out[hs6.isin(FIELD6)] = "Field crops"   # 2026-11-03: prepared groundnuts (HS 20) are an oilseed, a field crop
     return out
 
 

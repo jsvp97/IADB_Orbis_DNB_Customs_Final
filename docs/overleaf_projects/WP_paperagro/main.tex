@@ -84,7 +84,7 @@ matching of company names, validation with a large language model and a manual r
 largest exporters. We use the resulting database to classify every exporter as a foreign
 multinational, a domestic multinational or a local firm.
 
-Our main results can be summarized as follows. First, multinational firms account for almost
+Our main results can be summarized in six stylized facts. First, multinational firms account for almost
 half of the agricultural exports of the nine countries. In 2018, they shipped 47.5 percent, 39.6
 percent through foreign affiliates and 7.9 percent through domestic ones, and their share stayed
 between 47 and 50 percent in every year between 2012 and 2018. Second, the parents of foreign
@@ -94,9 +94,8 @@ Switzerland, Liechtenstein and other tax havens account for 26 percent. Third, a
 groups dominate: groups with more than 100 affiliates worldwide are 15 percent of all parents but
 ship half of the exports of foreign affiliates. Fourth, product--destination pairs with more
 multinational firms export more, and so do the firms that do not belong to a multinational group in
-those pairs; the share of multinationals in these exports changes little, and the association is
-stronger for field crops, such as cereals and oilseeds, than for horticultural crops. Fifth, multinational
-affiliates export more than local firms at every distance, but their exports do not fall less with
+those pairs. Fifth, this association is stronger for field crops, such as cereals and oilseeds, than
+for horticultural crops. Sixth, multinational affiliates export more than local firms at every distance, but their exports do not fall less with
 distance once we compare the same firm across destinations. The exports of local firms, instead,
 fall less with distance where multinationals from the same country export the same product,
 although this pattern disappears when we compare origins that ship the same product to the same
@@ -155,8 +154,8 @@ and Johannesen, 2024; T{\o}rsl{\o}v, Wier and Zucman, 2023).
 
 The remainder of this paper is organized as follows. Section~\ref{sec:data} describes the data, the
 construction of the multinational database and the main features of agricultural exports.
-Section~\ref{sec:results} presents the results: first who owns these exports, and then how the
-presence of multinational firms relates to export performance. Section~\ref{sec:concl} concludes
+Section~\ref{sec:results} presents six stylized facts: first who owns these exports, and then how
+the presence of multinational firms relates to export performance. Section~\ref{sec:concl} concludes
 and discusses policy implications.
 
 %======================================================================
@@ -301,17 +300,33 @@ The products these firms export are concentrated in a few groups. Over 2012--201
 (US\$14.1 billion a year, mostly soybean meal), vegetables and fruit (10.4), cereals (10.3), oil
 seeds (7.1) and vegetable oils (5.8) were the largest, and soybean meal, soybeans and crude soybean
 oil alone amounted to US\$21.8 billion a year, 28 percent of the total (see Table~\ref{tab:ap_sitc}
-and Figure~\ref{fig:ap_hs6} in the Appendix). Foreign ownership varies across these groups. The
-foreign share is highest in miscellaneous food products (71 percent), oil seeds (61 percent),
-tobacco (55 percent) and cereals (48 percent), and lowest in sugar (21 percent) and in coffee,
-beverages and dairy (about 30 percent each), while domestic multinationals are most present in
-dairy (23 percent), sugar (18 percent) and coffee (16 percent) (see Figure~\ref{fig:ap_sitc}). The
+and Figure~\ref{fig:ap_hs6} in the Appendix). Foreign ownership varies across these groups. In 2018,
+the foreign share is highest in oil seeds (71 percent), miscellaneous food products (69 percent),
+tobacco (55 percent) and cereals (53 percent), and lowest in sugar (19 percent) and in meat, crude
+materials, beverages, coffee and vegetable oils (between 26 and 30 percent), while domestic
+multinationals are most present in dairy (22 percent), sugar (17 percent), coffee (14 percent) and
+meat (13 percent) (see Figure~\ref{fig:sitc}). The
 leading parent countries also change from one group to another: US groups lead in oil seeds (54
 percent of the exports of foreign affiliates) and cereals (33 percent), Swiss and Liechtenstein
 groups in animal feed (28 and 19 percent), German groups in coffee (42 percent), Saudi and
-Brazilian groups in meat, and Spanish groups in fish and in vegetables and fruit. Agricultural
+Brazilian groups in meat, and Spanish groups in fish and in vegetables and fruit (see
+Table~\ref{tab:ap_sitc}). Agricultural
 inputs (seeds, animal feed and live animals) and the remaining agricultural products have similar
 foreign shares, 36 and 40 percent (see Table~\ref{tab:ap_inputs}).
+
+The next figure shows, for each product group, the share of its exports shipped by foreign and by
+domestic multinationals in 2018, with the groups ordered by the multinational share (see
+Figure~\ref{fig:sitc}).
+% ---- Figure: Multinational Share of Agricultural Exports, by Product Group, 2018
+\begin{figure}[H]\centering%
+  \caption{Multinational Share of Agricultural Exports, by Product Group, 2018}%
+  \label{fig:sitc}%
+  \includegraphics[width=0.85\textwidth,height=0.8\textheight,keepaspectratio]{figures/agro2018/fig_wp2_sitc2.pdf}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Shares of each SITC Rev.\,3 division's agricultural export value in 2018, by type of exporter. Divisions ordered by MNE share, largest first; ``Other'' last.\\[3pt]%
+  \srcnote}%
+  \end{figure}
 
 Grouping products by the type of farm production gives a similar picture. Multinational firms ship
 51 percent of the exports of field crops (cereals, oilseeds, pulses, roots and sugar crops, with
@@ -324,19 +339,17 @@ by end use, by exporting country and by parent country, are reported in the Appe
 to \ref{fig:ap_dist}).
 
 %======================================================================
-\section{Results}\label{sec:results}
+\section{Stylized Facts}\label{sec:results}
 %======================================================================
-We present our results in two parts. We first examine who owns the region's agricultural exports
-(Section~\ref{sec:owners}) and then how the presence of multinational firms is related to export
-performance (Section~\ref{sec:perf}).
+We now present six stylized facts on the role of multinational firms in the agricultural exports of
+Latin America. The first three describe who owns these exports: the share shipped by multinational
+firms, the countries where their parents are based and the size of the groups they belong to. As in
+the previous section, these facts describe the year 2018. The last three describe how the presence
+of multinational firms is related to export performance, and they come from regressions on
+2012--2018. Since the data do not provide variation in the presence of multinationals that is
+unrelated to exports, we interpret these estimates as correlations rather than causal effects.
 
-\subsection{Who Owns Agricultural Exports}\label{sec:owners}
-
-We begin by examining the share of agricultural exports shipped by multinational firms, the
-countries where their parents are based and the size of the groups they belong to. As in the
-previous section, we describe the year 2018.
-
-\subsubsection{Multinationals Ship Almost Half of Agricultural Exports}
+\subsection{Fact 1: Multinationals Ship Almost Half of Agricultural Exports}\label{sec:owners}
 
 Multinational firms shipped 47.5 percent of the agricultural exports of the nine countries in 2018,
 39.6 percent through foreign affiliates and 7.9 percent through domestic ones (see
@@ -372,7 +385,7 @@ bottom (see Figure~\ref{fig:f1}).
   \srcnote}%
   \end{figure}
 
-\subsubsection{Parents Are Based in a Few Countries}
+\subsection{Fact 2: Parents Are Based in a Few Countries}
 
 The parents of foreign affiliates are based in a few countries. In 2018, groups based in the United
 States shipped 24 percent of the agricultural exports of foreign affiliates and Dutch groups 12
@@ -406,47 +419,32 @@ year of the sample, with between 4 and 8 percent of their agricultural exports b
 2017, and its share rose to 11 percent in 2018, when Argentina imported far more soybeans from
 Paraguay than in previous years (Trase, 2020). Affiliates of Spanish groups send 21 percent to Spain and 19 percent to the United States,
 and those of Brazilian groups 31 percent to China and 13 percent to the United States, while Swiss
-and Liechtenstein groups sell mostly to markets outside the ten largest destinations (Panel A). Seen
-from the destinations, US groups supply 59 percent of the agricultural exports of foreign affiliates
+and Liechtenstein groups sell mostly to markets outside the ten largest destinations (see
+Table~\ref{tab:ap_pxd18} and Figure~\ref{fig:hm} in the Appendix). Seen from the destinations, US
+groups supply 59 percent of the agricultural exports of foreign affiliates
 that go to Argentina, 35 percent of those that go to Vietnam and 22 percent of those that go to
-China, and Spanish groups supply 29 percent of those that go to Spain (Panel B). Only 6 percent of
+China, and Spanish groups supply 29 percent of those that go to Spain (see Table~\ref{tab:pxd}). Only 6 percent of
 the exports of foreign affiliates go to the country of their parent (see
 Figure~\ref{fig:ap_home} in the Appendix for each parent country over 2012--2018).
 
-The next table shows where the agricultural exports of the affiliates of the ten largest parent
-countries go (Panel A, rows add to 100) and which parent countries supply the exports of foreign
-affiliates to the ten largest destinations (Panel B, columns add to 100) (see Table~\ref{tab:pxd}).
-% ---- Table: Destination of Foreign-Multinational Agricultural Exports, by Parent Country, 2018
+The next table shows which parent countries supply the agricultural exports of foreign affiliates
+to each of the ten largest destinations; each column adds to 100. We keep the ten largest parent
+countries and the ten largest destinations, which account for 72 and 59 percent of the
+agricultural exports of foreign affiliates with a recorded parent country, and group the rest as
+other parents and other destinations (see Table~\ref{tab:pxd}).
+% ---- Table: Foreign-Multinational Agricultural Exports: Top 10 Destinations and Top 10 Parents, 2018
 \begin{table}[H]\centering\footnotesize%
-  \caption{Destination of Foreign-Multinational Agricultural Exports, by Parent Country, 2018}%
+  \caption{Foreign-Multinational Agricultural Exports: Top 10 Destinations and Top 10 Parents, 2018}%
   \label{tab:pxd}%
-  {\textit{Panel A. Destination of the exports of each parent country (rows add to 100)}}\par\vspace{2pt}%
-  \adjustbox{max width=\textwidth}{\input{tables/agro2018/tab_wp1c_country_rowpct}}%
-  \par\vspace{8pt}%
-  {\textit{Panel B. Parent countries of the exports to each destination (columns add to 100)}}\par\vspace{2pt}%
-  \adjustbox{max width=\textwidth}{\input{tables/agro2018/tab_wp1c_country_colpct}}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro2018/tab_wp1c_country_colpct}}%
   \par\vspace{3pt}%
   \begin{minipage}{0.95\textwidth}\footnotesize %
-  \textit{Notes:} Agricultural exports of foreign MNEs with a recorded parent country in 2018, in percent. Rows: the ten largest parent countries and all other parents. Columns: the ten largest destinations and all other destinations.\\[3pt]%
+  \textit{Notes:} Percent of the agricultural exports of foreign MNEs with a recorded parent country going to each destination in 2018, by parent country (columns add to 100). Columns: the ten largest destinations of foreign-MNE exports and all other destinations. Rows: the ten largest parent countries and all other parents.\\[3pt]%
   \srcnote%
   \end{minipage}%
   \end{table}
 
-The next figure extends this view to the fifteen largest parent countries and destinations. Each row
-shows the share of the exports of the affiliates of one parent country that goes to each destination
-(see Figure~\ref{fig:hm}).
-% ---- Figure: Destination of Foreign-Multinational Agricultural Exports: Fifteen Largest Parent Countries and Destinations, 2018
-\begin{figure}[H]\centering%
-  \caption{Destination of Foreign-Multinational Agricultural Exports: Fifteen Largest Parent Countries and Destinations, 2018}%
-  \label{fig:hm}%
-  \includegraphics[width=0.9\textwidth,height=0.8\textheight,keepaspectratio]{figures/agro2018/fig_wp1d_heatmap_country_rowpct.pdf}%
-  \par\vspace{2pt}%
-  \parbox{0.92\textwidth}{\footnotesize %
-  \textit{Notes:} Percent of the agricultural exports of the foreign MNEs of each parent country (rows) going to each destination (columns) in 2018. Only the fifteen largest destinations are shown, so rows do not add to 100.\\[3pt]%
-  \srcnote}%
-  \end{figure}
-
-\subsubsection{A Few Large Groups Ship Most Foreign-Affiliate Exports}
+\subsection{Fact 3: A Few Large Groups Ship Most Foreign-Affiliate Exports}
 
 Most of the exports of foreign affiliates come from groups with very large networks. In 2018, 41
 percent of parents had only one affiliate in the world, but the 15 percent with more than 100
@@ -470,16 +468,7 @@ Figure~\ref{fig:network}).
   \srcnote}%
   \end{figure}
 
-\subsection{Multinationals and Export Performance}\label{sec:perf}
-
-We next examine how the presence of multinational firms is related to export performance. We
-consider two questions: whether total exports and the exports of non-MNE firms are larger in
-markets where multinationals are present, and whether exports fall less with distance for
-multinational affiliates than for local firms and for local firms where multinationals are present. Since the data do not provide variation in the
-presence of multinationals that is unrelated to exports, we interpret the estimates as correlations
-rather than causal effects.
-
-\subsubsection{Multinational Presence}
+\subsection{Fact 4: Exports Are Larger Where More Multinationals Are Present}\label{sec:perf}
 
 There are several reasons why exports could be larger where multinational firms are present. Their
 affiliates bring buyers, distribution networks and knowledge of foreign standards. Other firms can
@@ -495,11 +484,12 @@ $y$, and $N_{odpy}$ is the number of multinational firms that export it. We firs
 equation using only the observations with at least one multinational firm; this is the
 \emph{intensive margin}. We then replace $\ln N_{odpy}$ with a variable equal to one if at least
 one multinational firm exports the product from $o$ to $d$ in year $y$; this is the
-\emph{extensive margin}. In the strictest version, $\delta_{odp}$ and $\delta_{ody}$ are fixed
-effects for each origin--destination--product and each origin--destination--year. They absorb,
-for example, the fact that some countries export some products to some markets every year, and
-changes over time in the trade costs between two countries. Other columns use fewer fixed effects.
-The last column of each margin is the strictest specification we can estimate. It includes the four
+\emph{extensive margin}. The first column of each margin includes fixed effects for each
+origin--destination--product and for each year. The second replaces the year fixed effects with
+origin--destination--year fixed effects, as in equation~(\ref{eq:presence}): $\delta_{odp}$ and
+$\delta_{ody}$ absorb, for example, the fact that some countries export some products to some
+markets every year, and changes over time in the trade costs between two countries. The third
+column of each margin is the strictest specification we can estimate. It includes the four
 sets of fixed effects that combine three of the four dimensions: origin--destination--product,
 origin--destination--year, origin--product--year and destination--product--year. It compares, for
 the same product exported by the same country in the same year, destinations where more or fewer
@@ -518,13 +508,15 @@ multinationals taking the place of other exporters. The regression describes cor
 not separate the effect of multinational firms from their choice of where to operate.
 
 Exports are larger where more multinational firms are present, and so are the exports of non-MNE
-firms. With the strictest fixed effects, a 10 percent increase in the number of multinationals that
-export a product from a country to a destination in a given year is associated with about 8 percent
-higher exports, and having at least one multinational is associated with exports about 90 percent
-higher (see Table~\ref{tab:t1}, column 3 of each margin). Non-MNE firms also export more where
+firms. With origin--destination--product and origin--destination--year fixed effects, a 10 percent
+increase in the number of multinationals that export a product from a country to a destination in a
+given year is associated with about 8 percent higher exports, and having at least one multinational
+is associated with exports about 90 percent higher (see Table~\ref{tab:t1}, columns 2 and 5). The
+estimates with origin--destination--product and year fixed effects are similar, 0.83 and 0.66
+(columns 1 and 4). Non-MNE firms also export more where
 multinationals are present: the elasticity is 0.37, and their exports are 27 percent higher when at
 least one multinational is present (Panel B). The association remains positive and
-significant in the strictest specification (column 4 of each margin), although it is smaller. The
+significant in the strictest specification (columns 3 and 6), although it is smaller. The
 elasticity is 0.54 for total exports and 0.16 for the exports of non-MNE firms, and having at least
 one multinational is associated with exports 76 percent higher, and with exports of non-MNE firms 11
 percent higher. This specification uses fewer observations, because each observation must share each
@@ -532,9 +524,8 @@ of the four fixed effects with other observations. The positive association for 
 help other exporters rather than take their place.
 
 The next table reports the estimates of equation~(\ref{eq:presence}). Panel A uses total exports
-and Panel B the exports of non-MNE firms only. The first four columns give the intensive margin
-and the last four the extensive margin, each with four sets of fixed effects (see
-Table~\ref{tab:t1}).
+and Panel B the exports of non-MNE firms only. Columns 1 to 3 give the intensive margin and
+columns 4 to 6 the extensive margin, each with three sets of fixed effects (see Table~\ref{tab:t1}).
 % ---- Table: Multinational Presence and Agricultural Exports
 \begin{table}[H]\centering\small%
   \caption{Multinational Presence and Agricultural Exports}%
@@ -542,7 +533,7 @@ Table~\ref{tab:t1}).
   \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/reg_agp_presence}}%
   \par\vspace{3pt}%
   \begin{minipage}{0.95\textwidth}\footnotesize %
-  \textit{Notes:} Regression at the origin country, destination country, product and year level; agricultural products, 2012--2018. Dependent variable: $\ln$ exports (Panel A) and $\ln$ exports of non-MNE firms (Panel B). Intensive margin: $\ln$ number of MNEs, observations with at least one MNE. Extensive margin: indicator for at least one MNE. Panel B uses only the exports of non-MNE firms, so that the exports of the multinationals themselves do not enter the dependent variable. Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%
+  \textit{Notes:} Regression at the origin country, destination country, product and year level; agricultural products, 2012--2018. Dependent variable: $\ln$ exports (Panel A) and $\ln$ exports of non-MNE firms (Panel B). Columns 1--3 (intensive margin): $\ln$ number of MNEs, observations with at least one MNE. Columns 4--6 (extensive margin): indicator for at least one MNE. Panel B uses only the exports of non-MNE firms, so that the exports of the multinationals themselves do not enter the dependent variable. Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%
   \srcnote%
   \end{minipage}%
   \end{table}
@@ -550,7 +541,7 @@ Table~\ref{tab:t1}).
 We next examine whether this association differs by type of multinational, in two ways (see
 Table~\ref{tab:ap_counts} in the Appendix).
 
-\emph{Foreign and domestic multinationals.} The association is stronger for foreign multinationals
+The association is stronger for foreign multinationals
 than for domestic ones. With the strictest fixed effects, a 10 percent increase in the number of
 foreign affiliates is associated with about 4.6 percent higher exports, against 2.4 percent for
 domestic affiliates (column 4, Panel A). The same holds for the exports of non-MNE firms, with
@@ -558,7 +549,7 @@ elasticities of 0.34 for foreign and 0.24 for domestic affiliates (column 4, Pan
 groups usually have larger networks abroad, so their affiliates can reach more buyers and bring
 more information about foreign markets than domestic groups.
 
-\emph{Foreign multinationals, by destination.} We then examine foreign affiliates separately,
+We then examine foreign affiliates separately,
 according to whether the destination is the country of their parent. The association is stronger for foreign affiliates
 that export to other countries than for those that ship to the parent's country: with the
 strictest fixed effects, the elasticity is 0.37 for other destinations and 0.24 for the parent's
@@ -571,35 +562,39 @@ agricultural exports of foreign affiliates go to the parent's country (see
 Table~\ref{tab:ap_pres}). These estimates use fewer observations, because they need at least one
 affiliate of each type in the same origin--destination--product--year, so they are less precise.
 
-Larger exports in markets with more multinationals could simply be the exports of the multinationals themselves. To examine what multinationals add, we
-estimate equation~(\ref{eq:presence}) with the share of multinational firms in the exports of each
-origin--destination--product--year as the dependent variable, using the observations with at least
-one multinational, where this share averages 67 percent. If more multinationals raised only their
-own exports, their share would rise strongly with their number. With the stricter fixed effects it
-rises only a little: a 10 percent increase in the number of multinationals is associated with a share
-0.7 percentage points higher in column 3 and 0.9 points higher in the strictest specification
-(column 4). With fewer fixed effects, the share is slightly lower where more
-multinationals are present (columns 1 and 2). The share of domestic multinationals changes even less,
-by at most 0.1 percentage points (Panel C). So where more
-multinationals export a product to a destination, the exports of other firms are also larger, and
-the multinational share stays about the same.
+We also examine whether exports are larger where multinationals account for a larger share of the
+market. To do so, we estimate equation~(\ref{eq:presence}) replacing the number of multinationals with
+the share of multinational firms in the exports of each origin--destination--product--year. Columns
+1 to 3 use the observations with at least one multinational, where this share averages 67 percent,
+and columns 4 to 6 use all observations, with a share of zero where no multinational exports. The
+fixed effects are those of Table~\ref{tab:t1}.
 
-The next table reports these estimates. Panel A uses the share of all multinationals, Panel B the
-share of foreign multinationals and Panel C the share of domestic multinationals, with the same four
-sets of fixed effects as Table~\ref{tab:t1} (see Table~\ref{tab:share}).
-% ---- Table: Multinational Presence and the Multinational Share of Agricultural Exports
+Exports are larger where multinationals are present, but not where they account for a larger share
+of a market they are already in. Across all observations, a 10 percentage point higher multinational
+share is associated with total exports between 1.4 and 1.8 percent higher (Panel A, columns 4 to 6),
+which reflects the difference between markets with and without multinationals. Among the
+observations with at least one multinational, a 10 percentage point higher share is associated with
+total exports between 7 and 11 percent lower (columns 1 to 3): for a given presence of
+multinationals, markets where they ship a larger share of the total are smaller. In Panel B the
+coefficients are negative and large, but they are mostly mechanical: for a given total, a larger
+multinational share means smaller exports of the other firms, and at a share of 67 percent this
+alone gives a coefficient of about $-3$.
+
+The next table reports these estimates. Panel A uses total exports and Panel B the exports of
+non-MNE firms (see Table~\ref{tab:share}).
+% ---- Table: Multinational Share and Agricultural Exports
 \begin{table}[H]\centering\small%
-  \caption{Multinational Presence and the Multinational Share of Agricultural Exports}%
+  \caption{Multinational Share and Agricultural Exports}%
   \label{tab:share}%
   \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/reg_agp_share}}%
   \par\vspace{3pt}%
   \begin{minipage}{0.95\textwidth}\footnotesize %
-  \textit{Notes:} Regression at the origin country, destination country, product and year level; agricultural products, 2012--2018; observations with at least one MNE. Dependent variable: share of the exports of all MNEs (Panel A), foreign MNEs (Panel B) and domestic MNEs (Panel C) in the value exported, between 0 and 1. Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%
+  \textit{Notes:} Regression at the origin country, destination country, product and year level; agricultural products, 2012--2018. Dependent variable: $\ln$ exports (Panel A) and $\ln$ exports of non-MNE firms (Panel B). MNE share of exports: share of MNEs in the value exported, between 0 and 1. Columns 1--3: observations with at least one MNE. Columns 4--6: all observations, with a share of zero where no MNE exports. Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%
   \srcnote%
   \end{minipage}%
   \end{table}
 
-\subsubsection{Type of Production}
+\subsection{Fact 5: The Association Is Stronger for Field Crops}
 
 Agricultural products differ in how they are produced. Field crops, such as cereals, oilseeds, pulses
 and sugar crops, are grown on large areas and harvested by machine, while fruit, vegetables, coffee,
@@ -612,10 +607,11 @@ the Appendix gives the full definitions). Multinationals ship 51 percent of the 
 crops and 40 percent of those of horticultural and plantation crops.
 
 We examine whether the association between multinational presence and exports differs across these
-types. To do so, we add to equation~(\ref{eq:presence}) the interactions of the number of
-multinationals (or of the indicator for at least one multinational) with each type of production;
-horticultural and plantation crops are the omitted group, so each interaction measures the
-difference with them. Columns 1 and 3 use origin--destination--product and
+types. To do so, we replace $\ln N_{odpy}$ in equation~(\ref{eq:presence}) with its interactions with
+an indicator for each of the four types of production (and, at the extensive margin, the indicator for
+at least one multinational with each type), so each coefficient measures the association for one
+type. The type of production does not enter on its own, since it is absorbed by the
+origin--destination--product fixed effects. Columns 1 and 3 use origin--destination--product and
 origin--destination--year fixed effects, and columns 2 and 4 the strictest specification.
 
 The association between multinational presence and exports is stronger for field crops. With
@@ -623,13 +619,14 @@ origin--destination--product and origin--destination--year fixed effects, a 10 p
 the number of multinationals is associated with 6.7 percent higher exports of horticultural and
 plantation crops and with 10.0 percent higher exports of field crops; the difference, 0.33, is
 significant at the 1 percent level (Panel A, column 1). The difference is larger in the strictest
-specification, 0.51 against a base of 0.47 (column 2). The same holds for the exports of non-MNE
+specification, 0.97 against 0.47 (column 2), and also significant at the 1 percent level. The same holds for the exports of non-MNE
 firms: their elasticity is 0.32 in horticultural crops and 0.53 in field crops, and having at least
 one multinational is associated with exports of non-MNE firms 23 percent higher in horticultural
 crops and 47 percent higher in field crops (Panel B, columns 1 and 3). These differences for non-MNE
 firms, and the difference at the extensive margin for total exports, are not significant in the
-strictest specification (columns 2 and 4). Livestock and fisheries are in between, and
-other processed food shows no difference or a weaker association for non-MNE firms. Field crops are
+strictest specification (columns 2 and 4). Livestock and fisheries are in between, with elasticities of 0.92 for total
+exports and 0.51 for those of non-MNE firms (column 1), and other processed food is close to
+horticultural crops for total exports and lower for non-MNE firms (0.15). Field crops are
 produced at a large scale and pass through storage, crushing and shipping facilities that large
 traders operate, which may explain why the presence of multinationals matters more for them.
 
@@ -651,12 +648,12 @@ the exports of non-MNE firms (see Table~\ref{tab:crop}).
   \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/reg_agp_croptype}}%
   \par\vspace{3pt}%
   \begin{minipage}{0.95\textwidth}\footnotesize %
-  \textit{Notes:} Regression at the origin country, destination country, product and year level; agricultural products, 2012--2018. Dependent variable: $\ln$ exports (Panel A) and $\ln$ exports of non-MNE firms (Panel B). Horticultural and plantation crops are the omitted group; each interaction is the difference with them. Types of production as defined in Table~\ref{tab:ap_crop}. Intensive margin: observations with at least one MNE. Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%
+  \textit{Notes:} Regression at the origin country, destination country, product and year level; agricultural products, 2012--2018. Dependent variable: $\ln$ exports (Panel A) and $\ln$ exports of non-MNE firms (Panel B). Each coefficient is the interaction of $\ln$ number of MNEs (columns 1--2) or of the indicator for at least one MNE (columns 3--4) with an indicator for the type of production; the type of production on its own is absorbed by the origin--destination--product fixed effects. Types of production as defined in Table~\ref{tab:ap_crop}. Columns 1--2: observations with at least one MNE. Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%
   \srcnote%
   \end{minipage}%
   \end{table}
 
-\subsubsection{Distance}
+\subsection{Fact 6: Distance Reduces the Exports of Multinationals as Much as Those of Local Firms}
 
 Distance raises the cost of exporting. Transport costs rise with distance, and so do the fixed costs
 of finding buyers, learning about demand and enforcing contracts in markets that are far away
@@ -695,10 +692,10 @@ present in the destination (see Table~\ref{tab:t2}).
 \begin{table}[H]\centering\small%
   \caption{Distance and Firm Agricultural Exports: Multinationals by Presence at the Destination}%
   \label{tab:t2}%
-  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/reg_wp0_table2_repro}}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/reg_agp_distance_early}}%
   \par\vspace{3pt}%
   \begin{minipage}{0.95\textwidth}\footnotesize %
-  \textit{Notes:} Regression at the firm, destination country, product and year level; agricultural products, 2012--2018. Dependent variable: $\ln$ exports. Local (non-MNE) firms are the omitted group. Present: the group has an affiliate in the destination or the destination is the parent's country. Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%
+  \textit{Notes:} Regression at the firm, destination country, product and year level; agricultural products, 2012--2018. Dependent variable: $\ln$ exports. Local (non-MNE) firms are the omitted group. Present: the group has an affiliate in the destination or the destination is the parent's country. The MNE indicators enter only through their interactions with distance. This result is not robust: when a firm fixed effect is included, the interactions become small and not significant (see Table~\ref{tab:t2b}). Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%
   \srcnote%
   \end{minipage}%
   \end{table}
@@ -718,7 +715,8 @@ but not $M_f$ on its own. Multinationals export more than local
 firms at every distance, and since $\ln D_{od}$ is always large and positive (8.5 on average in
 agriculture), the interaction can pick up this difference in levels instead of a difference in how
 exports change with distance. We therefore estimate the regression again with stricter fixed
-effects. Column 1 repeats column 2 of Table~ef{tab:t2}. Column 2 adds a firm fixed effect. Since a firm
+effects. Column 1 repeats column 2 of Table~
+ef{tab:t2}. Column 2 adds a firm fixed effect. Since a firm
 is either a multinational affiliate or not, the firm fixed effect absorbs $M_f$, and $\gamma$ then
 compares how the exports of the same firm change across destinations at different distances.
 Columns 3 to 5 use stricter fixed effects: firm--year, then firm--product--year with
@@ -783,8 +781,7 @@ Ownership is concentrated. A few parent countries, led by the United States and 
 and a small number of groups with more than 100 affiliates worldwide account for most of the
 exports of foreign affiliates, and about a quarter of these exports belongs to groups whose parent
 is recorded in a tax haven. Exports are larger where more multinational firms are present, and the
-same holds for the exports of firms outside multinational groups, while the multinational share of
-these exports changes little. This association is stronger for field crops, which are produced at a
+same holds for the exports of firms outside multinational groups. This association is stronger for field crops, which are produced at a
 large scale and harvested by machine, than for fruit, vegetables and other crops that use more labor. Multinational affiliates export more than local firms at every
 distance, but their exports do not fall less with distance once we compare the same firm across
 markets. The exports of local firms do fall less with distance where multinationals from their
@@ -1017,16 +1014,6 @@ America and the Caribbean}. Washington, DC: Inter-American Development Bank.
   \textit{Notes:} Shares of each product's export value, by type of exporter, 2012--2018. The twenty largest agricultural products by export value, ordered by MNE share, largest first.\\[3pt]%
   \srcnote}%
   \end{figure}
-% ---- Figure: Multinational Share of Agricultural Exports, by Product Group
-\begin{figure}[H]\centering%
-  \caption{Multinational Share of Agricultural Exports, by Product Group}%
-  \label{fig:ap_sitc}%
-  \includegraphics[width=0.9\textwidth,height=0.8\textheight,keepaspectratio]{figures/agro/fig_wp2_sitc2.pdf}%
-  \par\vspace{2pt}%
-  \parbox{0.92\textwidth}{\footnotesize %
-  \textit{Notes:} Shares of each SITC Rev.\,3 division's export value, 2012--2018 pooled. Divisions ordered by MNE share, largest first; ``Other'' last.\\[3pt]%
-  \srcnote}%
-  \end{figure}
 % ---- Table: Agricultural Exports and Multinational Shares: Inputs and Other Products
 \begin{table}[H]\centering\footnotesize%
   \caption{Agricultural Exports and Multinational Shares: Inputs and Other Products}%
@@ -1223,6 +1210,27 @@ America and the Caribbean}. Washington, DC: Inter-American Development Bank.
   \srcnote%
   \end{minipage}%
   \end{table}
+% ---- Table: Destination of Foreign-Multinational Agricultural Exports, by Parent Country, 2018
+\begin{table}[H]\centering\footnotesize%
+  \caption{Destination of Foreign-Multinational Agricultural Exports, by Parent Country, 2018}%
+  \label{tab:ap_pxd18}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro2018/tab_wp1c_country_rowpct}}%
+  \par\vspace{3pt}%
+  \begin{minipage}{0.95\textwidth}\footnotesize %
+  \textit{Notes:} Percent of the agricultural exports of foreign MNEs with a recorded parent country going to each destination in 2018 (rows add to 100). Rows: the ten largest parent countries and all other parents. Columns: the ten largest destinations and all other destinations.\\[3pt]%
+  \srcnote%
+  \end{minipage}%
+  \end{table}
+% ---- Figure: Destination of Foreign-Multinational Agricultural Exports: Fifteen Largest Parent Countries and Destinations, 2018
+\begin{figure}[H]\centering%
+  \caption{Destination of Foreign-Multinational Agricultural Exports: Fifteen Largest Parent Countries and Destinations, 2018}%
+  \label{fig:hm}%
+  \includegraphics[width=0.9\textwidth,height=0.8\textheight,keepaspectratio]{figures/agro2018/fig_wp1d_heatmap_country_rowpct.pdf}%
+  \par\vspace{2pt}%
+  \parbox{0.92\textwidth}{\footnotesize %
+  \textit{Notes:} Percent of the agricultural exports of the foreign MNEs of each parent country (rows) going to each destination (columns) in 2018. Only the fifteen largest destinations are shown, so rows do not add to 100.\\[3pt]%
+  \srcnote}%
+  \end{figure}
 % ---- Table: Destination of Foreign-Multinational Agricultural Exports, by Parent Country
 \begin{table}[H]\centering\small%
   \caption{Destination of Foreign-Multinational Agricultural Exports, by Parent Country}%
@@ -1318,7 +1326,7 @@ America and the Caribbean}. Washington, DC: Inter-American Development Bank.
 \begin{table}[H]\centering\small%
   \caption{Multinational Presence and Agricultural Exports, by Type of Multinational}%
   \label{tab:ap_counts}%
-  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/reg_wp1e_counts}}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/reg_agp_counts}}%
   \par\vspace{3pt}%
   \begin{minipage}{0.95\textwidth}\footnotesize %
   \textit{Notes:} Regression at the origin country, destination country, product and year level; agricultural products, 2012--2018. Dependent variable: $\ln$ exports (Panel A) and $\ln$ exports of non-MNE firms (Panel B). Regressors: $\ln$ number of MNEs of each type. Columns (5)--(6) split foreign MNEs by whether the destination is the parent's country. Panel B uses only the exports of non-MNE firms, so that the exports of the multinationals themselves do not enter the dependent variable. Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%
@@ -1329,7 +1337,7 @@ America and the Caribbean}. Washington, DC: Inter-American Development Bank.
 \begin{table}[H]\centering\small%
   \caption{Multinational Presence and Agricultural Exports: Extensive Margin, by Type of Multinational}%
   \label{tab:ap_ext}%
-  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/reg_wp1e_extensive}}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/reg_agp_extensive}}%
   \par\vspace{3pt}%
   \begin{minipage}{0.95\textwidth}\footnotesize %
   \textit{Notes:} Regression at the origin country, destination country, product and year level; agricultural products, 2012--2018. Dependent variable: $\ln$ exports (Panel A) and $\ln$ exports of non-MNE firms (Panel B). Regressors: indicators for at least one MNE of each type. Columns (5)--(6) split foreign MNEs by whether the destination is the parent's country. Panel B uses only the exports of non-MNE firms, so that the exports of the multinationals themselves do not enter the dependent variable. Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%
@@ -1340,7 +1348,7 @@ America and the Caribbean}. Washington, DC: Inter-American Development Bank.
 \begin{table}[H]\centering\small%
   \caption{Distance and Firm Agricultural Exports: Foreign and Domestic Multinationals}%
   \label{tab:ap_dist}%
-  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/reg_wp1e_distance_hq}}%
+  \adjustbox{max width=\textwidth, max totalheight=0.8\textheight}{\input{tables/agro/reg_agp_distance_hq}}%
   \par\vspace{3pt}%
   \begin{minipage}{0.95\textwidth}\footnotesize %
   \textit{Notes:} Regression at the firm, destination country, product and year level; agricultural products, 2012--2018. Dependent variable: $\ln$ exports. Local (non-MNE) firms are the omitted group. Columns (3)--(4) split foreign MNEs by whether the destination is the parent's country. Standard errors clustered by origin--destination pair in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\[3pt]%

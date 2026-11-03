@@ -88,3 +88,7 @@ output/overleaf_mirror/
 
 # Overleaf upload zips (rebuilt by stylized_facts/python/wp_export_overleaf.py)
 docs/overleaf_projects/*.zip
+
+# External downloads (2026-11-02): large or redistribution-restricted; see data/raw/external/README.md
+data/raw/external/*
+!data/raw/external/README.md
