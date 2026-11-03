@@ -107,7 +107,13 @@ python/wp_agro_capital.py           2026-11-02 capital intensity of agro HS6 pro
                                     hired worker by NAICS farm type) and NBER-CES (equipment per employee, NAICS 311/312, 2012-18);
                                     high/low within each stage -> data/intermediate/wp/hs6_capital_intensity.{parquet,csv}
 python/wp_agro_note_v3.py           2026-11-02 every exhibit of WP_paperagro/Note_v3.tex (tables/v3/) with fixed effects added
-                                    progressively, plus the master workbook docs/notes/WP_paperagro_v3_master_estimates.xlsx
+                                    progressively, plus the master workbook docs/notes/WP_paperagro_v3_master_estimates.xlsx.
+                                    2026-11-03: every table runs its full FE progression (303 regressions); the workbook is laid
+                                    out like outreg2 (sheet "All regressions", one sheet per note table "Table 5" ... "Table A.2",
+                                    "Long format", "Notes"); numbers and titles are read from the compiled note
+                                    (output/wp_2012_2018/agro/v3/build/Note_v3.aux). Regressions are pickled in
+                                    output/wp_2012_2018/agro/v3/v3_regressions.pkl; `python wp_agro_note_v3.py workbook` rebuilds
+                                    the workbook without re-estimating.
 python/wp_agro_refresh_overleaf.py  re-copies every exhibit the hand-edited WP_paperagro/main.tex uses from a wp output
                                      folder (default output/wp_2012_2018/agro), relabelled; never touches main.tex.
                                      Year window for any wp_* script: set WP_YEARS=2012-2018 (wp_common.YEAR_WINDOW;

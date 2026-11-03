@@ -318,7 +318,7 @@ def parent_panels(d: pd.DataFrame, k: int = 10) -> None:
             ax.text(v + xmax * 0.01, yi, f"{v:.1f}%", va="center", fontsize=9)
         ax.set_yticks(yy); ax.set_yticklabels(s.index)
         ax.set_xlim(0, xmax); ax.set_title(title, fontsize=11)
-        ax.set_xlabel("Share of foreign-MNE agricultural exports (%)")
+        ax.set_xlabel("Share of the agricultural exports of foreign MNEs (%)")
         for sp in ("top", "right"):
             ax.spines[sp].set_visible(False)
     fig.tight_layout(h_pad=2.0)
@@ -350,7 +350,7 @@ def parent_all(d: pd.DataFrame, k: int = 15) -> None:
     for yi, v in zip(yy, top.values):
         ax.text(v + xmax * 0.01, yi, f"{v:.1f}%", va="center", fontsize=9)
     ax.set_yticks(yy); ax.set_yticklabels(top.index)
-    ax.set_xlim(0, xmax); ax.set_xlabel("Share of foreign-MNE agricultural exports (%)")
+    ax.set_xlim(0, xmax); ax.set_xlabel("Share of the agricultural exports of foreign MNEs (%)")
     for sp in ("top", "right"):
         ax.spines[sp].set_visible(False)
     W.savefig(fig, "fig_agp_parent_all", G)

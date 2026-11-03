@@ -31,7 +31,7 @@ import wp_common as W  # noqa: E402
 NET_DTA = W.WP_INT / "parent_network_size.dta"
 SCOPES = W.SCOPES_ALL
 EDGES = [0, 1, 10, 100, np.inf]
-BINLAB = ["1", "2--10", "11--100", "$>$100"]
+BINLAB = ["1", "2 to 10", "11 to 100", "More than 100"]   # 2026-11-03: no dashes in the labels
 MID = "#c8a24a"
 
 
@@ -63,7 +63,7 @@ def fig5_network(f: pd.DataFrame, G: Path, T: Path, scope: str) -> None:
     g["sv"] = g["v"] / g["v"].sum(); g["sp"] = g["npar"] / g["npar"].sum()
     fig, ax = plt.subplots(figsize=(7, 4.2))
     x = np.arange(len(g))
-    ax.bar(x - 0.2, g["sv"], 0.4, color=W.C_MNE_EXT, label="Share of foreign-MNE export value")
+    ax.bar(x - 0.2, g["sv"], 0.4, color=W.C_MNE_EXT, label="Share of the export value of foreign MNEs")
     ax.bar(x + 0.2, g["sp"], 0.4, color=W.C_MNE_DOM, label="Share of parents")
     ax.set_xticks(x); ax.set_xticklabels(g.index)
     ax.set_xlabel("Number of affiliates of the group worldwide"); ax.set_ylabel("Share")
