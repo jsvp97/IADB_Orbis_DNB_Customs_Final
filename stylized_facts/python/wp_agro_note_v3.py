@@ -17,11 +17,11 @@ LaTeX tables go to docs/overleaf_projects/WP_paperagro/tables/v3/ (and output/wp
 Regressions
   presence (origin x destination x product x year cells; clustered by origin-destination):
     ln X_odpy = b ln N_odpy (intensive, cells with >= 1 MNE) or b 1[N_odpy > 0] (extensive) + FE
-    dependent: ln exports of all firms, ln exports of non-MNE firms; on the products where MNEs operate also
-    ln number of non-MNE exporters and ln exports per non-MNE exporter
+    dependent: ln exports of all firms, ln exports of local firms; on the products where MNEs operate also
+    ln number of local exporters and ln exports per local exporter
   heterogeneity: ln N (or the indicator) interacted with each type of production (FAO crop groups,
     wp_agro_croptype) or with each capital-intensity group (wp_agro_capital), no main term
-  distance (firm x destination x product x year): ln x = a ln D + g (MNE x ln D) [+ MNE] + FE; non-MNE firms:
+  distance (firm x destination x product x year): ln x = a ln D + g (MNE x ln D) [+ MNE] + FE; local firms:
     ln x = a ln D + c AnyMNE_odpy + g (AnyMNE_odpy x ln D) + FE
   by country: the presence regression origin by origin
 """
@@ -244,7 +244,7 @@ DEPLAB = {"ln_total": r"$\ln$ exports, all firms", "ln_nonmne": r"$\ln$ exports,
 
 
 def presence_tables(g: pd.DataFrame) -> None:
-    # Fact 4: all firms and non-MNE firms, panels = margins, columns = fixed effects
+    # Fact 4: all firms and local firms, panels = margins, columns = fixed effects
     for dep, name, tid in (("ln_total", "v3_presence_all", "Presence, all firms"), ("ln_nonmne", "v3_presence_local", "Presence, local firms")):
         pa = [fit(g, dep, ["ln_n_mne"], s, FE_CELL, tid, "Intensive margin", f"({i + 1})", "all cells") for i, s in enumerate(CELL_SETS)]
         pb = [fit(g, dep, ["any_n_mne"], s, FE_CELL, tid, "Extensive margin", f"({i + 1})", "all cells") for i, s in enumerate(CELL_SETS)]
@@ -262,7 +262,7 @@ def presence_tables(g: pd.DataFrame) -> None:
                 fit(sub, dep, [reg], s, FE_CELL, "Presence, MNE products (progression)", f"{mg}, {DEPLAB[dep]}", f"({i + 1})", "MNE products")
     pa = [fit(sub, dep, ["ln_n_mne"], s, FE_CELL, "Presence, MNE products", f"Intensive margin, {DEPLAB[dep]}", f"({i + 1})", "MNE products") for i, (dep, s) in enumerate(cols)]
     pb = [fit(sub, dep, ["any_n_mne"], s, FE_CELL, "Presence, MNE products", f"Extensive margin, {DEPLAB[dep]}", f"({i + 1})", "MNE products") for i, (dep, s) in enumerate(cols)]
-    extra = [("Dependent variable", [r"\multicolumn{2}{c}{All firms}", r"\multicolumn{2}{c}{Non-MNE firms}", r"\multicolumn{2}{c}{Non-MNE exporters}", r"\multicolumn{2}{c}{Per non-MNE exporter}"])]
+    extra = [("Dependent variable", [r"\multicolumn{2}{c}{All firms}", r"\multicolumn{2}{c}{Local firms}", r"\multicolumn{2}{c}{Local exporters}", r"\multicolumn{2}{c}{Per local exporter}"])]
     write_table_mne(pa, pb, [s for _, s in cols])
 
 
@@ -452,14 +452,14 @@ def country_regressions(g: pd.DataFrame) -> None:
         rows += [[COUNTRY[o]] + cells_ + [f"{r[1]['n']:,}"], [""] + ses + [""]]
     k = 5
     L = [r"\begin{tabular}{lccccr}", r"\toprule",
-         r" & \multicolumn{2}{c}{$\ln$ exports, all firms} & \multicolumn{2}{c}{$\ln$ exports, non-MNE firms} & \\",
+         r" & \multicolumn{2}{c}{$\ln$ exports, all firms} & \multicolumn{2}{c}{$\ln$ exports, local firms} & \\",
          r"\cmidrule(lr){2-3}\cmidrule(lr){4-5}",
          r" & $\ln$(number & At least & $\ln$(number & At least & Observations \\",
          r" & of MNEs) & one MNE & of MNEs) & one MNE & (all firms, (2)) \\",
          " & (1) & (2) & (3) & (4) & " + r"\\", r"\midrule"]
     L += [" & ".join(r) + r" \\" for r in rows]
-    L += [r"\midrule", r"Origin $\times$ destination $\times$ product FE & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & \\",
-          r"Origin $\times$ destination $\times$ year FE & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & \\", r"\bottomrule", r"\end{tabular}"]
+    L += [r"\midrule", r"Destination $\times$ product FE & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & \\",
+          r"Destination $\times$ year FE & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & \\", r"\bottomrule", r"\end{tabular}"]
     txt = "\n".join(L) + "\n"
     (OUTD / "v3_country_presence.tex").write_text(txt, encoding="utf-8"); (TEXD / "v3_country_presence.tex").write_text(txt, encoding="utf-8")
     LAYOUTS["v3_country_presence"] = pd.DataFrame(rows, columns=["Country", "(1)", "(2)", "(3)", "(4)", "Observations"])
@@ -475,7 +475,7 @@ def workbook() -> None:
             "Agricultural products, HS 2007 chapters 01-24. MNE = exporter linked to Orbis or Dun & Bradstreet (convention sf).",
             "Origin x destination x product x year cells; ln exports on ln number of MNEs (cells with >=1 MNE) or on an indicator for at least one MNE; SE clustered by origin-destination.",
             "Same regressions with ln N (or the indicator) interacted with each type of production or capital-intensity group; tests compare groups.",
-            "Firm x destination x product x year; ln exports on ln distance and its interaction with the MNE indicator; non-MNE firms on the interaction with at least one MNE from the same origin in the market.",
+            "Firm x destination x product x year; ln exports on ln distance and its interaction with the MNE indicator; local firms on the interaction with at least one MNE from the same origin in the market.",
             "Presence regression origin by origin, origin x destination x product and origin x destination x year FE, SE clustered by destination.",
             "table, panel, column, sample, dependent, regressor, coef, se, pvalue, stars, nobs, r2, r2_within, fixed_effects, cluster, weights",
             "wp_agro_note_v3.py (stylized_facts/python)"]})
