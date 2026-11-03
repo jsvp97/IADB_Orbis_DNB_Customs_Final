@@ -190,3 +190,15 @@ Not on disk (to download): Fontagné–Guimbard–Orefice (2022) HS6 trade elast
 - **Outreg/esttab fragments and Overleaf mirrors.** Both pipelines `copy` every exhibit to an Overleaf folder that exists only on the author's machine; `export_graph` in `src/06` uses `copy` without `cap` and will error if `$overleaf` does not exist — set `$overleaf` to a local folder (`config/paths.do` does).
 - **`Github/` folder.** Until 2026-09-03 the real GitHub clone was nested inside this folder and the outer `.git` was a diverged local-only history. Fixed: outer `main` = `origin/main`; old history tagged `archive-outer-local-history-2026-09-03`; the nested clone is in `archive/` and can be deleted. **Commit from this folder.**
 - **Spaces in paths.** Everything lives under `C:\Sebas BID\` — always quote paths in Stata (`"$root\..."`) and Python (`Path(r"...")`).
+
+
+---
+
+# Token-efficient approach (from github.com/drona23/claude-token-efficient)
+
+## Approach
+- Read existing files before writing. Don't re-read unless changed.
+- Thorough in reasoning, concise in output.
+- No sycophantic openers or closing fluff.
+- No emojis or em-dashes.
+- Do not guess APIs, versions, flags, commit SHAs, or package names. Verify by reading code or docs before asserting.
