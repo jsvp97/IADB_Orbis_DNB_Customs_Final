@@ -42,10 +42,18 @@ SCOPE = "agro"
 G, T, _ = W.outdirs(SCOPE)
 ORDER = ["Field crops", "Horticultural and plantation crops", "Livestock and fisheries", "Other processed food and beverages"]
 
-FIELD = ({"10", "11"} | {f"12{k:02d}" for k in range(1, 10)} | {"1212", "1213", "1214", "0713", "0714"}
-         | {f"15{k:02d}" for k in range(7, 19)} | {"1701", "1702", "1703"} | {f"23{k:02d}" for k in range(2, 9)})
-HORTI = {"06", "08", "09", "18", "20", "24", "1210", "1211", "2204", "2205", "2206"} | {f"07{k:02d}" for k in range(1, 15)} - {"0713", "0714"}
-FIELD6 = {"200811"}
+# 2026-11-03, after the product-by-product comparison with the Census of Agriculture farm types
+# (wp_agro_classification.py): roots and tubers (FAO group 5, heading 0714) join potatoes (0701) in horticultural
+# crops, as in the census (vegetable farming), except cassava (071410), which the census puts with grains; the permanent oilseed crops of FAO group 4.2 (coconut, oil palm,
+# olive) and their oils are plantation crops (headings 1203, 1509, 1510, 1511, 1513, code 120710); vegetable,
+# flower and other seeds for sowing (120930, 120991, 120999) and carob and fruit stones (121299) follow their crop.
+PLANT4 = {"1203", "1509", "1510", "1511", "1513"}
+FIELD = (({"10", "11"} | {f"12{k:02d}" for k in range(1, 10)} | {"1212", "1213", "1214", "0713"}
+          | {f"15{k:02d}" for k in range(7, 19)} | {"1701", "1702", "1703"} | {f"23{k:02d}" for k in range(2, 9)}) - PLANT4)
+HORTI = ({"06", "08", "09", "18", "20", "24", "1210", "1211", "2204", "2205", "2206", "1203", "1509", "1510", "1511", "1513"}
+         | {f"07{k:02d}" for k in range(1, 15)} - {"0713"})
+FIELD6 = {"200811", "071410"}   # cassava stays a field crop (grain farming in the census concordance)
+HORTI6 = {"120710", "120930", "120991", "120999", "121292", "121299"}   # 121292: carob has its own code from HS 2012 on
 LIVE = {"01", "02", "03", "04", "05", "16", "2301"} | {f"15{k:02d}" for k in range(1, 7)}
 
 
@@ -59,6 +67,7 @@ def crop_type(hs6: pd.Series) -> pd.Series:
     out[pick(HORTI)] = "Horticultural and plantation crops"
     out[pick(FIELD)] = "Field crops"
     out[hs6.isin(FIELD6)] = "Field crops"   # 2026-11-03: prepared groundnuts (HS 20) are an oilseed, a field crop
+    out[hs6.isin(HORTI6)] = "Horticultural and plantation crops"
     return out
 
 

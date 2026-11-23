@@ -92,3 +92,13 @@ docs/overleaf_projects/*.zip
 # External downloads (2026-11-02): large or redistribution-restricted; see data/raw/external/README.md
 data/raw/external/*
 !data/raw/external/README.md
+
+# UNSD correspondence tables, downloaded 2026-11-03
+data/raw/unsd/
+
+# LaTeX build files in the Overleaf mirrors (2026-11-23); the distributed PDF lives in docs/
+docs/overleaf_projects/**/*.aux
+docs/overleaf_projects/**/*.out
+docs/overleaf_projects/**/*.spl
+docs/overleaf_projects/**/*.toc
+docs/overleaf_projects/WP_paperagro/Note_v*.pdf

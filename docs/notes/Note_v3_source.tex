@@ -1,0 +1,1063 @@
+\documentclass[article, 12pt, 3p]{elsarticle}
+
+\usepackage{natbib} 
+\setcitestyle{authoryear,open={(},close={)}}
+%\bibliographystyle{plainnat}
+
+\usepackage{etoolbox,comment,setspace,fancyhdr,hyperref,color,graphicx,subcaption,booktabs,rotating,multirow}
+
+\captionsetup[subfigure]{labelformat=simple,labelsep=space}
+\renewcommand\thesubfigure{(\roman{subfigure})}
+
+\newcounter{rowfig}
+\renewcommand{\therowfig}{\Alph{rowfig}}
+
+\usepackage{amsmath,amsthm,amssymb,amstext,bbold,amsfonts}
+\usepackage{float,caption}
+\usepackage{threeparttable}
+\usepackage{lscape}
+\usepackage{bbm}
+\usepackage{adjustbox}
+\usepackage[tracking=true]{microtype}
+%\usepackage[pdftex, letterpaper, margin=1in, headheight=-.25cm]{geometry}
+ %\usepackage[abbr]{harvard}
+ 
+\hypersetup{
+  colorlinks   = true, %Colours links instead of ug dly boxes
+  urlcolor     = blue, %Colour for external hyperlinks
+  linkcolor    = black, %Colour of internal links 
+  citecolor   = blue %Colour of citations
+}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{definition}{Definition}
+\newtheorem{assumption}{Assumption}
+\newtheorem{condition}{Condition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{conjecture}{Conjecture}
+\newtheorem{corollary}{Corollary}
+\numberwithin{corollary}{proposition}
+%\numberwithin{equation}{section}
+% [[prompt01]] original: \numberwithin{equation}{}
+
+%\newcommand{\inv}{\makebox[0pt][l]{$^{-1}$}}
+\pdfoptionpdfminorversion=6 
+
+%Define argmax
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+%%Put space between captions and figures.
+%\setlength{\belowcaptionskip}{6pt}
+
+\makeatletter
+\def\ps@pprintTitle{%
+   \let\@oddhead\@empty
+   \let\@evenhead\@empty
+   \let\@oddfoot\@empty
+   \let\@evenfoot\@oddfoot
+}
+\makeatother
+\usepackage{ragged2e}
+\usepackage{setspace} 
+\usepackage{caption}
+% [[prompt01]] original: \usepackage[usenames,dvipsnames]{pstricks}
+% [[prompt01]] original: \usepackage{epsfig}
+% [[prompt01]] original: \usepackage{pst-grad} % For gradients
+% [[prompt01]] original: \usepackage{pst-plot} % For axes
+ \usepackage[space]{grffile} % For spaces in paths
+ \makeatletter % For spaces in paths
+ \patchcmd\Gread@eps{\@inputcheck#1 }{\@inputcheck"#1"\relax}{}{}
+ \makeatother
+\usepackage[utf8]{inputenc}
+% [[prompt01]] original: \usepackage{stackrel}
+\IfFileExists{stackrel.sty}{\usepackage{stackrel}}{}
+\usepackage{array}
+\usepackage{siunitx}
+% [[prompt02]] added: column-width convention of the reference (_reference_productivity/Tables/_tabledefs.tex,
+% copied, not \input): N{<width>} centred numeric column, L{<width>} ragged-right label column.
+\usepackage{makecell}
+\newcolumntype{N}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newlength{\labelw}\setlength{\labelw}{0.22\textwidth}
+\newlength{\labelwwide}\setlength{\labelwwide}{0.36\textwidth}
+\newlength{\labelwnarrow}\setlength{\labelwnarrow}{0.19\textwidth}
+\newcommand{\colwfor}[2]{\dimexpr(\textwidth-(#2)-\tabcolsep*\numexpr2*#1+2\relax)/#1\relax}
+\newcommand{\colwform}[3]{\dimexpr(\textwidth-(#3)-\tabcolsep*\numexpr2*#1+2*#2\relax)/#1\relax}
+\newcommand{\colw}{\colwfor{6}{\labelw}}
+\newcommand{\colwvii}{\colwfor{7}{\labelw}}
+\newcommand{\colwnarrow}{\colwfor{8}{\labelw}}
+\newcommand{\notesize}{\footnotesize}
+\setlength{\extrarowheight}{4pt}
+\renewcommand\normalsize{\fontsize{11}{8}\selectfont}
+\newcommand\narrowstyle{\SetTracking{encoding=*}{-10}\lsstyle}
+\newcommand\vnarrowstyle{\SetTracking{encoding=*}{-40}\lsstyle}
+\newcommand\vvnarrowstyle{\SetTracking{encoding=*}{-75}\lsstyle}
+
+\newcommand\narrowtext[1]{\textls[-10]{#1}}
+\newcommand\vnarrowtext[1]{\textls[-40]{#1}}
+\newcommand\vvnarrowtext[1]{\textls[-75]{#1}}
+
+\makeatletter
+\renewcommand\footnotesize{%
+   \@setfontsize\footnotesize\@ixpt{9}%
+   \abovedisplayskip 8\p@ \@plus2\p@ \@minus4\p@
+   \abovedisplayshortskip \z@ \@plus\p@
+   \belowdisplayshortskip 4\p@ \@plus2\p@ \@minus2\p@
+   \def\@listi{\leftmargin\leftmargini
+               \topsep 4\p@ \@plus2\p@ \@minus2\p@
+               \parsep 2\p@ \@plus\p@ \@minus\p@
+               \itemsep \parsep}%
+   \belowdisplayskip \abovedisplayskip
+}
+\makeatother
+
+\usepackage{setspace}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}  % [[v3]] scalable fonts, needed by microtype outside Overleaf
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{pdfpages}
+\usepackage{dsfont}
+\newcommand{\bc}{\begin{center}}
+\newcommand{\ec}{\end{center}}
+\newcommand{\bt}{\begin{tabular}}
+\newcommand{\et}{\end{tabular}}
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\ben}{\begin{enumerate}}
+\newcommand{\een}{\end{enumerate}}
+\newcommand{\bd}{\begin{displaymath}}
+\newcommand{\ed}{\end{displaymath}}
+\newcommand{\beann}{\begin{eqnarray*}}
+\newcommand{\eeann}{\end{eqnarray*}}
+\newcommand{\bea}{\begin{eqnarray}}
+\newcommand{\eea}{\end{eqnarray}}
+\newcommand{\ba}{\begin{array}}
+\newcommand{\ea}{\end{array}}
+\newcommand{\bma}{\begin{pmatrix}}
+\newcommand{\ema}{\end{pmatrix}}
+%}}}
+%Math Shortcuts {{{
+\newcommand{\Ra}{\Rightarrow}
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bbY}{\mathbb{Y}}
+\newcommand{\bbF}{\mathbb{F}}
+\newcommand{\bbS}{\mathbb{S}}
+\newcommand{\bbN}{\mathbb{N}}
+\newcommand{\bbG}{\mathbb{G}}
+\newcommand{\bbT}{\mathbb{T}}
+\newcommand{\deB}{\mathcal{B}}
+\newcommand{\deW}{\mathcal{W}}
+\newcommand{\deR}{\mathcal{R}}
+\newcommand{\deF}{\mathcal{F}}
+\newcommand{\deA}{\mathcal{A}}
+\newcommand{\deY}{\mathcal{Y}}
+\newcommand{\deS}{\mathcal{S}}
+\newcommand{\deL}{\mathcal{L}}
+\newcommand{\deH}{\mathcal{H}}
+\newcommand{\deE}{\mathcal{E}}
+\newcommand{\deP}{\mathcal{P}}
+\newcommand{\deG}{\mathcal{G}}
+\newcommand{\deT}{\mathcal{T}}
+\newcommand{\deff}{\mathcal{f}}
+\newcommand{\dep}{\mathcal{p}}
+\newcommand{\E}{\mathnormal{E}}
+\newcommand{\var}{\mathnormal{V\!AR}}
+\newcommand{\Cov}{\mathnormal{COV}}
+\newcommand{\Corr}{\mathnormal{CORR}}
+\newcommand{\Prob}{\mathnormal{Prob}}
+%}}}
+%Additional Shortcuts {{{
+\newcommand{\mD}{\displaystyle}
+\newcommand{\mT}{\textstyle}
+\newcommand{\mS}{\scriptstyle}
+\newcommand{\mSS}{\scriptscriptstyle}
+\newcommand{\m}[1]{\,#1\,}
+\newcommand{\nn}{\nonumber}
+\newcommand{\colorEmphText}{\color{blue}}
+\newcommand{\colorEmphBackground}{\color{yellow}}
+%}}}
+% \usepackage[stable]{footmisc} 
+\newcommand*{\mycommand}[1]{\texttt{\emph{#1}}}
+% [[prompt01]] original: \renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+%% these three are essential for estout
+\usepackage{booktabs}  % neatly formatting lines
+\usepackage{threeparttable}    
+\usepackage{dcolumn}    % aligning decimals
+    \newcolumntype{d}[1]{D{.}{.}{#1}}
+% Estout LaTeX wrapper (by Jörg Weber)
+\let\estinput=\input % define a new input command so that we can still flatten the document
+\newcommand{\estwide}[3]{
+		\vspace{.75ex}{
+			%\textsymbols% Note the added command here
+			\begin{tabular*}
+			{\textwidth}{@{\hskip\tabcolsep\extracolsep\fill}l*{#2}{#3}}
+			\toprule
+			\estinput{#1}
+			\addlinespace[.75ex]
+			\end{tabular*}
+			}
+		}	
+\newcommand{\estauto}[3]{
+		\vspace{.75ex}{
+			%\textsymbols% Note the added command here
+			\begin{tabular}{l*{#2}{#3}}
+			\toprule
+			\estinput{#1}
+			\\ \bottomrule           % 08 Dec 2021. Add these slashes.
+			\addlinespace[-.75]
+			\end{tabular}
+			}
+		}
+% Allow line breaks with \\ in specialcells
+\newcommand{\specialcell}[2][c]{%
+    \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}
+}
+\usepackage{float}
+\usepackage[section]{placeins}
+% [[prompt02d]] floats share pages with text instead of going to float pages
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.85}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\setlength{\floatsep}{10pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{14pt plus 2pt minus 2pt}
+\setlength{\intextsep}{12pt plus 2pt minus 2pt}
+\newcommand{\sym}[1]{\rlap{#1}}% Thanks David Carlisle
+\usepackage{hhline}
+\captionsetup{font=normalsize} 
+
+
+ % Note/Source/Text after Tables
+\newcommand{\figtext}[1]{
+	\vspace{-1.9ex}
+	\captionsetup{justification=justified,font=scriptsize}
+	\caption*{\hspace{6pt}\hangindent=1.5em #1}
+	} 
+\newcommand{\fignote}[1]{\figtext{\emph{Note:~}~#1}}
+
+\newcommand{\figsource}[1]{\figtext{\emph{Source:~}~#1}}
+
+% Add significance note with \starnote
+\newcommand{\starnote}{\figtext{* p < 0.1, ** p < 0.05, *** p < 0.01. Standard errors in parentheses.}}
+% [[prompt01]] added: source note of every table and figure (wording from main.tex l. 16)
+% [[prompt02]] original: \newcommand{\srcnote}{\textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}
+\newcommand{\srcnote}{\textit{Source:} Authors' calculations based on customs data matched to Orbis (Bureau van Dijk) and Dun \& Bradstreet.}
+%\usepackage{etoolbox} % to hook into `figure` and reset the mysubfig counter
+
+% [[prompt01]] original: \usepackage{subfig}
+
+
+% Checkmarks
+\usepackage{tikz}
+\newcommand{\tikzxmark}{%
+\tikz[scale=0.23] {
+    \draw[line width=0.7,line cap=round] (0,0) to [bend left=6] (1,1);
+    \draw[line width=0.7,line cap=round] (0.2,0.95) to [bend right=3] (0.8,0.05);
+}}
+\newcommand{\tikzcmark}{% 
+\tikz[scale=0.23] {
+    \draw[line width=0.7,line cap=round] (0.25,0) to [bend left=10] (1,1);
+    \draw[line width=0.8,line cap=round] (0,0.35) to [bend right=1] (0.23,0);
+}}
+%\renewcommand{\arraystretch}{0.9}
+% [[prompt02]] original: \renewcommand{\arraystretch}{0.8}
+% [[prompt02]] original: \setlength{\tabcolsep}{5pt}
+ \makeatletter
+\newcommand*\mysize{%
+  \@setfontsize\mysize{7.5}{9.0}%
+}
+
+\makeatother
+% For reference:
+%\[
+%    \checkmark
+%    \tikzxmark
+%    \tikzcmark
+%\]
+
+%\onehalfspacing
+
+% [[prompt03b]] elsarticle draws two rules around the (absent) abstract; suppress them for this summary
+\makeatletter
+\let\els@maketitle\maketitle
+\renewcommand{\maketitle}{\begingroup\let\hrule\relax\els@maketitle\endgroup}
+\makeatother
+\usepackage{pgfplots}\pgfplotsset{compat=1.16}  % [[v3]] figures drawn in the note itself
+\hyphenpenalty=10000 \exhyphenpenalty=10000  % [[v3]] no words split across lines with a hyphen
+\begin{document}
+
+\title{$\,$\\ $\,$\\ $\,$\\\vspace{-4.9em}\LARGE\textbf{Multinational Firms and Agricultural Trade in Latin America}\footnote{The views and interpretations in this paper are strictly those of the authors and should not be attributed to the Inter-American Development Bank, its executive directors, or its member countries.}}
+\author{\vskip 2em This version: November 2026\\[2pt] \small Preliminary draft, please do not circulate}
+
+\thispagestyle{empty}
+\maketitle
+\setcounter{page}{0}\setcounter{footnote}{0}
+\renewcommand\normalsize{\fontsize{12}{20}\selectfont}\normalsize
+\newpage
+
+\section{Introduction}\label{sec:intro}
+
+Agriculture accounts for 35 percent of the merchandise exports of the nine Latin American countries studied here,
+and for more than half in Argentina, Paraguay and Uruguay. Much of world agricultural trade goes through a few large
+firms. Four trading companies handle most of the world grain trade (Murphy, Burch and Clapp, 2012, and Clapp, 2015),
+and multinational firms lead the processing, trading and retail stages of agricultural value chains (UNCTAD, 2009,
+and Reardon et al., 2009). Yet there is little systematic evidence on how much of the agricultural exports of the
+region is shipped by multinational firms, where these firms are based, and how the exports of other firms relate to
+their presence.
+
+This paper documents these patterns with customs records for all the agricultural exports of nine countries, linked
+to ownership data on multinational groups. Some products, such as grains and oilseeds, are grown on large areas with
+machinery and shipped in bulk. Others, such as fruit, vegetables and coffee, depend on hired labor (Kandel, 2008). We
+therefore compare multinationals across types of production and levels of capital intensity.
+
+We document six stylized facts. Multinational firms ship almost half of the agricultural exports of the region
+(Fact 1). Their parents are based in a few countries (Fact 2), and a few large groups ship most of the exports of
+foreign affiliates (Fact 3). Exports are larger where more multinationals export the same product to the same
+destination, and so are the exports of local firms (Fact 4). This association is stronger for field crops, and within
+each type of production capital intensity makes little difference (Fact 5). The exports of multinationals do not fall
+less with distance than those of local firms once the same firm is compared across destinations (Fact 6).
+
+These estimates describe associations, not causal effects. Section~\ref{sec:data} describes the data,
+Section~\ref{sec:facts} presents the facts and Section~\ref{sec:conclusions} concludes.
+
+\section{Data}\label{sec:data}
+
+Our dataset consists of three main databases. First, we have firm level export data from the customs agencies of
+nine Latin American countries: Argentina, Chile, Colombia, Costa Rica, the Dominican Republic, El Salvador, Paraguay,
+Peru and Uruguay. The data cover 2012 to 2018, the years in which all nine countries are observed. Each record includes
+the firm's tax identifier, the product code at six digits of the Harmonized System (HS), the destination country, the
+year and the export value in US dollars.\footnote{The countries report HS 2007, HS 2012 or HS 2017, depending on the
+country and the year. We convert all codes to HS 2017 with the correlation tables of the United Nations Statistics
+Division (UNSD, 2026). In the records of Uruguay for 2016 to 2018, the codes of chapters 01 to 09 lost their first
+digit, a zero, and we restore it.} Agricultural products are HS chapters 01 to 24. Second, we have data on the global
+ultimate owner of each company and the country of that owner from Orbis (Bureau van Dijk) and Dun \& Bradstreet.\footnote{Exporters
+are linked to these records by tax identifiers, by name matching confirmed with a large language model, and by a manual
+review of the largest unmatched exporters. In 2018, the country of the owner is known for 88 percent of the agricultural
+exports of foreign affiliates.} Finally, we measure the capital intensity of the industry behind each product with US
+data: the 2017 Census of Agriculture (USDA NASS, 2019) for farms and the Manufacturing Industry Database of the National
+Bureau of Economic Research and the Center for Economic Studies (NBER and CES, see Becker, Gray and Marvakov, 2021) for food
+and beverage processing.
+
+An exporter linked to the ownership data is an affiliate of a multinational firm (MNE), and its ultimate owner is its
+parent. The affiliate is a domestic MNE when its parent is located in the exporting country and a foreign MNE otherwise.
+Exporters that cannot be linked are local firms. A multinational group is the set of affiliates with the same parent.
+Table~\ref{tab:sample} presents agricultural exports in 2018. In that year, 13,107 firms exported 782 products to 211
+countries, for a total of US\$79.5 billion.
+
+% ---- Table: Agricultural exports, by exporting country, 2018
+\begin{table}[htbp]
+\centering
+\caption{Agricultural exports, by exporting country, 2018}
+\label{tab:sample}
+{\footnotesize\setlength{\tabcolsep}{4pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_sample}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Exporters are distinct tax identifiers within each country. Destinations exclude free trade zones and shipments to the exporting country. LAC9: the nine countries together.\\
+\srcnote
+\end{minipage}
+\end{table}
+
+We group products in three ways. The first is the type of production, based on the crop groups of the FAO Indicative
+Crop Classification (FAO, 2015): field crops (cereals, oilseeds, pulses, cassava and sugar crops), horticultural and
+plantation crops (fruit, vegetables, coffee, tea, cocoa, spices, flowers, tobacco and permanent oilseed crops), livestock
+and fisheries, and other processed food and beverages. Each group includes the preparations of its products. The second
+is capital intensity: machinery and equipment per hired worker for farm products and equipment capital per employee for
+processed products.\footnote{We link HS products to industries with the UNSD correspondence tables, from HS 2017 to the
+Central Product Classification, to the International Standard Industrial Classification and to the North American Industry
+Classification System 2017. When a product reaches several farm types or industries, we add up their capital and their
+workers. The census covers fourteen farm types, which we use as published. It does not cover fishing, so fresh fish takes
+the values of the farm types linked to it, mainly aquaculture. Products linked to no farm type or food or beverage
+industry, such as bran and ethyl alcohol, are not classified. They are 1 percent of exports in 2018.} A product has high
+capital intensity when this ratio is above that of its stage as a whole, US\$113 thousand per hired worker on farms and
+US\$118 thousand per employee in processing. This threshold is our choice, and we use the US data only to rank products.
+The third combines the first two, splitting each type of production into products with high and low capital intensity.
+Table~\ref{tab:groups} reports these groups.
+
+\section{Stylized Facts}\label{sec:facts}
+
+Each fact is shown first for the nine countries together and then by country. Descriptive tables and figures refer to
+2018, the last year in which all nine countries are observed. The multinational share of agricultural exports stays between
+47 and 50 percent in every year from 2012 to 2018. The regressions use the panel for 2012 to 2018.
+
+\subsection{Fact 1: Multinationals ship almost half of agricultural exports}\label{sec:f1}
+
+\subsubsection*{Aggregate}
+
+In 2018, multinational firms shipped 47.2 percent of the agricultural exports of the nine countries, 39.3 percent
+through foreign affiliates and 7.9 percent through domestic ones (Table~\ref{tab:mne}). These exports come from 3,224
+affiliates of 1,930 groups, whose parents are based in 112 countries. Affiliates are a quarter of exporters, but they are
+larger and sell to more markets. A foreign affiliate exported US\$11.9 million on average and a domestic affiliate US\$10.4
+million, against US\$4.2 million for a local firm. They reached 5.5 and 6.1 destinations, against 3.9 for local firms.
+
+% ---- Table: Multinationals in agricultural exports, 2018
+\begin{table}[htbp]
+\centering
+\caption{Multinationals in agricultural exports, 2018}
+\label{tab:mne}
+{\footnotesize\setlength{\tabcolsep}{4pt}\setlength{\extrarowheight}{1pt}
+\input{tables/v3/v3_mne_summary}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Exports, destinations and products per exporter are averages over the exporters of each type. Destinations are counted as in Table~\ref{tab:sample}.\\
+\srcnote
+\end{minipage}
+\end{table}
+
+The weight of multinationals differs across markets and products. Foreign affiliates ship 50.0 percent of the exports
+that go to other Latin American countries and 43.4 percent of those that go to China, against 33.9 percent of those that go
+to Europe and 33.5 percent of those that go to the United States and Canada (Table~\ref{tab:dest}). By product, the foreign
+share is highest in oil seeds (71.4 percent) and miscellaneous edible products (68.5 percent) and lowest in sugar (15.2
+percent) (Figure~\ref{fig:sitc}). Domestic multinationals are most present in coffee and in dairy (13.9 percent each).
+
+% ---- Table: Agricultural exports and ownership, by destination region, 2018
+\begin{table}[htbp]
+\centering
+\caption{Agricultural exports and ownership, by destination region, 2018}
+\label{tab:dest}
+{\footnotesize\setlength{\tabcolsep}{4pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_dest}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Columns 2 to 4: percent of the exports to each region shipped by each type of exporter. China includes Hong Kong and Macao. Other includes Oceania and shipments to free trade zones.\\
+\srcnote
+\end{minipage}
+\end{table}
+
+% ---- Figure: Multinational share of agricultural exports, by product group, 2018
+\begin{figure}[htbp]
+\centering
+\caption{Multinational share of agricultural exports, by product group, 2018}
+\label{fig:sitc}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_fig_sitc}}
+
+\begin{minipage}{0.9\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Divisions of the Standard International Trade Classification, Rev.\,3. The number at the end of each bar is the MNE share. Divisions below 0.5 percent of exports are grouped as Other.\\
+\srcnote
+\end{minipage}
+\end{figure}
+
+\FloatBarrier
+\subsubsection*{By country}
+
+The weight of multinationals is highest in Paraguay (69.4 percent) and Uruguay (61.0 percent) and lowest in El Salvador
+(30.4 percent), Colombia (39.6 percent) and Peru (39.9 percent) (Figure~\ref{fig:cshare}). Domestic multinationals matter
+most in Chile (18.7 percent) and Colombia (12.6 percent). Affiliates are between 12 and 42 percent of exporters, and in every
+country they export more on average than local firms (Table~\ref{tab:cexp}).
+
+% ---- Figure: Multinational share of agricultural exports, by exporting country, 2018
+\begin{figure}[htbp]
+\centering
+\caption{Multinational share of agricultural exports, by exporting country, 2018}
+\label{fig:cshare}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_fig_country_share}}
+
+\begin{minipage}{0.9\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} The number at the end of each bar is the MNE share. LAC9: the nine countries together.\\
+\srcnote
+\end{minipage}
+\end{figure}
+
+% ---- Table: Agricultural exporters and multinational affiliates, by exporting country, 2018
+\begin{table}[htbp]
+\centering
+\caption{Agricultural exporters and multinational affiliates, by exporting country, 2018}
+\label{tab:cexp}
+{\footnotesize\setlength{\tabcolsep}{3pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_country_exporters}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Exports per affiliate and per local firm are averages over the exporters of each type. Main destination: the largest destination and its share of the agricultural exports of the country in percent.\\
+\srcnote
+\end{minipage}
+\end{table}
+
+\FloatBarrier
+\subsection{Fact 2: Parents are based in a few countries}\label{sec:f2}
+
+\subsubsection*{Aggregate}
+
+In 2018, groups based in the United States shipped 23 percent of the agricultural exports of foreign affiliates and Dutch
+groups 12 percent, followed by groups whose parent is recorded in Switzerland (9 percent) and Liechtenstein (7 percent)
+(Figure~\ref{fig:parents}). Tax havens and similar jurisdictions together account for 26 percent. Groups often hold their
+affiliates through companies located there, so the recorded parent country does not always show where the group operates.
+
+Each parent country supplies a different set of markets. US groups supply 59 percent of the exports of foreign affiliates
+that go to Argentina, 35 percent of those that go to Vietnam and 22 percent of those that go to China, while Spanish groups
+supply 29 percent of those that go to Spain (Table~\ref{tab:pxd}). Few exports go back to the country of the parent: 5.3
+percent of the exports of foreign affiliates.
+
+% ---- Figure: Agricultural exports of foreign multinationals, by parent country, 2018
+\begin{figure}[htbp]
+\centering
+\caption{Agricultural exports of foreign multinationals, by parent country, 2018}
+\label{fig:parents}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_fig_parents}}
+
+\begin{minipage}{0.9\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Percent of the agricultural exports of foreign MNEs with a recorded parent country (88 percent of the total). The fifteen largest parent countries.\\
+\srcnote
+\end{minipage}
+\end{figure}
+
+% ---- Table: Agricultural exports of foreign multinationals: top 10 destinations and top 10 parents, 2018
+\begin{table}[htbp]
+\centering
+\caption{Agricultural exports of foreign multinationals: top 10 destinations and top 10 parents, 2018}
+\label{tab:pxd}
+{\footnotesize\setlength{\tabcolsep}{3pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_pxd}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Percent of the exports of each parent country that go to each destination, foreign MNEs with a recorded parent country. Each column adds to 100. The ten largest parent countries and destinations account for 72 and 59 percent of these exports.\\
+\srcnote
+\end{minipage}
+\end{table}
+
+\FloatBarrier
+\subsubsection*{By country}
+
+The main parent country differs across the nine countries (Figure~\ref{fig:cparent} and Table~\ref{tab:cparents}). US
+groups ship 54 percent of the exports of foreign affiliates with a recorded parent in Paraguay and 41 percent in Costa Rica.
+The main parent is the Netherlands in Argentina, Spain in Peru, Japan in Chile, Germany in Colombia, Brazil in Uruguay, Hong
+Kong in the Dominican Republic and Panama in El Salvador. The three largest parent countries account for between 46 percent
+of these exports, in Colombia, and 78 percent, in El Salvador.
+
+% ---- Figure: Agricultural exports of foreign multinationals by parent country, by exporting country, 2018
+\begin{figure}[htbp]
+\centering
+\caption{Multinational share of agricultural exports by parent country, by exporting country, 2018}
+\label{fig:cparent}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_fig_country_parent}}
+
+\begin{minipage}{0.9\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} The ten largest parent countries of the nine countries together. Other foreign MNEs include firms with no recorded parent country. LAC9: the nine countries together.\\
+\srcnote
+\end{minipage}
+\end{figure}
+
+% ---- Table: Main parent countries, by exporting country, 2018
+\begin{table}[htbp]
+\centering
+\caption{Main parent countries of foreign multinationals, by exporting country, 2018}
+\label{tab:cparents}
+{\footnotesize\setlength{\tabcolsep}{4pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_country_parents}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Shares of the agricultural exports of foreign MNEs with a recorded parent country.\\
+\srcnote
+\end{minipage}
+\end{table}
+
+\FloatBarrier
+\subsection{Fact 3: A few large groups ship most of the exports of foreign affiliates}\label{sec:f3}
+
+\subsubsection*{Aggregate}
+
+In 2018, 41 percent of parents had only one affiliate in the world. Yet the 15 percent of parents with more than 100
+affiliates shipped 49 percent of the exports of foreign affiliates, and groups with more than ten affiliates shipped 78
+percent (Figure~\ref{fig:network}).
+
+% ---- Figure: Agricultural exports of foreign multinationals and number of parents, by size of the global network of the group, 2018
+\begin{figure}[htbp]
+\centering
+\caption{Agricultural exports of foreign multinationals and number of parents, by size of the global network of the group, 2018}
+\label{fig:network}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_fig_network}}
+
+\begin{minipage}{0.9\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Affiliates worldwide in Orbis and Dun \& Bradstreet. Groups with this information account for 98 percent of the exports of foreign MNEs.\\
+\srcnote
+\end{minipage}
+\end{figure}
+
+\FloatBarrier
+\subsubsection*{By country}
+
+Groups with more than 100 affiliates ship more than half of the exports of foreign affiliates in Paraguay (79.5
+percent), Costa Rica (61.5 percent), Chile (54.4 percent) and Uruguay (53.8 percent) (Table~\ref{tab:cnetwork}). Peru is the
+exception: groups with a single affiliate ship 38.5 percent and groups with more than 100 affiliates 22.7 percent.
+
+% ---- Table: Agricultural exports of foreign multinationals by size of the global network of the group, by exporting country, 2018
+\begin{table}[htbp]
+\centering
+\caption{Agricultural exports of foreign multinationals by size of the global network of the group, by exporting country, 2018}
+\label{tab:cnetwork}
+{\footnotesize\setlength{\tabcolsep}{4pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_country_network}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Columns 1 to 4: percent of the exports of foreign MNEs shipped by groups with the given number of affiliates worldwide. Coverage: percent of these exports shipped by groups with this information.\\
+\srcnote
+\end{minipage}
+\end{table}
+
+\FloatBarrier
+\subsection{Fact 4: Exports are larger where more multinationals are present}\label{sec:f4}
+
+\subsubsection*{Aggregate}
+
+To measure the association between multinational presence and exports, we estimate
+\begin{equation}\label{eq:presence}
+\ln X_{odpy} = \beta \ln N_{odpy} + \delta + \varepsilon_{odpy},
+\end{equation}
+where $X_{odpy}$ is the value of product $p$ exported from origin $o$ to destination $d$ in year $y$, $N_{odpy}$ is the
+number of MNEs that export it, and $\delta$ is a set of fixed effects. This is the intensive margin, estimated on observations
+with at least one MNE. At the extensive margin, we replace $\ln N_{odpy}$ with an indicator for at least one MNE. The dependent
+variable is the exports of all firms or of local firms only.
+
+Columns 1 to 4 of the tables have, in order, origin, destination, product and year fixed effects, origin $\times$ year,
+destination $\times$ year and product fixed effects, origin $\times$ destination $\times$ product and year fixed effects, and
+origin $\times$ destination $\times$ product and origin $\times$ destination $\times$ year fixed effects. Column 5, the
+strictest specification, adds origin $\times$ product $\times$ year and destination $\times$ product $\times$ year fixed
+effects.\footnote{An accompanying workbook reports eleven specifications for every table, including those not printed here.}
+Standard errors are clustered by pair of origin and destination countries. Multinationals choose the products and markets in
+which they operate, so these estimates are conditional correlations.
+
+The elasticity of exports with respect to the number of multinationals is 2.19 in column 1, 0.83 once the same origin,
+destination and product are followed over time (column 3), 0.80 in column 4 and 0.55 in the strictest specification
+(Table~\ref{tab:t1}, Panel A). At the extensive margin, exports are 0.66 log points larger with at least one multinational in
+column 3 and 0.57 in the strictest specification (Panel B). The association for local firms is smaller, but it is positive and
+significant in every specification (Table~\ref{tab:t1local}). Their elasticity goes from 1.56 in column 1 to 0.41, 0.37 and
+0.18 in columns 3 to 5, and the coefficient on at least one multinational goes from 1.94 to 0.27, 0.24 and 0.09.
+
+% ---- Table: Multinational presence and agricultural exports, all firms
+\begin{table}[htbp]
+\centering
+\caption{Multinational presence and agricultural exports, all firms}
+\label{tab:t1}
+{\footnotesize\setlength{\tabcolsep}{4pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_presence_all}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Equation~\ref{eq:presence}, 2012 to 2018. Dependent variable: $\ln$ exports of all firms. Standard errors clustered by pair of origin and destination countries in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\
+\srcnote
+\end{minipage}
+\end{table}
+
+% ---- Table: Multinational presence and agricultural exports, local firms
+\begin{table}[htbp]
+\centering
+\caption{Multinational presence and agricultural exports, local firms}
+\label{tab:t1local}
+{\footnotesize\setlength{\tabcolsep}{4pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_presence_local}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Regressions as in Table~\ref{tab:t1}. Dependent variable: $\ln$ exports of local firms. Standard errors clustered by pair of origin and destination countries in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\
+\srcnote
+\end{minipage}
+\end{table}
+
+The larger exports of local firms come mainly from more local exporters rather than from larger sales per exporter
+(Table~\ref{tab:mneprod}). Here the sample is restricted to products that at least one multinational from the same origin
+exports in some year, 97 percent of the observations and 99.5 percent of the value. A 10 percent higher number of
+multinationals is associated with 2.3 percent more local exporters and 1.5 percent higher exports per local exporter (columns 5
+and 7). In the strictest specification, the first remains significant (1.2 percent) and the second does not (0.6 percent). The
+extensive margin shows the same pattern (Panel B).
+
+% ---- Table: Multinational presence and the exports of local firms: number of exporters and exports per exporter
+\begin{table}[htbp]
+\centering
+\caption{Multinational presence and the exports of local firms: number of exporters and exports per exporter}
+\label{tab:mneprod}
+{\footnotesize\setlength{\tabcolsep}{3pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_presence_mneprod}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Products that at least one MNE from the same origin exports in some year. Odd columns have the fixed effects of column 4 of Table~\ref{tab:t1} and even columns those of column 5. Standard errors clustered by pair of origin and destination countries in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\
+\srcnote
+\end{minipage}
+\end{table}
+
+\FloatBarrier
+\subsubsection*{By country}
+
+The association holds in every country (Tables~\ref{tab:cpres_all} and~\ref{tab:cpres_local}). We estimate
+equation~(\ref{eq:presence}) by country with the fixed effects of column 4 of Table~\ref{tab:t1}. The elasticity of total
+exports ranges from 0.60 in Costa Rica to 0.99 in Uruguay, and the coefficient on at least one multinational is positive and
+significant in every country. For local firms, both coefficients are positive and significant in seven countries, with
+elasticities from 0.23 in Colombia to 0.74 in Paraguay. Neither is significant in Costa Rica and El Salvador.
+
+% ---- Table: Multinational presence and agricultural exports, by exporting country, all firms
+\begin{table}[htbp]
+\centering
+\caption{Multinational presence and agricultural exports, by exporting country, all firms}
+\label{tab:cpres_all}
+{\footnotesize\setlength{\tabcolsep}{3pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_country_presence_all}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Equation~\ref{eq:presence} for each exporting country (ISO 3166 codes), 2012 to 2018. Dependent variable: $\ln$ exports of all firms. Standard errors clustered by destination country in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\
+\srcnote
+\end{minipage}
+\end{table}
+
+% ---- Table: Multinational presence and agricultural exports, by exporting country, local firms
+\begin{table}[htbp]
+\centering
+\caption{Multinational presence and agricultural exports, by exporting country, local firms}
+\label{tab:cpres_local}
+{\footnotesize\setlength{\tabcolsep}{3pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_country_presence_local}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Regressions as in Table~\ref{tab:cpres_all}. Dependent variable: $\ln$ exports of local firms. Standard errors clustered by destination country in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\
+\srcnote
+\end{minipage}
+\end{table}
+
+\FloatBarrier
+\subsection{Fact 5: The association is stronger for field crops}\label{sec:f5}
+
+\subsubsection*{Aggregate}
+
+In 2018, multinationals account for 51.1 percent of the exports of field crops and 38.6 percent of those of horticultural
+and plantation crops (Table~\ref{tab:groups}). They also account for 63.3 percent of the exports of farm products with high
+capital intensity, against 36.5 percent of the other farm products. Among processed products, the order is reversed, 44.9
+against 50.4 percent. Within each type of production, the differences by capital intensity go in both directions. Field crops
+are almost all products of high capital intensity: those with low capital intensity are 0.3 percent of exports.
+
+% ---- Table: Agricultural exports and multinational shares, by type of production and capital intensity
+\begin{table}[htbp]
+\centering
+\caption{Agricultural exports and multinational shares, by type of production and capital intensity, 2018}
+\label{tab:groups}
+{\footnotesize\setlength{\tabcolsep}{4pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_groups}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Groups defined in Section~\ref{sec:data}. Capital per worker is the average of the group weighted by exports.\\
+\textit{Source:} Authors' calculations based on customs data matched to Orbis (Bureau van Dijk) and Dun \& Bradstreet, FAO, USDA NASS, and NBER and CES.
+\end{minipage}
+\end{table}
+
+The association is also stronger in field crops. To compare groups, we interact $\ln N_{odpy}$ in
+equation~(\ref{eq:presence}) with an indicator for each group. In column 4, the elasticity is 1.01 for field crops and 0.68 for
+horticultural and plantation crops. In the strictest specification it is 0.99 against 0.49. Both differences are significant at
+the 1 percent level (Table~\ref{tab:crop}, Panel A). For local firms, the elasticity is 0.55 against 0.31 in column 4. This
+difference is significant at the 1 percent level, but not in the strictest specification (Panel B).
+
+% ---- Table: Multinational presence and agricultural exports, by type of production
+\begin{table}[htbp]
+\centering
+\caption{Multinational presence and agricultural exports, by type of production}
+\label{tab:crop}
+{\footnotesize\setlength{\tabcolsep}{4pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_crop_int}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Regressions as in Table~\ref{tab:t1}, Panel A, with $\ln$ number of MNEs interacted with an indicator for each type of production. Standard errors clustered by pair of origin and destination countries in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\
+\textit{Source:} Authors' calculations based on customs data matched to Orbis (Bureau van Dijk) and Dun \& Bradstreet. Crop groups from the FAO Indicative Crop Classification.
+\end{minipage}
+\end{table}
+
+Capital intensity gives a similar result at the farm stage. The elasticity is 1.11 for farm products with high capital
+intensity and 0.66 for the others in column 4, and 1.09 against 0.50 in the strictest specification. Both differences are
+significant (Table~\ref{tab:capital}, Panel A). Among processed products, it is 0.76 with high and 0.88 with low capital
+intensity in column 4, and the difference is not significant in the strictest specification. For local firms at the farm stage,
+it is 0.69 against 0.34 in column 4 and 0.49 against 0.25 in the strictest specification, where the difference is not
+significant (Panel B).
+
+% ---- Table: Multinational presence and agricultural exports, by capital intensity
+\begin{table}[htbp]
+\centering
+\caption{Multinational presence and agricultural exports, by capital intensity}
+\label{tab:capital}
+{\footnotesize\setlength{\tabcolsep}{4pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_capital_int}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Regressions as in Table~\ref{tab:t1}, Panel A, with $\ln$ number of MNEs interacted with an indicator for each group of capital intensity. Standard errors clustered by pair of origin and destination countries in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\
+\textit{Source:} Authors' calculations based on customs data matched to Orbis (Bureau van Dijk) and Dun \& Bradstreet, USDA NASS, and NBER and CES.
+\end{minipage}
+\end{table}
+
+The stronger association of farm products with high capital intensity comes from field crops (Table~\ref{tab:txk}). In
+column 4, the elasticity is 0.70 with high and 0.66 with low capital intensity in horticultural and plantation crops, 0.87
+against 0.93 in livestock and fisheries, and 0.70 against 0.65 in other processed food. None of these differences is significant
+at the 5 percent level in columns 4 and 5. In field crops it is 1.04 against 0.54 in column 4, but the second group is very small
+and the difference is not significant in the strictest specification. For local firms, the only difference significant at the 5
+percent level in these columns is in livestock and fisheries in column 4 (Panel B).
+
+% ---- Table: Multinational presence and agricultural exports, by type of production and capital intensity
+\begin{table}[htbp]
+\centering
+\caption{Multinational presence and agricultural exports, by type of production and capital intensity}
+\label{tab:txk}
+{\footnotesize\setlength{\tabcolsep}{4pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_txk_int}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Regressions as in Table~\ref{tab:t1}, Panel A, with $\ln$ number of MNEs interacted with an indicator for each type of production with high or low capital intensity. Standard errors clustered by pair of origin and destination countries in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\
+\textit{Source:} Authors' calculations based on customs data matched to Orbis (Bureau van Dijk) and Dun \& Bradstreet, FAO, USDA NASS, and NBER and CES.
+\end{minipage}
+\end{table}
+
+The extensive margin gives a similar picture (Tables~\ref{tab:crop_ext},~\ref{tab:capital_ext} and~\ref{tab:txk_ext} in
+the Appendix). The differences between field and horticultural crops and by capital intensity at the farm stage are significant
+in column 4 but not in the strictest specification.
+
+\FloatBarrier
+\subsubsection*{By country}
+
+The higher multinational share of field crops holds where field crops are a large part of agricultural exports
+(Table~\ref{tab:cgroups}). Multinationals ship 46 percent of the field crop exports of Argentina, 78 percent of those of Paraguay
+and 82 percent of those of Uruguay, against 34, 39 and 35 percent of their horticultural and plantation exports. The order is
+reversed in Peru, Colombia, Costa Rica and El Salvador, where field crops are 27 percent of agricultural exports or less.
+
+% ---- Table: Multinational share of agricultural exports by type of production and capital intensity, by exporting country
+\begin{table}[htbp]
+\centering
+\caption{Multinational share of agricultural exports by type of production and capital intensity, by exporting country, 2018}
+\label{tab:cgroups}
+{\footnotesize\setlength{\tabcolsep}{4pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_country_groups}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Rows under Type of production and Capital intensity: percent of the exports of each group shipped by MNEs. Rows under Share of exports: percent of the agricultural exports of the country. Groups as in Table~\ref{tab:groups}.\\
+\srcnote
+\end{minipage}
+\end{table}
+
+The elasticity is significantly larger for field crops than for horticultural and plantation crops in Argentina (1.02
+against 0.67), Chile (1.16 against 0.61) and Uruguay (1.55 against 0.59), and the order is reversed in the Dominican Republic
+(0.23 against 0.59) (Table~\ref{tab:chet}). The difference is not significant in the other five countries. Farm products with
+high capital intensity show a larger elasticity in Argentina, Chile, Uruguay and El Salvador, and in Paraguay at the 10 percent
+level, and a smaller one in Costa Rica. This group has fewer than 150 observations in Costa Rica and El Salvador, so these two
+estimates rest on very few markets.
+
+% ---- Table: Multinational presence and agricultural exports by type of production and capital intensity, by exporting country
+\begin{table}[htbp]
+\centering
+\caption{Multinational presence and agricultural exports by type of production and capital intensity, by exporting country}
+\label{tab:chet}
+{\footnotesize\setlength{\tabcolsep}{3pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_country_hetero}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Regressions as in Table~\ref{tab:cpres_all}, Panel A, with $\ln$ number of MNEs interacted with an indicator for each group. A blank cell means that the country has no observation with an MNE in that group. Standard errors clustered by destination country in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\
+\textit{Source:} Authors' calculations based on customs data matched to Orbis (Bureau van Dijk) and Dun \& Bradstreet, FAO, USDA NASS, and NBER and CES.
+\end{minipage}
+\end{table}
+
+\FloatBarrier
+\subsection{Fact 6: The exports of multinationals do not fall less with distance}\label{sec:f6}
+
+\subsubsection*{Aggregate}
+
+To compare how exports vary with distance, we estimate at the level of the firm, destination, product and year
+\begin{equation}\label{eq:dist}
+\ln x_{fodpy} = \alpha \ln D_{od} + \gamma \left(M_{f} \times \ln D_{od}\right) + \theta M_f + \delta + u_{fodpy},
+\end{equation}
+where $x_{fodpy}$ is the value of product $p$ exported by firm $f$ from $o$ to $d$ in year $y$, $D_{od}$ is the distance
+between the two countries (CEPII), and $M_f$ equals one if the firm is a multinational affiliate. A positive $\gamma$ means that
+the exports of multinationals fall less with distance. Columns 1 and 2 of Table~\ref{tab:dist} have origin, destination, product
+and year fixed effects, and column 3 has origin $\times$ year, destination $\times$ year and product fixed effects. Columns 4 to 7
+add firm, firm $\times$ product, firm $\times$ year and firm $\times$ product $\times$ year fixed effects, which absorb $M_f$.
+Column 8 replaces destination $\times$ year with destination $\times$ product $\times$ year fixed effects.
+
+When $M_f$ is left out, the interaction is positive, 0.034 (column 1), but it picks up the difference in levels between
+multinationals and local firms. With $M_f$, multinationals export 0.81 log points more than local firms and the interaction is
+negative, 0.060 in absolute value (column 2). With firm fixed effects, it is small and not significant (columns 4 to 8), except
+with firm $\times$ product fixed effects (column 5), where it is 0.034 in absolute value and significant at the 10 percent level.
+Splitting multinationals by whether the group is present at the destination gives the same pattern (Panel B).
+
+% ---- Table: Distance and firm agricultural exports, all firms
+\begin{table}[htbp]
+\centering
+\caption{Distance and firm agricultural exports, all firms}
+\label{tab:dist}
+{\footnotesize\setlength{\tabcolsep}{3pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_distance_all}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Equation~\ref{eq:dist}, 2012 to 2018. Dependent variable: $\ln$ exports. Local firms are the omitted group. Column 1 leaves out the MNE indicator. Panel B: a group is present when it has an affiliate at the destination or the destination is the country of the parent. Standard errors clustered by pair of origin and destination countries in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\
+\textit{Source:} Authors' calculations based on customs data matched to Orbis (Bureau van Dijk) and Dun \& Bradstreet. Distances from the CEPII gravity database.
+\end{minipage}
+\end{table}
+
+Local firms, on the other hand, export more to distant markets where multinationals from their country export the same
+product (Table~\ref{tab:dist_local}). The interaction between distance and an indicator for at least one multinational in the
+market is 0.14 in columns 1 and 2 and between 0.10 and 0.11 with firm fixed effects (columns 3 to 6), significant at the 1 percent
+level. It disappears with destination $\times$ product $\times$ year fixed effects (column 7), so part of this pattern may reflect
+features of each destination and product that attract both multinationals and local exporters.
+
+% ---- Table: Distance and firm agricultural exports, local firms
+\begin{table}[htbp]
+\centering
+\caption{Distance and firm agricultural exports, local firms}
+\label{tab:dist_local}
+{\footnotesize\setlength{\tabcolsep}{3pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_distance_local}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Local firms, 2012 to 2018. Dependent variable: $\ln$ exports. At least one MNE in the market: at least one MNE from the same origin exports the same product to the same destination in the same year. Standard errors clustered by pair of origin and destination countries in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\
+\textit{Source:} Authors' calculations based on customs data matched to Orbis (Bureau van Dijk) and Dun \& Bradstreet. Distances from the CEPII gravity database.
+\end{minipage}
+\end{table}
+
+\FloatBarrier
+\subsubsection*{By country}
+
+The exports of multinationals fall less with distance only in Costa Rica (Table~\ref{tab:cdist}). We estimate
+equation~(\ref{eq:dist}) by country, where the destination $\times$ year fixed effects absorb $\ln D_{od}$. Without firm fixed
+effects (Panel A), the interaction is positive and significant in Costa Rica, negative and significant at the 10 percent level in
+Peru and Colombia, and not significant elsewhere. With firm fixed effects (Panel B), it is positive and significant in Costa Rica,
+negative and significant in Argentina and the Dominican Republic, and not significant elsewhere.
+
+% ---- Table: Distance and firm agricultural exports, by exporting country
+\begin{table}[htbp]
+\centering
+\caption{Distance and firm agricultural exports, by exporting country}
+\label{tab:cdist}
+{\footnotesize\setlength{\tabcolsep}{3pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_country_distance}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Equation~\ref{eq:dist} for each exporting country (ISO 3166 codes), 2012 to 2018. Dependent variable: $\ln$ exports. Local firms are the omitted group. Panel A has the fixed effects of column 3 of Table~\ref{tab:dist} and Panel B those of column 4. Standard errors clustered by destination country in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\
+\textit{Source:} Authors' calculations based on customs data matched to Orbis (Bureau van Dijk) and Dun \& Bradstreet. Distances from the CEPII gravity database.
+\end{minipage}
+\end{table}
+
+\FloatBarrier
+\section{Conclusions}\label{sec:conclusions}
+
+Multinational firms ship almost half of the agricultural exports of the nine countries, from 30 percent in El Salvador to
+69 percent in Paraguay, and these exports are concentrated in a few parent countries and in a few large groups. Where more
+multinationals export a product to a destination, exports are larger, and so are the exports of local firms, mostly through more
+local exporters. The exports of multinationals do not fall less with distance once each firm is compared across destinations.
+
+Two patterns are specific to agriculture. First, the weight of multinationals and their association with exports are larger in
+field crops, which are grown at a large scale with machinery and move in bulk, than in horticultural and plantation crops, which
+use more labor. This difference is clearest in Argentina, Chile and Uruguay. Second, capital intensity adds little once the type
+of production is taken into account. Farm products with high capital intensity show a stronger association because most of them
+are field crops.
+
+These patterns are associations. They do not measure the effect of multinational presence on exports.
+
+\section*{References}
+
+\begin{list}{}{\leftmargin=1.5em \itemindent=-1.5em \itemsep=2pt \topsep=4pt}
+\item Becker, R.\ A., Gray, W.\ B.\ and Marvakov, J., 2021. NBER-CES Manufacturing Industry Database (1958--2018, version 2021a). Cambridge, MA: National Bureau of Economic Research.
+\item Clapp, J., 2015. ABCD and Beyond: From Grain Merchants to Agricultural Value Chain Managers. \emph{Canadian Food Studies}, 2(2), 126--135.
+\item FAO, 2015. \emph{World Programme for the Census of Agriculture 2020, Volume 1: Programme, Concepts and Definitions}. FAO Statistical Development Series 15. Rome: Food and Agriculture Organization of the United Nations.
+\item Kandel, W., 2008. Hired Farmworkers a Major Input for Some U.S. Farm Sectors. \emph{Amber Waves}, April 2008. Washington, DC: US Department of Agriculture, Economic Research Service.
+\item Murphy, S., Burch, D.\ and Clapp, J., 2012. \emph{Cereal Secrets: The World's Largest Grain Traders and Global Agriculture}. Oxfam Research Reports. Oxford: Oxfam International.
+\item Reardon, T., Barrett, C.\ B., Berdegu\'e, J.\ A.\ and Swinnen, J.\ F.\ M., 2009. Agrifood Industry Transformation and Small Farmers in Developing Countries. \emph{World Development}, 37(11), 1717--1727.
+\item UNCTAD, 2009. \emph{World Investment Report 2009: Transnational Corporations, Agricultural Production and Development}. New York and Geneva: United Nations.
+\item UNSD, 2026. Correspondence tables between HS 2017, HS 2012, HS 2007, CPC Ver. 2.1, ISIC Rev. 4 and NAICS 2017. United Nations Statistics Division, Classifications on Economic Statistics. Accessed 3 November 2026.
+\item USDA NASS, 2019. \emph{2017 Census of Agriculture: United States Summary and State Data}, Volume 1, Geographic Area Series, Part 51. Washington, DC: US Department of Agriculture, National Agricultural Statistics Service.
+\end{list}
+
+\clearpage
+\appendix
+\setcounter{table}{0}\renewcommand{\thetable}{A.\arabic{table}}
+\section*{Appendix}
+
+% ---- Table: Multinational presence and agricultural exports, by type of production: extensive margin
+\begin{table}[htbp]
+\centering
+\caption{Multinational presence and agricultural exports, by type of production: extensive margin}
+\label{tab:crop_ext}
+{\footnotesize\setlength{\tabcolsep}{4pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_crop_ext}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Regressions as in Table~\ref{tab:crop}, with the indicator for at least one MNE in place of $\ln$ number of MNEs. Standard errors clustered by pair of origin and destination countries in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\
+\textit{Source:} Authors' calculations based on customs data matched to Orbis (Bureau van Dijk) and Dun \& Bradstreet. Crop groups from the FAO Indicative Crop Classification.
+\end{minipage}
+\end{table}
+
+% ---- Table: Multinational presence and agricultural exports, by capital intensity: extensive margin
+\begin{table}[htbp]
+\centering
+\caption{Multinational presence and agricultural exports, by capital intensity: extensive margin}
+\label{tab:capital_ext}
+{\footnotesize\setlength{\tabcolsep}{4pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_capital_ext}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Regressions as in Table~\ref{tab:capital}, with the indicator for at least one MNE in place of $\ln$ number of MNEs. Standard errors clustered by pair of origin and destination countries in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\
+\textit{Source:} Authors' calculations based on customs data matched to Orbis (Bureau van Dijk) and Dun \& Bradstreet, USDA NASS, and NBER and CES.
+\end{minipage}
+\end{table}
+
+% ---- Table: Multinational presence and agricultural exports, by type of production and capital intensity: extensive margin
+\begin{table}[htbp]
+\centering
+\caption{Multinational presence and agricultural exports, by type of production and capital intensity: extensive margin}
+\label{tab:txk_ext}
+{\footnotesize\setlength{\tabcolsep}{4pt}\setlength{\extrarowheight}{1pt}
+\adjustbox{max width=\linewidth}{\input{tables/v3/v3_txk_ext}}}
+
+\begin{minipage}{0.95\linewidth}
+\notesize
+\vspace{0.6em}
+\textit{Notes:} Regressions as in Table~\ref{tab:txk}, with the indicator for at least one MNE in place of $\ln$ number of MNEs. Standard errors clustered by pair of origin and destination countries in parentheses. *** $p<0.01$, ** $p<0.05$, * $p<0.1$.\\
+\textit{Source:} Authors' calculations based on customs data matched to Orbis (Bureau van Dijk) and Dun \& Bradstreet, FAO, USDA NASS, and NBER and CES.
+\end{minipage}
+\end{table}
+
+\end{document}

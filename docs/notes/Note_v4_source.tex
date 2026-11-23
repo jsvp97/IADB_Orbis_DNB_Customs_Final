@@ -1,0 +1,804 @@
+\documentclass[article, 12pt, 3p]{elsarticle}
+
+\usepackage{natbib} 
+\setcitestyle{authoryear,open={(},close={)}}
+%\bibliographystyle{plainnat}
+
+\usepackage{etoolbox,comment,setspace,fancyhdr,hyperref,color,graphicx,subcaption,booktabs,rotating,multirow}
+
+\captionsetup[subfigure]{labelformat=simple,labelsep=space}
+\renewcommand\thesubfigure{(\roman{subfigure})}
+
+\newcounter{rowfig}
+\renewcommand{\therowfig}{\Alph{rowfig}}
+
+\usepackage{amsmath,amsthm,amssymb,amstext,bbold,amsfonts}
+\usepackage{float,caption}
+\usepackage{threeparttable}
+\usepackage{lscape}
+\usepackage{bbm}
+\usepackage{adjustbox}
+\usepackage[tracking=true]{microtype}
+%\usepackage[pdftex, letterpaper, margin=1in, headheight=-.25cm]{geometry}
+ %\usepackage[abbr]{harvard}
+ 
+\hypersetup{
+  colorlinks   = true, %Colours links instead of ug dly boxes
+  urlcolor     = blue, %Colour for external hyperlinks
+  linkcolor    = black, %Colour of internal links 
+  citecolor   = blue %Colour of citations
+}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{definition}{Definition}
+\newtheorem{assumption}{Assumption}
+\newtheorem{condition}{Condition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{conjecture}{Conjecture}
+\newtheorem{corollary}{Corollary}
+\numberwithin{corollary}{proposition}
+%\numberwithin{equation}{section}
+% [[prompt01]] original: \numberwithin{equation}{}
+
+%\newcommand{\inv}{\makebox[0pt][l]{$^{-1}$}}
+\pdfoptionpdfminorversion=6 
+
+%Define argmax
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+%%Put space between captions and figures.
+%\setlength{\belowcaptionskip}{6pt}
+
+\makeatletter
+\def\ps@pprintTitle{%
+   \let\@oddhead\@empty
+   \let\@evenhead\@empty
+   \let\@oddfoot\@empty
+   \let\@evenfoot\@oddfoot
+}
+\makeatother
+\usepackage{ragged2e}
+\usepackage{setspace} 
+\usepackage{caption}
+% [[prompt01]] original: \usepackage[usenames,dvipsnames]{pstricks}
+% [[prompt01]] original: \usepackage{epsfig}
+% [[prompt01]] original: \usepackage{pst-grad} % For gradients
+% [[prompt01]] original: \usepackage{pst-plot} % For axes
+ \usepackage[space]{grffile} % For spaces in paths
+ \makeatletter % For spaces in paths
+ \patchcmd\Gread@eps{\@inputcheck#1 }{\@inputcheck"#1"\relax}{}{}
+ \makeatother
+\usepackage[utf8]{inputenc}
+% [[prompt01]] original: \usepackage{stackrel}
+\IfFileExists{stackrel.sty}{\usepackage{stackrel}}{}
+\usepackage{array}
+\usepackage{siunitx}
+% [[prompt02]] added: column-width convention of the reference (_reference_productivity/Tables/_tabledefs.tex,
+% copied, not \input): N{<width>} centred numeric column, L{<width>} ragged-right label column.
+\usepackage{makecell}
+\newcolumntype{N}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newlength{\labelw}\setlength{\labelw}{0.22\textwidth}
+\newlength{\labelwwide}\setlength{\labelwwide}{0.36\textwidth}
+\newlength{\labelwnarrow}\setlength{\labelwnarrow}{0.19\textwidth}
+\newcommand{\colwfor}[2]{\dimexpr(\textwidth-(#2)-\tabcolsep*\numexpr2*#1+2\relax)/#1\relax}
+\newcommand{\colwform}[3]{\dimexpr(\textwidth-(#3)-\tabcolsep*\numexpr2*#1+2*#2\relax)/#1\relax}
+\newcommand{\colw}{\colwfor{6}{\labelw}}
+\newcommand{\colwvii}{\colwfor{7}{\labelw}}
+\newcommand{\colwnarrow}{\colwfor{8}{\labelw}}
+\newcommand{\notesize}{\footnotesize}
+\setlength{\extrarowheight}{4pt}
+\renewcommand\normalsize{\fontsize{11}{8}\selectfont}
+\newcommand\narrowstyle{\SetTracking{encoding=*}{-10}\lsstyle}
+\newcommand\vnarrowstyle{\SetTracking{encoding=*}{-40}\lsstyle}
+\newcommand\vvnarrowstyle{\SetTracking{encoding=*}{-75}\lsstyle}
+
+\newcommand\narrowtext[1]{\textls[-10]{#1}}
+\newcommand\vnarrowtext[1]{\textls[-40]{#1}}
+\newcommand\vvnarrowtext[1]{\textls[-75]{#1}}
+
+\makeatletter
+\renewcommand\footnotesize{%
+   \@setfontsize\footnotesize\@ixpt{9}%
+   \abovedisplayskip 8\p@ \@plus2\p@ \@minus4\p@
+   \abovedisplayshortskip \z@ \@plus\p@
+   \belowdisplayshortskip 4\p@ \@plus2\p@ \@minus2\p@
+   \def\@listi{\leftmargin\leftmargini
+               \topsep 4\p@ \@plus2\p@ \@minus2\p@
+               \parsep 2\p@ \@plus\p@ \@minus\p@
+               \itemsep \parsep}%
+   \belowdisplayskip \abovedisplayskip
+}
+\makeatother
+
+\usepackage{setspace}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}  % [[v3]] scalable fonts, needed by microtype outside Overleaf
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{pdfpages}
+\usepackage{dsfont}
+\newcommand{\bc}{\begin{center}}
+\newcommand{\ec}{\end{center}}
+\newcommand{\bt}{\begin{tabular}}
+\newcommand{\et}{\end{tabular}}
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\ben}{\begin{enumerate}}
+\newcommand{\een}{\end{enumerate}}
+\newcommand{\bd}{\begin{displaymath}}
+\newcommand{\ed}{\end{displaymath}}
+\newcommand{\beann}{\begin{eqnarray*}}
+\newcommand{\eeann}{\end{eqnarray*}}
+\newcommand{\bea}{\begin{eqnarray}}
+\newcommand{\eea}{\end{eqnarray}}
+\newcommand{\ba}{\begin{array}}
+\newcommand{\ea}{\end{array}}
+\newcommand{\bma}{\begin{pmatrix}}
+\newcommand{\ema}{\end{pmatrix}}
+%}}}
+%Math Shortcuts {{{
+\newcommand{\Ra}{\Rightarrow}
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bbY}{\mathbb{Y}}
+\newcommand{\bbF}{\mathbb{F}}
+\newcommand{\bbS}{\mathbb{S}}
+\newcommand{\bbN}{\mathbb{N}}
+\newcommand{\bbG}{\mathbb{G}}
+\newcommand{\bbT}{\mathbb{T}}
+\newcommand{\deB}{\mathcal{B}}
+\newcommand{\deW}{\mathcal{W}}
+\newcommand{\deR}{\mathcal{R}}
+\newcommand{\deF}{\mathcal{F}}
+\newcommand{\deA}{\mathcal{A}}
+\newcommand{\deY}{\mathcal{Y}}
+\newcommand{\deS}{\mathcal{S}}
+\newcommand{\deL}{\mathcal{L}}
+\newcommand{\deH}{\mathcal{H}}
+\newcommand{\deE}{\mathcal{E}}
+\newcommand{\deP}{\mathcal{P}}
+\newcommand{\deG}{\mathcal{G}}
+\newcommand{\deT}{\mathcal{T}}
+\newcommand{\deff}{\mathcal{f}}
+\newcommand{\dep}{\mathcal{p}}
+\newcommand{\E}{\mathnormal{E}}
+\newcommand{\var}{\mathnormal{V\!AR}}
+\newcommand{\Cov}{\mathnormal{COV}}
+\newcommand{\Corr}{\mathnormal{CORR}}
+\newcommand{\Prob}{\mathnormal{Prob}}
+%}}}
+%Additional Shortcuts {{{
+\newcommand{\mD}{\displaystyle}
+\newcommand{\mT}{\textstyle}
+\newcommand{\mS}{\scriptstyle}
+\newcommand{\mSS}{\scriptscriptstyle}
+\newcommand{\m}[1]{\,#1\,}
+\newcommand{\nn}{\nonumber}
+\newcommand{\colorEmphText}{\color{blue}}
+\newcommand{\colorEmphBackground}{\color{yellow}}
+%}}}
+% \usepackage[stable]{footmisc} 
+\newcommand*{\mycommand}[1]{\texttt{\emph{#1}}}
+% [[prompt01]] original: \renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+%% these three are essential for estout
+\usepackage{booktabs}  % neatly formatting lines
+\usepackage{threeparttable}    
+\usepackage{dcolumn}    % aligning decimals
+    \newcolumntype{d}[1]{D{.}{.}{#1}}
+% Estout LaTeX wrapper (by Jörg Weber)
+\let\estinput=\input % define a new input command so that we can still flatten the document
+\newcommand{\estwide}[3]{
+		\vspace{.75ex}{
+			%\textsymbols% Note the added command here
+			\begin{tabular*}
+			{\textwidth}{@{\hskip\tabcolsep\extracolsep\fill}l*{#2}{#3}}
+			\toprule
+			\estinput{#1}
+			\addlinespace[.75ex]
+			\end{tabular*}
+			}
+		}	
+\newcommand{\estauto}[3]{
+		\vspace{.75ex}{
+			%\textsymbols% Note the added command here
+			\begin{tabular}{l*{#2}{#3}}
+			\toprule
+			\estinput{#1}
+			\\ \bottomrule           % 08 Dec 2021. Add these slashes.
+			\addlinespace[-.75]
+			\end{tabular}
+			}
+		}
+% Allow line breaks with \\ in specialcells
+\newcommand{\specialcell}[2][c]{%
+    \begin{tabular}[#1]{@{}c@{}}#2\end{tabular}
+}
+\usepackage{float}
+\usepackage[section]{placeins}
+% [[prompt02d]] floats share pages with text instead of going to float pages
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.85}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\setlength{\floatsep}{10pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{14pt plus 2pt minus 2pt}
+\setlength{\intextsep}{12pt plus 2pt minus 2pt}
+\newcommand{\sym}[1]{\rlap{#1}}% Thanks David Carlisle
+\usepackage{hhline}
+\captionsetup{font=normalsize} 
+
+
+ % Note/Source/Text after Tables
+\newcommand{\figtext}[1]{
+	\vspace{-1.9ex}
+	\captionsetup{justification=justified,font=scriptsize}
+	\caption*{\hspace{6pt}\hangindent=1.5em #1}
+	} 
+\newcommand{\fignote}[1]{\figtext{\emph{Note:~}~#1}}
+
+\newcommand{\figsource}[1]{\figtext{\emph{Source:~}~#1}}
+
+% Add significance note with \starnote
+\newcommand{\starnote}{\figtext{* p < 0.1, ** p < 0.05, *** p < 0.01. Standard errors in parentheses.}}
+% [[prompt01]] added: source note of every table and figure (wording from main.tex l. 16)
+% [[prompt02]] original: \newcommand{\srcnote}{\textit{Source:} Authors' calculations based on customs data matched to Orbis and Dun \& Bradstreet.}
+\newcommand{\srcnote}{\textit{Source:} Authors' calculations based on customs data matched to Orbis (Bureau van Dijk) and Dun \& Bradstreet.}
+%\usepackage{etoolbox} % to hook into `figure` and reset the mysubfig counter
+
+% [[prompt01]] original: \usepackage{subfig}
+
+
+% Checkmarks
+\usepackage{tikz}
+\newcommand{\tikzxmark}{%
+\tikz[scale=0.23] {
+    \draw[line width=0.7,line cap=round] (0,0) to [bend left=6] (1,1);
+    \draw[line width=0.7,line cap=round] (0.2,0.95) to [bend right=3] (0.8,0.05);
+}}
+\newcommand{\tikzcmark}{% 
+\tikz[scale=0.23] {
+    \draw[line width=0.7,line cap=round] (0.25,0) to [bend left=10] (1,1);
+    \draw[line width=0.8,line cap=round] (0,0.35) to [bend right=1] (0.23,0);
+}}
+%\renewcommand{\arraystretch}{0.9}
+% [[prompt02]] original: \renewcommand{\arraystretch}{0.8}
+% [[prompt02]] original: \setlength{\tabcolsep}{5pt}
+ \makeatletter
+\newcommand*\mysize{%
+  \@setfontsize\mysize{7.5}{9.0}%
+}
+
+\makeatother
+% For reference:
+%\[
+%    \checkmark
+%    \tikzxmark
+%    \tikzcmark
+%\]
+
+%\onehalfspacing
+
+% [[prompt03b]] elsarticle draws two rules around the (absent) abstract; suppress them for this summary
+\makeatletter
+\let\els@maketitle\maketitle
+\renewcommand{\maketitle}{\begingroup\let\hrule\relax\els@maketitle\endgroup}
+\makeatother
+\usepackage{pgfplots}\pgfplotsset{compat=1.16}  % [[v3]] figures drawn in the note itself
+\hyphenpenalty=10000 \exhyphenpenalty=10000  % [[v3]] no words split across lines with a hyphen
+
+% [[v4]] float macros: label, caption, content, notes, source
+\newcommand{\SIG}{*** $p<0.01$, ** $p<0.05$, * $p<0.1$.}
+\newcommand{\vtab}[5]{\begin{table}[htbp]\centering\caption{#2}\label{#1}
+{\footnotesize\setlength{\tabcolsep}{4pt}\setlength{\extrarowheight}{1pt}\adjustbox{max width=\linewidth}{#3}}\par
+\begin{minipage}{0.95\linewidth}\notesize\vspace{0.6em}\textit{Notes:} #4\\#5\end{minipage}\end{table}}
+\newcommand{\vfig}[5]{\begin{figure}[htbp]\centering\caption{#2}\label{#1}
+\adjustbox{max width=\linewidth}{#3}\par
+\begin{minipage}{0.9\linewidth}\notesize\vspace{0.6em}\textit{Notes:} #4\\#5\end{minipage}\end{figure}}
+\begin{document}
+
+\title{$\,$\\ $\,$\\ $\,$\\\vspace{-4.9em}\LARGE\textbf{Multinational Firms and Agricultural Trade in Latin America}\footnote{The views and interpretations in this paper are strictly those of the authors and should not be attributed to the Inter-American Development Bank, its executive directors, or its member countries.}}
+\author{\vskip 2em This version: November 2026\\[2pt] \small Preliminary draft, please do not circulate}
+
+\thispagestyle{empty}
+\maketitle
+\begin{center}
+\begin{minipage}{0.86\linewidth}
+\small
+\textit{Abstract.} We use firm level customs data from nine Latin American countries, linked to ownership data, to
+examine the role of multinational firms in agricultural exports. We show that multinationals ship 47 percent of these
+exports, less than in mining and manufacturing, and that a few parent countries and a few large groups account for most
+of them. We also find that exports are larger where more multinationals export the same product to the same
+destination, and that this association is stronger for farm products with high capital intensity. Finally, we show that
+multinationals are not more likely to export capital intensive products and that fewer markets keep local exports after
+the first multinational enters, although local exports were already growing before entry.\\[4pt]
+\textit{JEL codes:} F14, F23, Q17. \textit{Keywords:} multinational firms, agricultural exports, capital intensity, Latin America.
+\end{minipage}
+\end{center}
+\setcounter{page}{0}\setcounter{footnote}{0}
+\renewcommand\normalsize{\fontsize{12}{20}\selectfont}\normalsize
+\newpage
+
+\section{Introduction}\label{sec:intro}
+
+Agriculture is a major source of export revenue in Latin America. It accounts for 35 percent of the merchandise exports
+of the nine countries studied here, and for more than half in Argentina, Paraguay and Uruguay. A small number of large
+firms handle much of world agricultural trade. Four trading companies account for most of the world grain trade
+(Murphy, Burch and Clapp, 2012, and Clapp, 2015), and multinational firms lead the processing, trading and retail stages
+of agricultural value chains (UNCTAD, 2009, and Reardon et al., 2009). However, there is little systematic evidence on
+how much of the agricultural exports of the region is shipped by multinational firms and on how their presence relates
+to the exports of other firms.
+
+In this paper, we address these questions. More precisely, we ask how large the role of multinationals is in
+agricultural exports and who owns them, whether exports are larger where more multinationals are present, and whether
+this association differs across products. We organize the analysis around the capital intensity of the product.
+Agricultural products differ widely in the machinery and equipment used per worker, from fruit orchards to grain farms
+and from fruit packing to oilseed crushing. Firms with better access to capital and technology may have an advantage
+in the products that need more of them.
+
+To explore these questions, we use firm level customs data from Argentina, Chile, Colombia, Costa Rica, the Dominican
+Republic, El Salvador, Paraguay, Peru and Uruguay over the period 2012 to 2018. We link the exporters to ownership data
+from Orbis and Dun \& Bradstreet, which tell us whether an exporter belongs to a multinational group and where its
+parent is located. We measure the capital intensity of each product with US census data.
+
+Our main results can be summarized as follows. First, multinationals ship 47 percent of agricultural exports, less than
+in mining and fuels (80 percent) or manufacturing (58 percent). Their parents are concentrated in a few countries, and
+the twenty largest groups ship half of the exports of foreign affiliates. Second, exports are larger where more
+multinationals export the same product to the same destination. A 10 percent increase in the number of multinationals
+is associated with exports about 8 percent larger when we compare the same origin, destination and product over time.
+Third, this association is stronger for farm products with high capital intensity, mainly grains and oilseeds. Among
+processed products we find no robust difference. Fourth, multinationals are not more likely to export capital intensive
+products. Fifth, after the first multinational starts to export a product, fewer markets keep local exports, but local
+exports were already growing before entry, so these estimates cannot be read as effects.
+
+Our paper contributes to the literature on the export spillovers of foreign firms (Aitken, Hanson and Harrison, 1997)
+and on the links between multinationals and local firms (Javorcik, 2004). These studies focus on manufacturing. We
+provide evidence for agriculture, where the technology of production varies widely across products. Closer to our
+paper, Carballo, Marra de Arti\~nano, Ottaviano and Volpe Martincus (2021) show that domestic firms that start selling
+to a multinational are more likely to start exporting, and Carballo, Marra de Arti\~nano and Volpe Martincus (2026) show
+that investment promotion raises the probability that a multinational opens its first affiliate in a country. We
+complement these studies with evidence on the weight of multinationals in agricultural exports and on how it varies
+with the capital intensity of the product. Our estimates describe associations, not causal effects.
+
+The rest of the paper is organized as follows. Section~\ref{sec:data} describes the data. Section~\ref{sec:desc}
+documents the weight of multinationals in agricultural exports. Section~\ref{sec:regs} relates their presence to
+exports and to capital intensity. Section~\ref{sec:conclusions} concludes.
+
+\section{Data}\label{sec:data}
+
+Our dataset consists of three main databases. First, we have firm level export data from the customs agencies of the
+nine countries. The data cover 2012 to 2018, the years in which all nine countries are observed. Each record includes
+the tax identifier of the firm, the product code at six digits of the Harmonized System (HS), the destination country,
+the year and the export value in US dollars.\footnote{The countries report HS 2007, HS 2012 or HS 2017, depending on the
+country and the year. We convert all codes to HS 2017 with the correlation tables of the United Nations Statistics
+Division (UNSD, 2026). In the records of Uruguay for 2016 to 2018, the codes of chapters 01 to 09 lost their first digit,
+a zero, and we restore it. Destinations are countries. Free trade zones and shipments to the exporting country are
+dropped.} Agricultural products are HS chapters 01 to 24. Second, we have data on the global ultimate owner of each
+company and the country of that owner from Orbis (Bureau van Dijk) and Dun \& Bradstreet.\footnote{Exporters are linked
+to these records by tax identifiers, by name matching confirmed with a large language model, and by a manual review of
+the largest unmatched exporters. In 2018, the country of the owner is known for 88 percent of the agricultural exports
+of foreign affiliates.} Finally, we measure the capital intensity of the industry behind each product with US data: the
+2017 Census of Agriculture (USDA NASS, 2019) for farm products and the Manufacturing Industry Database of the National
+Bureau of Economic Research and the Center for Economic Studies (NBER and CES, see Becker, Gray and Marvakov, 2021) for
+processed products.
+
+An exporter linked to the ownership data is an affiliate of a multinational firm (MNE), and its ultimate owner is its
+parent. The affiliate is a domestic MNE when its parent is located in the exporting country and a foreign MNE
+otherwise, including affiliates whose parent country is not recorded. Exporters that cannot be linked are local firms.
+A multinational group is the set of affiliates with the same parent. A snapshot of our dataset is presented in
+Table~\ref{tab:sample}. In 2018, 13,077 firms exported 782 agricultural products to 211 countries, for a total of
+US\$79.4 billion.
+
+\vtab{tab:sample}{Agricultural exports, by exporting country, 2018}{\input{tables/v4/v4_sample}}
+{The table reports agricultural exports, exporters, products and destinations in 2018. Exporters are distinct tax
+identifiers within each country. Destinations are countries, without free trade zones and shipments to the exporting
+country. LAC9: the nine countries together.}{\srcnote}
+
+Capital intensity is machinery and equipment per hired worker for farm products, from the fourteen farm types of the
+census, and equipment capital per employee for processed products, averaged over 2012 to 2018.\footnote{We link HS
+products to industries with the UNSD correspondence tables, from HS 2017 to the Central Product Classification, to the
+International Standard Industrial Classification and to the North American Industry Classification System 2017. When a
+product reaches several farm types or industries, we add up their capital and their workers. The census does not cover
+fishing, so fresh fish takes the values of the farm types linked to it, mainly aquaculture.} The measure covers 99
+percent of agricultural exports. The products it does not cover, such as bran and ethyl alcohol, are not classified.
+Within each stage, a product has high capital intensity when its capital per worker is above that of the stage as a
+whole, US\$113 thousand per hired worker on farms and US\$118 thousand per employee in processing. As an alternative,
+we use the median of the stage weighted by exports, US\$134 and US\$159 thousand, and quintiles of capital per worker
+within each stage. We use the US data only to rank products. We also group products by type of production, based on the
+crop groups of the FAO Indicative Crop Classification (FAO, 2015): field crops, horticultural and plantation crops,
+livestock and fisheries, and other processed food and beverages.
+
+\section{Multinationals in Agricultural Exports}\label{sec:desc}
+
+In this section, we document how much of the agricultural exports of the region is shipped by multinationals, where
+their parents are located and how concentrated their exports are across groups.
+
+\subsection{Multinationals ship almost half of agricultural exports, less than in other sectors}\label{sec:share}
+
+Table~\ref{tab:sector} compares agriculture with the other sectors. When looking at the nine countries together,
+multinationals account for 47.2 percent of agricultural exports in 2018, 39.3 percent through foreign affiliates and 7.9
+percent through domestic ones. Their weight is larger in mining and fuels, 79.8 percent, and in manufacturing, 58.0
+percent. Thus, agriculture is 35.0 percent of the exports of the region but only 27.5 percent of the exports of
+multinationals. This hides some variation across countries. The multinational share of agricultural exports ranges
+from 30.4 percent in El Salvador to 69.4 percent in Paraguay, and it is lower than in manufacturing in seven of the nine
+countries. Paraguay and Peru are the exceptions.
+
+\vtab{tab:sector}{Exports and multinational shares by sector, 2018}{\input{tables/v4/v4_sector}}
+{The table reports exports and the share shipped by multinationals in each sector in 2018. Agriculture: HS chapters 01
+to 24. Mining and fuels: HS 25 to 27. Fuels: HS 27. Manufacturing: HS 28 to 97. MNE share: percent of the exports of
+each sector shipped by foreign and domestic MNEs. LAC9: the nine countries together.}{\srcnote}
+
+Table~\ref{tab:mne} describes the exporters. The 3,218 affiliates that export agricultural products belong to 1,926
+groups whose parents are based in 112 countries. Affiliates are a quarter of agricultural exporters, but they are larger
+and sell to more markets. On average, a foreign affiliate exported US\$11.9 million and a domestic affiliate US\$10.4
+million, against US\$4.3 million for a local firm. They reached 5.5 and 6.1 destinations, against 3.9 for local firms.
+
+\vtab{tab:mne}{Multinationals in agricultural exports, 2018}{\input{tables/v4/v4_mne_summary}}
+{The table reports the number of exporters of each type and their average exports, destinations and products in 2018.}{\srcnote}
+
+\FloatBarrier
+\subsection{Parents are concentrated in a few countries}\label{sec:parents}
+
+Figure~\ref{fig:parents} shows the parent countries of foreign affiliates. Two countries account for more than a third
+of the agricultural exports of foreign affiliates with a recorded parent: the United States (23.4 percent) and the
+Netherlands (11.6 percent). A further 26.1 percent comes from groups whose parent is registered in jurisdictions such
+as Switzerland, Liechtenstein, Luxembourg, Panama and Bermuda. Groups often hold their affiliates through companies
+located there, so these countries show where the group is registered rather than where it operates. We therefore
+measure concentration both with all recorded parents and with the countries of operation only (Table~\ref{tab:pconc}).
+Among the countries of operation, the United States ships 31.7 percent of these exports and the five largest countries
+64.9 percent. The Herfindahl index is 1,427, the concentration of seven countries of equal size. Notice that the
+Netherlands also hosts holding companies, so part of its share may also reflect registration.
+
+\vfig{fig:parents}{Agricultural exports of foreign multinationals, by parent country, 2018}{\input{tables/v4/v4_fig_parents}}
+{The figure shows the percent of the agricultural exports of foreign MNEs with a recorded parent country (88 percent of
+the total) shipped by the affiliates of each parent country. Above the dashed line, the twelve largest countries of
+operation. Below, the largest registration jurisdictions (tax havens and conduit jurisdictions: Switzerland,
+Liechtenstein, Luxembourg, Panama, Bermuda, Hong Kong, Singapore and others).}{\srcnote}
+
+\vtab{tab:pconc}{Concentration of the agricultural exports of foreign multinationals by parent country, 2018}{\input{tables/v4/v4_parent_conc}}
+{The table reports measures of concentration across parent countries for foreign MNEs with a recorded parent country.
+Countries of operation: all parent countries except the registration jurisdictions of Figure~\ref{fig:parents}, with
+shares computed over their total. Equivalent number of countries: the number of countries of equal size with the same
+Herfindahl index.}{\srcnote}
+
+\FloatBarrier
+\subsection{A few large groups ship most of the exports of foreign affiliates}\label{sec:groups}
+
+Exports are also concentrated across groups (Table~\ref{tab:gconc}). The largest group ships 7.7 percent of the
+agricultural exports of foreign affiliates, and the twenty largest ship 51.7 percent. These groups have very large
+networks. Groups with more than 100 affiliates in the world are 15 percent of parents but ship 49 percent of the exports
+of foreign affiliates, while the 41 percent of parents with a single affiliate ship 10 percent
+(Figure~\ref{fig:network}).
+
+\vtab{tab:gconc}{Concentration of the agricultural exports of foreign multinationals by group, 2018}{\input{tables/v4/v4_group_conc}}
+{The table reports the share of the agricultural exports of foreign MNEs shipped by the largest groups. Groups are
+affiliates with the same ultimate owner in Orbis or Dun \& Bradstreet. Affiliates without a recorded owner count as
+groups of one.}{\srcnote}
+
+\vfig{fig:network}{Agricultural exports of foreign multinationals and number of parents, by size of the global network of the group, 2018}{\input{tables/v4/v4_fig_network}}
+{The figure shows the share of parents and the share of the exports of foreign MNEs by the number of affiliates of the
+group worldwide in Orbis and Dun \& Bradstreet. Groups with this information account for 98 percent of the exports of
+foreign MNEs.}{\srcnote}
+
+\FloatBarrier
+\section{Multinational Presence, Capital Intensity and Exports}\label{sec:regs}
+
+In this section, we relate the presence of multinationals to exports over 2012 to 2018. We first estimate the
+association between the number of multinationals and exports. We then ask whether it differs with capital intensity,
+whether multinationals locate in capital intensive products, and what happens to local exports when the first
+multinational enters.
+
+\subsection{Exports are larger where more multinationals are present}\label{sec:base}
+
+Exports are larger where more multinationals export the same product to the same destination. To assess this
+association, we estimate
+\begin{equation}\label{eq:presence}
+\ln X_{odpy} = \beta \ln N_{odpy} + \delta + \varepsilon_{odpy},
+\end{equation}
+where $X_{odpy}$ is the value of product $p$ exported from origin $o$ to destination $d$ in year $y$, $N_{odpy}$ is the
+number of MNEs that export it, and $\delta$ is a set of fixed effects. We estimate equation~(\ref{eq:presence}) on cells
+with at least one MNE. We also replace $\ln N_{odpy}$ with an indicator for at least one MNE and estimate it on all cells.
+The columns add fixed effects from origin, destination, product and year (column 1) to origin $\times$ destination
+$\times$ product, origin $\times$ destination $\times$ year, origin $\times$ product $\times$ year and destination
+$\times$ product $\times$ year (column 6).\footnote{Column 2 has origin $\times$ year, destination $\times$ year and
+product fixed effects, column 3 origin $\times$ destination $\times$ product and year fixed effects, column 4 origin
+$\times$ destination $\times$ product and origin $\times$ destination $\times$ year fixed effects, and column 5 adds
+origin $\times$ product $\times$ year fixed effects. An accompanying workbook reports every specification, sample and
+test.} In all specifications, we cluster standard errors by pair of origin and destination countries. Multinationals
+choose the products and markets in which they operate, so these estimates are conditional correlations.
+
+Table~\ref{tab:base} presents the estimates. The estimated coefficient on the number of multinationals is positive and
+significant in all specifications. It falls from 2.19 to 0.83 once we follow the same origin, destination and product
+over time (Panel A, columns 1 and 3). With origin $\times$ destination $\times$ year fixed effects, which control for
+factors such as bilateral trade costs that vary over time, the estimate is 0.79. Specifically, a 10 percent increase in
+the number of multinationals is associated with exports about 8 percent larger. This is true even under the most
+demanding specification, which controls not only for these factors but also for shocks to each product in each origin
+and in each destination. In this case, the estimate is 0.55. In Panel B, exports are 93 percent larger where at least
+one multinational is present in column 4 and 78 percent larger in column 6. The exports of local firms are also larger
+where more multinationals are present, with an elasticity of 0.37 in column 4 and 0.18 in column 6. This association
+runs mainly through a larger number of local exporters (Appendix Tables~\ref{tab:a_local} and~\ref{tab:a_exporters}).
+
+\vtab{tab:base}{Multinational presence and agricultural exports}{\input{tables/v4/v4_base}}
+{The table reports estimated coefficients of equation~(\ref{eq:presence}) for 2012 to 2018. The dependent variable is
+the natural logarithm of the exports of all firms. Panel A: cells with at least one MNE. Panel B: all cells. Standard
+errors clustered by pair of origin and destination countries are reported in parentheses. \SIG}{\srcnote}
+
+\FloatBarrier
+\subsection{The association is stronger for farm products with high capital intensity}\label{sec:het}
+
+We start by looking at the share of multinationals in the exports of products with different capital intensity
+(Table~\ref{tab:quint} and Figure~\ref{fig:kl}). At the farm stage, multinationals ship a larger share of the exports
+of products with more capital per worker. In 2018 they ship 36.7 percent of the exports of the farm products in the
+lowest quintile, mostly fruit, and 64.7 percent of those in the fourth quintile, mostly grains and oilseeds. In
+processing, the pattern does not hold. The share is 51.0 percent in the lowest quintile and 41.3 percent in the highest.
+
+\vtab{tab:quint}{Multinational share of agricultural exports by capital intensity, 2018}{\input{tables/v4/v4_quintiles}}
+{The table reports the share of MNEs in the exports of each quintile of capital per worker within each stage. Quintiles
+are weighted by exports of 2012 to 2018. Products linked to the same farm types or industries share one value, so
+quintiles have unequal sizes. Capital per worker: average of the quintile weighted by exports.}{\textit{Source:} Authors' calculations based on customs data matched to Orbis (Bureau van Dijk) and Dun \& Bradstreet, USDA NASS, and NBER and CES.}
+
+\vfig{fig:kl}{Multinational share of exports and capital per worker, by product, 2018}{\input{tables/v4/v4_fig_kl}}
+{The figure shows the MNE share of the exports of each product against its capital per worker. Each marker is an HS6
+product, with size proportional to its exports. The line is a fit weighted by exports.}{\textit{Source:} Authors' calculations based on customs data matched to Orbis (Bureau van Dijk) and Dun \& Bradstreet, USDA NASS, and NBER and CES.}
+
+The association between multinational presence and exports follows the same pattern. Table~\ref{tab:het} reports
+estimates of equation~(\ref{eq:presence}) in which we interact $\ln N_{odpy}$ with indicators for groups of products.
+With the stages pooled, products with high capital intensity show a larger elasticity, 0.83 against 0.76 in column 2.
+However, the difference is small, and it is not significant in the strictest specification (Panel A). With the median
+as the threshold, the difference is larger and significant in every column, 1.00 against 0.74 in column 2 and 0.78
+against 0.51 in column 4 (Panel B). Panel C shows that the difference comes from farm products. The elasticity is 1.11
+for farm products with high capital intensity and 0.66 for the other farm products in column 2, and 1.10 against 0.50 in
+column 4. Among processed products, the order depends on the threshold, and the difference is not significant in the
+strictest specification (Panel C and Appendix Table~\ref{tab:a_hetmed}).
+
+\vtab{tab:het}{Multinational presence and agricultural exports, by capital intensity}{\input{tables/v4/v4_het}}
+{The table reports estimated coefficients of equation~(\ref{eq:presence}) with the natural logarithm of the number of
+MNEs interacted with an indicator for each group of products. Cells with at least one MNE. Columns 1 to 4 have the fixed
+effects of columns 3 to 6 of Table~\ref{tab:base}. Standard errors clustered by pair of origin and destination countries
+are reported in parentheses. \SIG}{\textit{Source:} Authors' calculations based on customs data matched to Orbis (Bureau van Dijk) and Dun \& Bradstreet, USDA NASS, and NBER and CES.}
+
+At the farm stage, capital intensity and the type of production go together, as most farm products with high capital
+intensity are field crops. In Table~\ref{tab:farm}, we therefore add the interactions with the type of production. The
+difference between farm products with high and low capital intensity remains, 1.15 against 0.81 in column 2. It is
+significant in columns 1 to 3 but not in the strictest specification (Panel A). The continuous measure of capital per
+worker shows no slope once we control for the type of production (Panel B). With the stages pooled, the elasticity rises
+by 0.09 for each log point of capital per worker in column 2, and the slope is not significant in the strictest
+specification (Appendix Table~\ref{tab:a_cont}). Thus, the stronger association is a feature of a group of farm
+products, mainly grains and oilseeds, and not a gradient along capital per worker.
+
+\vtab{tab:farm}{Multinational presence and the exports of farm products: capital intensity and type of production}{\input{tables/v4/v4_farm}}
+{The table reports estimated coefficients of equation~(\ref{eq:presence}) for farm products of field crops,
+horticultural and plantation crops, and livestock and fisheries. The natural logarithm of the number of MNEs is
+interacted with high and low capital intensity (aggregate threshold) or with the natural logarithm of capital per
+worker, and with the types of production other than field crops. Standard errors clustered by pair of origin and
+destination countries are reported in parentheses. \SIG}{\textit{Source:} Authors' calculations based on customs data matched to Orbis (Bureau van Dijk) and Dun \& Bradstreet, FAO, USDA NASS, and NBER and CES.}
+
+\FloatBarrier
+\subsection{Multinationals are not more likely to export capital intensive products}\label{sec:loc}
+
+The stronger association does not come from multinationals choosing capital intensive products. To show this, we
+regress an indicator for at least one MNE exporting the product from the origin in the year on measures of capital
+intensity, with origin $\times$ year and type of production fixed effects. We use cells of origin, product and year
+with positive exports and cluster standard errors by product. An MNE is present in 68 percent of these cells, which
+account for 99 percent of agricultural exports.
+
+Table~\ref{tab:loc} presents the results. Capital per worker is not associated with the presence of an MNE (Panel A,
+column 1). By quintile, presence is lower in the upper quintiles of each stage, and it is 14 percentage points lower in
+the fourth quintile than in the first. The results for the MNE share of exports are mixed. The share rises with capital
+per worker and above the aggregate threshold, but not above the median or across quintiles (Panel B). The first entry
+of an MNE into a product that had none is not more likely in capital intensive products either (Panel C). Other product
+characteristics are more closely associated with presence. MNEs are 5 percentage points more likely to export
+differentiated products than homogeneous ones and 8 points more likely to export consumption goods than intermediate
+goods (Appendix Table~\ref{tab:a_loc}).
+
+\vtab{tab:loc}{Capital intensity and the presence of multinationals}{\input{tables/v4/v4_loc}}
+{The table reports estimated coefficients of a linear probability model on cells of origin, product and year with
+positive exports, for products with a capital intensity measure, 2012 to 2018. The dependent variable is an indicator
+for at least one MNE (Panel A), the MNE share of exports (Panel B) and an indicator for the first entry of an MNE (Panel
+C, cells with no MNE in any earlier year, 2013 to 2018). All regressions include origin $\times$ year and type of
+production fixed effects. Quintiles are within each stage, with the first quintile omitted. Standard errors clustered by
+product are reported in parentheses. \SIG}{\textit{Source:} Authors' calculations based on customs data matched to Orbis (Bureau van Dijk) and Dun \& Bradstreet, USDA NASS, and NBER and CES.}
+
+\FloatBarrier
+\subsection{Fewer markets keep local exports after the first multinational enters}\label{sec:event}
+
+We next examine what happens to local exports when the first multinational starts to export a product. We define the
+entry of the first multinational in a cell as the first year in which an MNE exports the product, in cells with no MNE
+in earlier years and with exports in at least two earlier years. Cells with an MNE in 2012 are left out. We follow two
+kinds of cells: origin and product, adding up all destinations, and origin, destination and product. The controls are
+cells that the first MNE has not yet entered and cells with no MNE in 2012 to 2018. We use three estimators: an event
+study regression with cell and origin $\times$ year fixed effects (and destination $\times$ year fixed effects in the
+second kind of cell), the estimator of Callaway and Sant'Anna (2021) with not yet treated controls, and the estimator of
+Sun and Abraham (2021). The base is the year before entry. The outcomes in logarithms use the cells and years with
+positive values.
+
+Table~\ref{tab:event} reports the average of the coefficients of the year of entry and the four following years, and
+Figure~\ref{fig:event} shows the Callaway and Sant'Anna coefficients by year. By construction, entry raises the number
+of MNEs in the cell, by 0.87 in origin and product cells and by 0.72 in origin, destination and product cells. The share
+of cells with local exports falls by 15 and 18 percentage points, and it keeps falling in the years after entry. Where
+local exports continue, their value does not change significantly, while the number of local exporters is 22 and 10
+percent larger. Total exports are 47 and 43 percent larger. The three estimators give similar results.
+
+However, these estimates cannot be read as effects of entry. Local exports and the number of local exporters grow in the
+years before entry. In origin, destination and product cells, the joint test rejects that the coefficients of the years
+before entry are zero for every outcome, and a placebo that moves entry three years earlier finds local exports 26
+percent higher (Appendix Table~\ref{tab:a_evchk}). In origin and product cells, the test rejects for the outcomes in
+logarithms but not for the share of cells with local exports, and the placebo is not significant. Thus, multinationals
+enter markets where local exporters were expanding. In origin, destination and product cells with exports in every
+year, the fall in the share with local exports is smaller, 7 percentage points, and local exports are 24 percent higher.
+The patterns are similar for products with high and low capital intensity (Appendix Table~\ref{tab:a_evhet}).
+
+\vtab{tab:event}{Entry of the first multinational and the exports of local firms}{\input{tables/v4/v4_event}}
+{The table reports the average of the coefficients of the year of entry and the four following years, relative to the
+year before entry. Origin $\times$ product cells add up all destinations. TWFE: event study with cell and origin
+$\times$ year fixed effects (and destination $\times$ year fixed effects for origin $\times$ destination $\times$
+product cells), with the fourth and earlier years before entry in one group. CS: Callaway and Sant'Anna (2021), not yet
+treated controls. SA: Sun and Abraham (2021), never treated controls. The natural logarithms use the cells and years
+with positive values. In brackets, the $p$ value of the joint test that the coefficients of the second, third and fourth
+years before entry are zero. Standard errors clustered by cell (origin $\times$ product) or by pair of origin and
+destination countries are reported in parentheses. \SIG}{\srcnote}
+
+\vfig{fig:event}{Entry of the first multinational: coefficients by year}{\input{tables/v4/v4_fig_event}}
+{The figure shows the Callaway and Sant'Anna (2021) estimates by year since entry, relative to the year before entry,
+with 95 percent confidence intervals. Top row: origin $\times$ product cells. Bottom row: origin $\times$ destination
+$\times$ product cells.}{\srcnote}
+
+\FloatBarrier
+\section{Conclusions}\label{sec:conclusions}
+
+We have used firm level customs data from nine Latin American countries, linked to ownership data, to show that
+multinational firms ship almost half of the agricultural exports of the region, less than in mining and manufacturing.
+Their parents are concentrated in a few countries, a quarter of their exports comes from groups registered in
+jurisdictions such as Switzerland and Liechtenstein, and twenty groups ship half of the exports of foreign affiliates.
+
+We have then shown that exports are larger where more multinationals export the same product to the same destination,
+and so are the exports of local firms. Capital intensity organizes part of this association. It is stronger for farm
+products with high capital intensity, mainly grains and oilseeds, and it does not differ in a robust way among
+processed products. Multinationals are not more likely to export capital intensive products, so the stronger
+association is not a matter of where they choose to be. We have finally shown that fewer markets keep local exports
+after the first multinational enters a product or a market, but local exports were already growing before entry.
+
+These patterns are associations. Measuring the effect of multinational presence on the exports of local firms would
+require changes in presence that are not related to the conditions of each market. Investment promotion, which shifts
+where multinationals locate (Carballo, Marra de Arti\~nano and Volpe Martincus, 2026), is a natural source of such
+changes and a promising avenue for future research.
+
+\section*{References}
+
+{\sloppy
+\begin{list}{}{\leftmargin=1.5em \itemindent=-1.5em \itemsep=2pt \topsep=4pt}
+\item Aitken, B., Hanson, G.\ H.\ and Harrison, A.\ E., 1997. Spillovers, Foreign Investment, and Export Behavior. \emph{Journal of International Economics}, 43(1), 103 to 132.
+\item Becker, R.\ A., Gray, W.\ B.\ and Marvakov, J., 2021. NBER and CES Manufacturing Industry Database (1958 to 2018, version 2021a). Cambridge, MA: National Bureau of Economic Research.
+\item Callaway, B.\ and Sant'Anna, P.\ H.\ C., 2021. Difference in Differences with Multiple Time Periods. \emph{Journal of Econometrics}, 225(2), 200 to 230.
+\item Carballo, J., Marra de Arti\~nano, I.\ and Volpe Martincus, C., 2026. The Impact of Investment Promotion on Multinational Production: Firm Level Evidence. \emph{Journal of Development Economics}, 180.
+\item Carballo, J., Marra de Arti\~nano, I., Ottaviano, G.\ I.\ P.\ and Volpe Martincus, C., 2021. Linkages with Multinationals: The Effects on Domestic Firms' Exports. Mimeo, Inter-American Development Bank.
+\item Clapp, J., 2015. ABCD and Beyond: From Grain Merchants to Agricultural Value Chain Managers. \emph{Canadian Food Studies}, 2(2), 126 to 135.
+\item Correia, S., Guimar\~aes, P.\ and Zylkin, T., 2020. Fast Poisson Estimation with High Dimensional Fixed Effects. \emph{Stata Journal}, 20(1), 95 to 115.
+\item FAO, 2015. \emph{World Programme for the Census of Agriculture 2020, Volume 1: Programme, Concepts and Definitions}. FAO Statistical Development Series 15. Rome: Food and Agriculture Organization of the United Nations.
+\item Javorcik, B.\ S., 2004. Does Foreign Direct Investment Increase the Productivity of Domestic Firms? In Search of Spillovers through Backward Linkages. \emph{American Economic Review}, 94(3), 605 to 627.
+\item Murphy, S., Burch, D.\ and Clapp, J., 2012. \emph{Cereal Secrets: The World's Largest Grain Traders and Global Agriculture}. Oxfam Research Reports. Oxford: Oxfam International.
+\item Rauch, J.\ E., 1999. Networks versus Markets in International Trade. \emph{Journal of International Economics}, 48(1), 7 to 35.
+\item Reardon, T., Barrett, C.\ B., Berdegu\'e, J.\ A.\ and Swinnen, J.\ F.\ M., 2009. Agrifood Industry Transformation and Small Farmers in Developing Countries. \emph{World Development}, 37(11), 1717 to 1727.
+\item Sun, L.\ and Abraham, S., 2021. Estimating Dynamic Treatment Effects in Event Studies with Heterogeneous Treatment Effects. \emph{Journal of Econometrics}, 225(2), 175 to 199.
+\item UNCTAD, 2009. \emph{World Investment Report 2009: Transnational Corporations, Agricultural Production and Development}. New York and Geneva: United Nations.
+\item UNSD, 2026. Correspondence tables between HS 2017, HS 2012, HS 2007, CPC Ver. 2.1, ISIC Rev. 4 and NAICS 2017. United Nations Statistics Division, Classifications on Economic Statistics. Accessed 3 November 2026.
+\item USDA NASS, 2019. \emph{2017 Census of Agriculture: United States Summary and State Data}, Volume 1, Geographic Area Series, Part 51. Washington, DC: US Department of Agriculture, National Agricultural Statistics Service.
+\end{list}
+}
+
+\clearpage
+\appendix
+\setcounter{table}{0}\renewcommand{\thetable}{A.\arabic{table}}
+\setcounter{figure}{0}\renewcommand{\thefigure}{A.\arabic{figure}}
+\section*{Appendix}
+
+The workbook that accompanies this paper reports every estimate, with all the fixed effects, samples and tests. This
+appendix reports the versions with the exports of local firms, with the indicator for at least one multinational as the
+regressor, by country, and the secondary crosses.
+
+\subsection*{Exports of local firms}
+
+\vtab{tab:a_local}{Multinational presence and the agricultural exports of local firms}{\input{tables/v4/v4_base_local}}
+{The table reports estimated coefficients of equation~(\ref{eq:presence}). The dependent variable is the natural
+logarithm of the exports of local firms, on cells with positive local exports. Standard errors clustered by pair of
+origin and destination countries are reported in parentheses. \SIG}{\srcnote}
+
+\vtab{tab:a_zeros}{Multinational presence and the probability of local exports}{\input{tables/v4/v4_zeros}}
+{The table reports estimated coefficients of linear probability models. The dependent variable is an indicator for
+positive local exports, on all cells with exports, including cells with no local exports. Columns 1 to 4 have the fixed
+effects of columns 3 to 6 of Table~\ref{tab:base}. In Panel B the comparison is mechanical: a cell without an MNE has
+local exports by definition. PPML on local exports in levels with the fixed effects of column 2 gives an elasticity of
+0.53 (standard error 0.06) with the natural logarithm of the number of MNEs and a coefficient of 0.20 (0.05) on the
+indicator. Standard errors clustered by pair of origin and destination countries are reported in parentheses. \SIG}{\srcnote}
+
+\vtab{tab:a_exporters}{Multinational presence, the number of local exporters and exports per local exporter}{\input{tables/v4/v4_exporters}}
+{The table reports estimated coefficients of equation~(\ref{eq:presence}) on cells with at least one local exporter.
+The dependent variables are the natural logarithms of the number of local exporters and of exports per local exporter.
+Panels A and B: natural logarithm of the number of MNEs, cells with at least one MNE. Panels C and D: indicator for at
+least one MNE. Columns 1 to 4 have the fixed effects of columns 3 to 6 of Table~\ref{tab:base}. Standard errors
+clustered by pair of origin and destination countries are reported in parentheses. \SIG}{\srcnote}
+
+\vtab{tab:a_hetlocal}{Multinational presence and the exports of local firms, by capital intensity}{\input{tables/v4/v4_het_local}}
+{The table reports estimates as in Table~\ref{tab:het}. The dependent variable is the natural logarithm of the exports
+of local firms. Standard errors clustered by pair of origin and destination countries are reported in parentheses.
+\SIG}{\srcnote}
+
+\clearpage
+\subsection*{Indicator for at least one multinational}
+
+\vtab{tab:a_hetD}{At least one multinational and agricultural exports, by capital intensity}{\input{tables/v4/v4_het_D}}
+{The table reports estimates as in Table~\ref{tab:het} with the indicator for at least one MNE in place of the natural
+logarithm of the number of MNEs, on all cells. Standard errors clustered by pair of origin and destination countries are
+reported in parentheses. \SIG}{\srcnote}
+
+\clearpage
+\subsection*{By country}
+
+\vtab{tab:a_country}{Multinational presence and agricultural exports, by exporting country}{\input{tables/v4/v4_country_lnN}}
+{The table reports estimated coefficients of equation~(\ref{eq:presence}) for each exporting country (ISO 3166 codes),
+on cells with at least one MNE. Within one country the origin dimension of each fixed effect is constant. Standard
+errors clustered by destination country are reported in parentheses. \SIG}{\srcnote}
+
+\vtab{tab:a_countryD}{At least one multinational and agricultural exports, by exporting country}{\input{tables/v4/v4_country_D}}
+{The table reports estimates as in Table~\ref{tab:a_country} with the indicator for at least one MNE, on all cells.
+Standard errors clustered by destination country are reported in parentheses. \SIG}{\srcnote}
+
+\vtab{tab:a_hetcountry}{Multinational presence and agricultural exports by capital intensity, by exporting country}{\input{tables/v4/v4_het_country}}
+{The table reports estimates as in Table~\ref{tab:het}, Panels A and B, for each exporting country, with destination
+$\times$ product and destination $\times$ year fixed effects. Standard errors clustered by destination country are
+reported in parentheses. \SIG}{\srcnote}
+
+\clearpage
+\subsection*{Secondary crosses}
+
+\vtab{tab:a_cont}{Multinational presence and agricultural exports: continuous capital intensity}{\input{tables/v4/v4_cont}}
+{The table reports estimates of equation~(\ref{eq:presence}) for classified products with the natural logarithm of the
+number of MNEs and its interaction with the natural logarithm of capital per worker. Panel B uses the deviation of the
+natural logarithm of capital per worker from the mean of its stage. Standard errors clustered by pair of origin and
+destination countries are reported in parentheses. \SIG}{\srcnote}
+
+\vtab{tab:a_type}{Multinational presence and agricultural exports, by type of production}{\input{tables/v4/v4_type}}
+{The table reports estimates as in Table~\ref{tab:het} with the natural logarithm of the number of MNEs interacted with
+the type of production (Panel A) and with the type of production and capital intensity (Panel B). Standard errors
+clustered by pair of origin and destination countries are reported in parentheses. \SIG}{\srcnote}
+
+\vtab{tab:a_cross}{Multinational presence and agricultural exports, by Rauch class, end use and inputs}{\input{tables/v4/v4_cross}}
+{The table reports estimates as in Table~\ref{tab:het}. Rauch (1999), conservative classification, through the HS 2007
+code of each HS 2017 product. End use from BEC Rev.4, with capital goods grouped with intermediate goods. Inputs: seeds,
+animal feed and live animals. Standard errors clustered by pair of origin and destination countries are reported in
+parentheses. \SIG}{\srcnote}
+
+\vtab{tab:a_hetmed}{Multinational presence and agricultural exports, by capital intensity: median threshold}{\input{tables/v4/v4_het_med}}
+{The table reports estimates as in Table~\ref{tab:het} with the export weighted median of each stage as the threshold.
+Panel B splits each type of production into products with high and low capital intensity. Standard errors clustered by
+pair of origin and destination countries are reported in parentheses. \SIG}{\srcnote}
+
+\vtab{tab:a_loc}{Capital intensity and the presence of multinationals: alternative specifications}{\input{tables/v4/v4_loc_alt}}
+{The table reports estimates as in Table~\ref{tab:loc}. Panel A replaces the type of production fixed effects with HS
+chapter fixed effects. Panel B reports average marginal effects of a logit. With Rauch, end use and inputs together with
+the natural logarithm of capital per worker, differentiated products show a presence 4.7 percentage points higher than
+homogeneous ones and consumption goods 8.0 points higher than intermediate goods. Standard errors clustered by product
+are reported in parentheses. \SIG}{\srcnote}
+
+\vtab{tab:a_locfd}{Capital intensity and the presence of foreign and domestic multinationals}{\input{tables/v4/v4_loc_fd}}
+{The table reports estimates as in Table~\ref{tab:loc}, Panel A, with the indicator for at least one foreign MNE (Panel
+A) or one domestic MNE (Panel B). Standard errors clustered by product are reported in parentheses. \SIG}{\srcnote}
+
+\clearpage
+\subsection*{Entry of the first multinational}
+
+\vtab{tab:a_evhet}{Entry of the first multinational: heterogeneity}{\input{tables/v4/v4_event_het}}
+{The table reports Callaway and Sant'Anna (2021) estimates, the average of the year of entry and the four following
+years, on the cells of each group (treated and controls). The natural logarithms use the cells and years with positive
+values. Standard errors are reported in parentheses. \SIG}{\srcnote}
+
+\vtab{tab:a_evchk}{Entry of the first multinational: checks}{\input{tables/v4/v4_event_chk}}
+{The table reports Callaway and Sant'Anna (2021) estimates, the average of the year of entry and the four following
+years. Placebo: entry moved three years earlier, years 2012 to 2016, cells entered in 2017 and 2018 and never entered
+cells. The last row is a PPML event study of local exports in levels with the fixed effects of the TWFE event study.
+Standard errors are reported in parentheses. \SIG}{\srcnote}
+
+
+\end{document}

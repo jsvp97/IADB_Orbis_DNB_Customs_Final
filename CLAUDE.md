@@ -189,6 +189,33 @@ Not on disk (to download): Fontagné–Guimbard–Orefice (2022) HS6 trade elast
 - **Stata globals inside programs.** FE specs must be globals (`${fe`f'}`), not locals — a local silently becomes empty inside a `program` and every regression runs without FE (fixed in both pipelines; keep it that way).
 - **Outreg/esttab fragments and Overleaf mirrors.** Both pipelines `copy` every exhibit to an Overleaf folder that exists only on the author's machine; `export_graph` in `src/06` uses `copy` without `cap` and will error if `$overleaf` does not exist — set `$overleaf` to a local folder (`config/paths.do` does).
 - **`Github/` folder.** Until 2026-09-03 the real GitHub clone was nested inside this folder and the outer `.git` was a diverged local-only history. Fixed: outer `main` = `origin/main`; old history tagged `archive-outer-local-history-2026-09-03`; the nested clone is in `archive/` and can be deleted. **Commit from this folder.**
+- **Uruguay 2016–2018 HS codes lost the leading zero (found 2026-11-03).** In the base, every URY export of HS
+  chapters 01–09 in 2016–2018 carries the first six characters of a 10-digit number without its leading zero:
+  0202.30 beef shows as `202300`, 0402.21 milk powder as `402210` (chapter 40), 0303 fish as `303xxx`. URY has no code
+  starting with 0 in those years (2,100–2,800 rows in every other year); US$2.6–3.1 bn a year are affected, and the
+  chapter 03–09 part falls OUTSIDE agriculture. True code = `"0" + first five characters`.
+  `stylized_facts/python/wp_common.fix_shifted_codes` corrects it at load (`load_fdpy`), and the cube was rebuilt
+  on 2026-11-03. Exhibits made before that date (main.tex, WP_total, WP_sectors, WP_countries, src/05–14) still use
+  the shifted codes. Some origins also report HS 2012/2017 codes in some years (CHL, COL, CRI, SLV, URY: 5–17% of
+  value); `hs07_6d` is not always HS 2007.
+- **The base mixes HS revisions; UNSD has no direct HS to NAICS table (2026-11-03).** ARG, DOM, PER, PRY and URY until 2015
+  report HS 2007; CHL, COL, CRI, SLV until 2016 and URY from 2016 report HS 2012; CHL, COL, CRI, SLV in 2017-18 report
+  HS 2017. `WP_HS17=1` makes `wp_common.load_fdpy` convert every code to HS 2017 (`to_hs2017`, UNSD correlation tables in
+  `data/raw/unsd/`, keeps the reported code in `hs_reported`) and uses its own cube `odpy_parent_cube_hs17.parquet`. The
+  column stays named `hs07_6d`. `wp_agro_note_v3.py` and `wp_agro_classification.py` set it by default; older scripts do
+  not. HS to NAICS through UNSD is a chain (HS 2017 -> CPC 2.1 -> ISIC Rev.4 -> NAICS 2017) that works at the level of
+  ISIC classes, so a product reaches several NAICS codes.
+- **v4 round of the agro paper (2026-11-23).** pyfixest 0.50's `fepois` does not converge with origin x destination x
+  product and origin x destination x year FE on the odpy cells; PPML runs in Stata (`ppmlhdfe`, `wp_agro_v4_ppml.do`).
+  Stata 18 now has csdid 2.0.3, drdid, eventstudyinteract and avar (installed from SSC on 2026-11-23). In batch mode
+  Stata writes `<dofile>.log` in the working directory, so a do-file must not open a log with that same name, and two
+  batch runs of the same do-file need different folders. When the paper module runs as `__main__`, the exhibits module
+  imports it again as a module: dump `X.P.FACTS` and `X.P.SHOWN`, not the `__main__` globals.
+- **No ln(1 + x) and no asinh in any regression (Sebastián, 2026-11-23).** Logs are ln(X) on positive values; zeros go
+  through PPML in levels or a 0/1 indicator (linear probability model). The v4 round had asinh and ln(1 + NL) outcomes
+  in E2e and E6; they were replaced the same day.
+- **HS6_to_NAICS_2017.dta mixes good and broken keys.** Chapters 01–09 appear twice: as correct codes (`020130`) and
+  as truncated 10-digit tariff codes without the leading zero (`201300` = 0201.30). Match on the correct ones only.
 - **Spaces in paths.** Everything lives under `C:\Sebas BID\` — always quote paths in Stata (`"$root\..."`) and Python (`Path(r"...")`).
 
 

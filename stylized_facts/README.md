@@ -106,6 +106,14 @@ python/wp_agro_croptype.py          2026-10-13 agro products by type of producti
 python/wp_agro_capital.py           2026-11-02 capital intensity of agro HS6 products: USDA Census of Agriculture 2017 (machinery per
                                     hired worker by NAICS farm type) and NBER-CES (equipment per employee, NAICS 311/312, 2012-18);
                                     high/low within each stage -> data/intermediate/wp/hs6_capital_intensity.{parquet,csv}
+python/wp_agro_classification.py    2026-11-03 one table with the classifications of the 860 agro HS 2017 products (FAO type of
+                                    production, census farm types or NBER industries, capital per worker, high/low, type x
+                                    capital, FAO vs census consistency), with two links from HS to NAICS: the UNSD tables
+                                    (HS 2017 -> CPC 2.1 -> ISIC Rev.4 -> NAICS 2017, data/raw/unsd) and the Census concordance
+                                    (HS6_to_NAICS_2017, broken keys dropped). WP_NAICS picks the one for the note (default unsd).
+                                    -> data/intermediate/wp/hs6_agro_classification.parquet and
+                                    docs/notes/WP_paperagro_product_classification.xlsx. Fact 5 under both links is the sheet Regressions, both links of
+                                    the master workbook, after `WP_NAICS=census ... wp_agro_note_v3.py alt`.
 python/wp_agro_note_v3.py           2026-11-02 every exhibit of WP_paperagro/Note_v3.tex (tables/v3/) with fixed effects added
                                     progressively, plus the master workbook docs/notes/WP_paperagro_v3_master_estimates.xlsx.
                                     2026-11-03: every table runs its full FE progression (303 regressions); the workbook is laid
@@ -114,6 +122,34 @@ python/wp_agro_note_v3.py           2026-11-02 every exhibit of WP_paperagro/Not
                                     (output/wp_2012_2018/agro/v3/build/Note_v3.aux). Regressions are pickled in
                                     output/wp_2012_2018/agro/v3/v3_regressions.pkl; `python wp_agro_note_v3.py workbook` rebuilds
                                     the workbook without re-estimating.
+                                    2026-11-03 (evening) rewrite: one grid of eleven FE specifications for every table
+                                    (GRID), by-country parts for every fact, the third classification, the 2018 figures as
+                                    pgfplots code, and Note_v3.tex flattened from docs/notes/Note_v3_source.tex
+                                    (`... wp_agro_note_v3.py flatten`). `... replay` rebuilds every table from the pickle.
+                                    2026-11-03 (night): product codes are HS 2017 (WP_HS17=1), all descriptive exhibits on 2018,
+                                    the workbook shows only the grid columns that apply to each table (cells 1-6, cells within one
+                                    origin 1-5, firms 1-11), and "Absorbed by the FE" where a regressor is left out.
+python/wp_agro_v4_data.py           2026-11-23 data of the v4 round (especificaciones_estimaciones_v4_2026-11-17.md, in the repo root):
+                                    data/intermediate/wp/v4/ classes.parquet (every product group of spec 0.3: type, stage, capital
+                                    per worker, high_mean = aggregate ratio of the stage, high_median, export weighted quintiles,
+                                    Rauch conservative and liberal, BEC end use, inputs), odpy and opy cells (real destinations only),
+                                    sector.parquet (firm rows of all products, for E1), and the event panels event_op / event_odp
+                                    (.parquet and .dta for Stata).
+python/wp_agro_v4_est.py            2026-11-23 E1 to E5 and E7 (590 regressions, FE codes FE1 to FE6, singletons counted) ->
+                                    output/wp_2012_2018/agro/v4/v4_regs_*.pkl, v4_desc_*.pkl.
+stata/wp_agro_v4_event.do           2026-11-23 E6: entry of the first MNE, cells A (origin x product) and B (origin x destination x
+                                    product), 6 outcomes (ln of positive values only, no ln(1+x) or asinh), TWFE (reghdfe), Callaway and Sant'Anna (csdid 2.0.3, not yet treated),
+                                    Sun and Abraham (eventstudyinteract), PPML (ppmlhdfe); heterogeneity, placebo, no exit, balanced.
+                                    Run: StataMP-64.exe /e do wp_agro_v4_event.do A (or B); -> v4_event_A.dta, v4_event_B.dta.
+stata/wp_agro_v4_ppml.do            2026-11-23 E2e PPML with FE4 (pyfixest's fepois does not converge on these FE) -> v4_ppml.dta.
+python/wp_agro_v4_workbook.py       2026-11-23 docs/notes/WP_paperagro_v4_master_estimates.xlsx: one sheet per table E1a ... E7c in
+                                    the v3 layout, red = printed in the paper (output/.../v4/v4_shown.json), Long format,
+                                    Classifications, Samples, Notes.
+python/wp_agro_v4_paper.py          2026-11-23 exhibits of Note_v4.tex (tables/v4/): `desc` (2018 descriptives, reusing the v3 code
+                                    on real destinations, sector context, parent concentration with registration jurisdictions apart,
+                                    group concentration), `regs` (wp_agro_v4_exhibits.py: baseline, capital intensity, heterogeneity,
+                                    location, event studies, appendix tables), `flatten` (Note_v4.tex from docs/notes/Note_v4_source.tex).
+                                    Order: v4_data, v4_est, Stata event and ppml do-files, v4_paper desc, regs, workbook, flatten.
 python/wp_agro_refresh_overleaf.py  re-copies every exhibit the hand-edited WP_paperagro/main.tex uses from a wp output
                                      folder (default output/wp_2012_2018/agro), relabelled; never touches main.tex.
                                      Year window for any wp_* script: set WP_YEARS=2012-2018 (wp_common.YEAR_WINDOW;

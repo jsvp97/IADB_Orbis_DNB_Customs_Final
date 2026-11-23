@@ -2,14 +2,14 @@
 \toprule
  & (1) & (2) & (3) & (4) & (5) & (6) & (7) \\
 \midrule
-$\ln$ distance & -0.178** & -0.188** & -0.363*** & -0.527*** & -0.386*** & -0.559*** & -0.573*** \\
- & (0.083) & (0.079) & (0.045) & (0.055) & (0.047) & (0.057) & (0.055) \\
-At least one MNE in the market & -0.242 & -0.239 & -0.133 & -0.384** & -0.120 & -0.190 & 0.309 \\
- & (0.247) & (0.250) & (0.164) & (0.167) & (0.168) & (0.183) & (0.273) \\
-$\ln$ distance $\times$ at least one MNE in the market & 0.139*** & 0.139*** & 0.101*** & 0.111*** & 0.102*** & 0.098*** & -0.003 \\
- & (0.030) & (0.030) & (0.019) & (0.020) & (0.020) & (0.022) & (0.032) \\
-Observations & 477,153 & 477,093 & 468,751 & 432,458 & 452,616 & 341,796 & 291,782 \\
-$R^2$ & 0.399 & 0.404 & 0.622 & 0.704 & 0.650 & 0.686 & 0.774 \\
+$\ln$ distance & -0.172** & -0.182** & -0.362*** & -0.525*** & -0.384*** & -0.557*** & -0.566*** \\
+ & (0.082) & (0.079) & (0.045) & (0.055) & (0.048) & (0.057) & (0.054) \\
+At least one MNE in the market & -0.240 & -0.236 & -0.134 & -0.370** & -0.116 & -0.174 & 0.376 \\
+ & (0.247) & (0.250) & (0.165) & (0.167) & (0.169) & (0.184) & (0.268) \\
+$\ln$ distance $\times$ at least one MNE in the market & 0.139*** & 0.139*** & 0.102*** & 0.109*** & 0.102*** & 0.096*** & -0.009 \\
+ & (0.030) & (0.030) & (0.019) & (0.020) & (0.020) & (0.022) & (0.031) \\
+Observations & 479,325 & 479,266 & 470,916 & 434,671 & 454,739 & 343,530 & 294,736 \\
+$R^2$ & 0.397 & 0.403 & 0.621 & 0.704 & 0.649 & 0.685 & 0.772 \\
 \midrule
 Origin FE & $\checkmark$ &  &  &  &  &  &  \\
 Destination FE & $\checkmark$ &  &  &  &  &  &  \\
@@ -17,10 +17,10 @@ Product FE & $\checkmark$ & $\checkmark$ & $\checkmark$ &  & $\checkmark$ &  &  
 Year FE & $\checkmark$ &  &  &  &  &  &  \\
 Origin $\times$ year FE &  & $\checkmark$ & $\checkmark$ & $\checkmark$ &  &  &  \\
 Destination $\times$ year FE &  & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ &  \\
+Destination $\times$ product $\times$ year FE &  &  &  &  &  &  & $\checkmark$ \\
 Firm FE &  &  & $\checkmark$ &  &  &  &  \\
 Firm $\times$ product FE &  &  &  & $\checkmark$ &  &  &  \\
 Firm $\times$ year FE &  &  &  &  & $\checkmark$ &  &  \\
 Firm $\times$ product $\times$ year FE &  &  &  &  &  & $\checkmark$ & $\checkmark$ \\
-Destination $\times$ product $\times$ year FE &  &  &  &  &  &  & $\checkmark$ \\
 \bottomrule
 \end{tabular}

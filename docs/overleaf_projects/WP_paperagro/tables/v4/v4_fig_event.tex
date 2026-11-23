@@ -1,0 +1,44 @@
+\begin{tikzpicture}
+\begin{axis}[xshift=0.0cm, yshift=0.0cm, width=5.6cm, height=4.8cm, xmin=-4.5, xmax=4.5, ymin=-0.423, ymax=0.089,
+  xtick={-4,-3,-2,-1,0,1,2,3,4}, tick label style={font=\scriptsize}, title={Any local exports}, title style={font=\scriptsize},
+  xlabel={Years since entry}, xlabel style={font=\scriptsize}, axis x line*=bottom, axis y line*=left, ylabel={Origin $\times$ product}, ylabel style={font=\scriptsize}]
+\addplot[draw=none, fill={rgb,255:red,166;green,191;blue,233}, fill opacity=0.6] coordinates {(-4,-0.1608) (-3,-0.1066) (-2,-0.0321) (-1,0.0000) (0,-0.0983) (1,-0.1538) (2,-0.1991) (3,-0.2788) (4,-0.3801) (4,-0.1638) (3,-0.1249) (2,-0.0728) (1,-0.0581) (0,-0.0112) (-1,0.0000) (-2,0.0459) (-3,0.0147) (-4,0.0013)} -- cycle;
+\addplot[thick, mark=*, mark size=1.2pt, color={rgb,255:red,31;green,56;blue,100}] coordinates {(-4,-0.0798) (-3,-0.0459) (-2,0.0069) (-1,0.0000) (0,-0.0548) (1,-0.1060) (2,-0.1359) (3,-0.2018) (4,-0.2719)};
+\draw[gray, dashed] (axis cs:-4.5,0) -- (axis cs:4.5,0);
+\end{axis}
+\begin{axis}[xshift=5.4cm, yshift=0.0cm, width=5.6cm, height=4.8cm, xmin=-4.5, xmax=4.5, ymin=-0.972, ymax=1.147,
+  xtick={-4,-3,-2,-1,0,1,2,3,4}, tick label style={font=\scriptsize}, title={$\ln$ local exports}, title style={font=\scriptsize},
+  xlabel={Years since entry}, xlabel style={font=\scriptsize}, axis x line*=bottom, axis y line*=left]
+\addplot[draw=none, fill={rgb,255:red,166;green,191;blue,233}, fill opacity=0.6] coordinates {(-4,-0.7873) (-3,-0.7953) (-2,-0.5700) (-1,0.0000) (0,-0.1623) (1,-0.1595) (2,-0.2987) (3,-0.1807) (4,-0.5361) (4,0.9701) (3,0.8154) (2,0.4177) (1,0.4269) (0,0.2582) (-1,0.0000) (-2,-0.0604) (-3,-0.0826) (-4,0.2045)} -- cycle;
+\addplot[thick, mark=*, mark size=1.2pt, color={rgb,255:red,31;green,56;blue,100}] coordinates {(-4,-0.2914) (-3,-0.4390) (-2,-0.3152) (-1,0.0000) (0,0.0480) (1,0.1337) (2,0.0595) (3,0.3174) (4,0.2170)};
+\draw[gray, dashed] (axis cs:-4.5,0) -- (axis cs:4.5,0);
+\end{axis}
+\begin{axis}[xshift=10.8cm, yshift=0.0cm, width=5.6cm, height=4.8cm, xmin=-4.5, xmax=4.5, ymin=-0.365, ymax=0.513,
+  xtick={-4,-3,-2,-1,0,1,2,3,4}, tick label style={font=\scriptsize}, title={$\ln$ local exporters}, title style={font=\scriptsize},
+  xlabel={Years since entry}, xlabel style={font=\scriptsize}, axis x line*=bottom, axis y line*=left]
+\addplot[draw=none, fill={rgb,255:red,166;green,191;blue,233}, fill opacity=0.6] coordinates {(-4,-0.2921) (-3,-0.1889) (-2,-0.0901) (-1,0.0000) (0,0.0692) (1,0.0479) (2,0.0902) (3,0.1495) (4,0.1085) (4,0.4397) (3,0.3978) (2,0.2917) (1,0.2168) (0,0.1925) (-1,0.0000) (-2,0.0390) (-3,-0.0066) (-4,-0.0389)} -- cycle;
+\addplot[thick, mark=*, mark size=1.2pt, color={rgb,255:red,31;green,56;blue,100}] coordinates {(-4,-0.1655) (-3,-0.0977) (-2,-0.0255) (-1,0.0000) (0,0.1308) (1,0.1323) (2,0.1909) (3,0.2736) (4,0.2741)};
+\draw[gray, dashed] (axis cs:-4.5,0) -- (axis cs:4.5,0);
+\end{axis}
+\begin{axis}[xshift=0.0cm, yshift=-5.2cm, width=5.6cm, height=4.8cm, xmin=-4.5, xmax=4.5, ymin=-0.339, ymax=0.084,
+  xtick={-4,-3,-2,-1,0,1,2,3,4}, tick label style={font=\scriptsize}, title={Any local exports}, title style={font=\scriptsize},
+  xlabel={Years since entry}, xlabel style={font=\scriptsize}, axis x line*=bottom, axis y line*=left, ylabel={Origin $\times$ dest. $\times$ product}, ylabel style={font=\scriptsize}]
+\addplot[draw=none, fill={rgb,255:red,166;green,191;blue,233}, fill opacity=0.6] coordinates {(-4,-0.0900) (-3,-0.0473) (-2,0.0165) (-1,0.0000) (0,-0.0976) (1,-0.1742) (2,-0.2180) (3,-0.2699) (4,-0.3040) (4,-0.2216) (3,-0.1926) (2,-0.1561) (1,-0.1285) (0,-0.0625) (-1,0.0000) (-2,0.0483) (-3,0.0109) (-4,-0.0123)} -- cycle;
+\addplot[thick, mark=*, mark size=1.2pt, color={rgb,255:red,31;green,56;blue,100}] coordinates {(-4,-0.0512) (-3,-0.0182) (-2,0.0324) (-1,0.0000) (0,-0.0801) (1,-0.1513) (2,-0.1870) (3,-0.2312) (4,-0.2628)};
+\draw[gray, dashed] (axis cs:-4.5,0) -- (axis cs:4.5,0);
+\end{axis}
+\begin{axis}[xshift=5.4cm, yshift=-5.2cm, width=5.6cm, height=4.8cm, xmin=-4.5, xmax=4.5, ymin=-0.606, ymax=0.402,
+  xtick={-4,-3,-2,-1,0,1,2,3,4}, tick label style={font=\scriptsize}, title={$\ln$ local exports}, title style={font=\scriptsize},
+  xlabel={Years since entry}, xlabel style={font=\scriptsize}, axis x line*=bottom, axis y line*=left]
+\addplot[draw=none, fill={rgb,255:red,166;green,191;blue,233}, fill opacity=0.6] coordinates {(-4,-0.5217) (-3,-0.2835) (-2,-0.1654) (-1,0.0000) (0,-0.0649) (1,-0.0204) (2,-0.0949) (3,-0.0248) (4,-0.1221) (4,0.3177) (3,0.2961) (2,0.1457) (1,0.1743) (0,0.0987) (-1,0.0000) (-2,-0.0083) (-3,-0.0732) (-4,-0.1728)} -- cycle;
+\addplot[thick, mark=*, mark size=1.2pt, color={rgb,255:red,31;green,56;blue,100}] coordinates {(-4,-0.3473) (-3,-0.1783) (-2,-0.0868) (-1,0.0000) (0,0.0169) (1,0.0770) (2,0.0254) (3,0.1356) (4,0.0978)};
+\draw[gray, dashed] (axis cs:-4.5,0) -- (axis cs:4.5,0);
+\end{axis}
+\begin{axis}[xshift=10.8cm, yshift=-5.2cm, width=5.6cm, height=4.8cm, xmin=-4.5, xmax=4.5, ymin=-0.126, ymax=0.190,
+  xtick={-4,-3,-2,-1,0,1,2,3,4}, tick label style={font=\scriptsize}, title={$\ln$ local exporters}, title style={font=\scriptsize},
+  xlabel={Years since entry}, xlabel style={font=\scriptsize}, axis x line*=bottom, axis y line*=left]
+\addplot[draw=none, fill={rgb,255:red,166;green,191;blue,233}, fill opacity=0.6] coordinates {(-4,-0.0980) (-3,-0.1000) (-2,-0.0400) (-1,0.0000) (0,0.0630) (1,0.0574) (2,0.0506) (3,0.0367) (4,0.0023) (4,0.1635) (3,0.1584) (2,0.1452) (1,0.1364) (0,0.1191) (-1,0.0000) (-2,0.0090) (-3,-0.0314) (-4,-0.0156)} -- cycle;
+\addplot[thick, mark=*, mark size=1.2pt, color={rgb,255:red,31;green,56;blue,100}] coordinates {(-4,-0.0568) (-3,-0.0657) (-2,-0.0155) (-1,0.0000) (0,0.0910) (1,0.0969) (2,0.0979) (3,0.0976) (4,0.0829)};
+\draw[gray, dashed] (axis cs:-4.5,0) -- (axis cs:4.5,0);
+\end{axis}
+\end{tikzpicture}

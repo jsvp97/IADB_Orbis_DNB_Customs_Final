@@ -1,0 +1,35 @@
+\begin{tikzpicture}
+\begin{axis}[
+  xbar stacked, bar width=8pt, y dir=reverse,
+  width=0.92\linewidth, height=7.1cm, xmin=0, xmax=0.80, ymin=0.30000000000000004, ymax=11.299999999999999,
+  ytick={1,2,3,4,5,6,7,8,9,10.6}, yticklabels={{Paraguay},{Uruguay},{Chile},{Costa Rica},{Argentina},{Dominican Republic},{Peru},{Colombia},{El Salvador},{LAC9}},
+  xtick={0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8}, xticklabels={0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8},
+  tick label style={font=\footnotesize}, xlabel={Share of export value}, xlabel style={font=\footnotesize},
+  axis x line*=bottom, axis y line*=left, ytick style={draw=none},
+  area legend, legend image post style={draw=none}, legend cell align=left, legend style={at={(0.5,0)}, anchor=north, yshift=-1.25cm, draw=none, font=\footnotesize, legend columns=4, /tikz/every even column/.append style={column sep=6pt}}]
+\addplot[fill={rgb,255:red,31;green,56;blue,100}, draw=white, line width=0.3pt] coordinates {(0.3443,1) (0.0411,2) (0.0425,3) (0.1752,4) (0.0609,5) (0.0894,6) (0.0337,7) (0.0180,8) (0.0104,9) (0.0810,10.6)};
+\addplot[fill={rgb,255:red,46;green,84;blue,150}, draw=white, line width=0.3pt] coordinates {(0.0440,1) (0.0377,2) (0.0002,3) (0.0331,4) (0.0730,5) (0.0000,6) (0.0029,7) (0.0002,8) (0.0122,9) (0.0401,10.6)};
+\addplot[fill={rgb,255:red,68;green,114;blue,196}, draw=white, line width=0.3pt] coordinates {(0.0000,1) (0.0005,2) (0.0124,3) (0.0024,4) (0.0650,5) (0.0150,6) (0.0023,7) (0.0066,8) (0.0002,9) (0.0311,10.6)};
+\addplot[fill={rgb,255:red,99;green,140;blue,210}, draw=white, line width=0.3pt] coordinates {(0.0000,1) (0.0015,2) (0.0017,3) (0.0000,4) (0.0506,5) (0.0160,6) (0.0000,7) (0.0000,8) (0.0000,9) (0.0227,10.6)};
+\addplot[fill={rgb,255:red,132;green,165;blue,222}, draw=white, line width=0.3pt] coordinates {(0.0009,1) (0.0045,2) (0.0108,3) (0.0024,4) (0.0163,5) (0.0079,6) (0.0567,7) (0.0026,8) (0.0026,9) (0.0163,10.6)};
+\addplot[fill={rgb,255:red,166;green,191;blue,233}, draw=white, line width=0.3pt] coordinates {(0.0122,1) (0.1137,2) (0.0007,3) (0.0000,4) (0.0143,5) (0.0000,6) (0.0000,7) (0.0222,8) (0.0000,9) (0.0157,10.6)};
+\addplot[fill={rgb,255:red,84;green,130;blue,53}, draw=white, line width=0.3pt] coordinates {(0.0778,1) (0.0777,2) (0.0000,3) (0.0000,4) (0.0023,5) (0.0000,6) (0.0000,7) (0.0074,8) (0.0000,9) (0.0125,10.6)};
+\addplot[fill={rgb,255:red,112;green,173;blue,71}, draw=white, line width=0.3pt] coordinates {(0.0004,1) (0.0264,2) (0.0093,3) (0.0032,4) (0.0173,5) (0.0090,6) (0.0001,7) (0.0036,8) (0.0207,9) (0.0111,10.6)};
+\addplot[fill={rgb,255:red,169;green,208;blue,142}, draw=white, line width=0.3pt] coordinates {(0.0006,1) (0.0038,2) (0.0005,3) (0.0218,4) (0.0000,5) (0.0069,6) (0.0427,7) (0.0053,8) (0.1345,9) (0.0095,10.6)};
+\addplot[fill={rgb,255:red,191;green,144;blue,0}, draw=white, line width=0.3pt] coordinates {(0.0011,1) (0.0261,2) (0.0135,3) (0.0000,4) (0.0071,5) (0.0235,6) (0.0167,7) (0.0033,8) (0.0152,9) (0.0094,10.6)};
+\addplot[fill={rgb,255:red,159;green,176;blue,200}, draw=white, line width=0.3pt] coordinates {(0.2078,1) (0.1843,2) (0.2089,3) (0.2170,4) (0.0659,5) (0.2415,6) (0.2013,7) (0.2010,8) (0.1086,9) (0.1434,10.6)};
+\addplot[fill={rgb,255:red,191;green,191;blue,191}, draw=white, line width=0.3pt] coordinates {(0.0051,1) (0.0926,2) (0.1870,3) (0.0118,4) (0.0794,5) (0.0369,6) (0.0430,7) (0.1259,8) (0.0000,9) (0.0788,10.6)};
+\legend{{USA},{NLD},{CHE},{LIE},{ESP},{BRA},{SAU},{LUX},{PAN},{GBR},{Other foreign MNEs},{Domestic MNEs}}
+\node[anchor=west, font=\scriptsize] at (axis cs:0.6943,1) {0.69};
+\node[anchor=west, font=\scriptsize] at (axis cs:0.6098,2) {0.61};
+\node[anchor=west, font=\scriptsize] at (axis cs:0.4874,3) {0.49};
+\node[anchor=west, font=\scriptsize] at (axis cs:0.4669,4) {0.47};
+\node[anchor=west, font=\scriptsize] at (axis cs:0.4521,5) {0.45};
+\node[anchor=west, font=\scriptsize] at (axis cs:0.4462,6) {0.45};
+\node[anchor=west, font=\scriptsize] at (axis cs:0.3991,7) {0.40};
+\node[anchor=west, font=\scriptsize] at (axis cs:0.3960,8) {0.40};
+\node[anchor=west, font=\scriptsize] at (axis cs:0.3044,9) {0.30};
+\node[anchor=west, font=\scriptsize] at (axis cs:0.4718,10.6) {0.47};
+\draw[gray, dashed, line width=0.3pt] (axis cs:0,9.8) -- (axis cs:0.80,9.8);
+\end{axis}
+\end{tikzpicture}

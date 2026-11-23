@@ -81,6 +81,12 @@ F_FGO    = RAW / "ProTEE_0_1.csv"                              # CEPII, Fontagne
 F_BEC    = RAW / "UNSD_HS-SITC-BEC_Correlations_2022.xlsx"     # UNSD: HS92..HS22 x BEC4/BEC5 x SITC1-4
 for _d in (WP_INT, WP_OUT):
     ensure_dir(_d)
+# HS 2017 codes (2026-11-03, agriculture note): WP_HS17=1 converts every product code of the base to HS 2017 at load
+# (to_hs2017) and keeps its own cube, so the outputs made on the codes as reported stay untouched.
+HS17 = _os.environ.get("WP_HS17", "").strip() == "1"
+if HS17:
+    CUBE_PQ = WP_INT / "odpy_parent_cube_hs17.parquet"
+UNSD = RAW / "unsd"                                            # UNSD correspondence tables, downloaded 2026-11-03
 
 
 def outdirs(scope: str) -> tuple[Path, Path, Path]:
@@ -444,10 +450,116 @@ def _in_window(df: pd.DataFrame) -> pd.DataFrame:
     return df[y.between(*YEAR_WINDOW)].reset_index(drop=True)
 
 
+SHIFTED_CODES = (("URY", (2016, 2017, 2018)),)   # origin and years whose HS chapters 01-09 lost the leading zero
+
+
+def fix_shifted_codes(df: pd.DataFrame) -> pd.DataFrame:
+    """2026-11-03. In the base, every Uruguay export of HS chapters 01-09 in 2016-2018 has its code read from a
+    10-digit number that lost the leading zero, so the six characters are digits 2-7 of the true code
+    (0202.30 frozen boneless beef appears as "202300", 0402.21 milk powder as "402210", in chapter 40). Uruguay has
+    no code starting with 0 in those years and 2,100-2,800 such rows in every other year. The true code is
+    "0" + the first five characters. A code is corrected when its shifted heading exists (HS 2007 headings and
+    headings seen elsewhere in the base) and either its literal heading does not exist, or the shifted code has
+    more Uruguayan exports than the literal code in the other years (this settles the few codes valid both ways,
+    such as 0901 coffee against 9011 microscopes)."""
+    yrs = pd.to_numeric(df["year"], errors="coerce")
+    for o, years in SHIFTED_CODES:
+        bad = (df["country_orig"] == o) & yrs.isin(years) & ~df["hs07_6d"].str.startswith("0")
+        if not bad.any():
+            continue
+        l = pd.read_stata(RAW / "lall2000_hs2007.dta", columns=["hs07_6d"])
+        heads = set(l["hs07_6d"].astype(str).str.zfill(6).str[:4])
+        clean = ~((df["country_orig"] == o) & yrs.isin(years))
+        heads |= set(df.loc[clean, "hs07_6d"].str[:4].unique())
+        other = df[(df["country_orig"] == o) & ~yrs.isin(years)].groupby("hs07_6d")["value_fob"].sum()
+        codes = df.loc[bad, "hs07_6d"].unique()
+        fix = {}
+        for c in codes:
+            s = "0" + c[:5]
+            if s[:4] not in heads:
+                continue
+            if c[:4] not in heads or other.get(s, 0.0) > other.get(c, 0.0):
+                fix[c] = s
+        df.loc[bad, "hs07_6d"] = df.loc[bad, "hs07_6d"].map(lambda c: fix.get(c, c))
+    return df
+
+
+# HS revision in which each origin reports its codes, by year (2026-11-03). Found from the codes themselves: an
+# origin-year is HS 2012 when it has codes that exist in HS 2012 and HS 2017 but not in HS 2007, and HS 2017 when it has
+# codes that exist only in HS 2017. Every other origin-year reports HS 2007. Uruguay mixes HS 2007 and HS 2012 codes
+# from 2016 on, which to_hs2017 settles code by code.
+HS_REVISION = {**{(o, y): 2012 for o in ("CHL", "COL", "CRI", "SLV") for y in range(2006, 2017)},
+               **{(o, y): 2017 for o in ("CHL", "COL", "CRI", "SLV", "ECU") for y in (2017, 2018, 2019, 2020, 2021, 2022)},
+               **{("URY", y): 2012 for y in range(2016, 2023)}}
+
+
+def hs_correlation(rev: int) -> pd.DataFrame:
+    """UNSD correlation table HS 2017 x HS `rev` (columns h17, old, rel)."""
+    x = pd.read_excel(UNSD / f"HS2017toHS{rev}ConversionAndCorrelationTables.xlsx", sheet_name=None, dtype=str)
+    c = x[[s for s in x if s.startswith("Correlation")][0]].dropna(axis=1, how="all")
+    c = c.iloc[1:, [0, -2, -1]]
+    c.columns = ["h17", "old", "rel"]
+    return c.dropna(subset=["h17", "old"])
+
+
+def hs2017_map(df: pd.DataFrame) -> pd.DataFrame:
+    """One row per (revision, reported code) -> HS 2017 code, from the UNSD correlation tables HS 2017 x HS 2007 and
+    HS 2017 x HS 2012. A code that UNSD links to one HS 2017 code takes it. A code that UNSD links to several HS 2017
+    codes (it was split) takes the same code number when it is among them, else the one with the largest exports of
+    the origins that report in HS 2017. Codes in HS 2017 already are kept."""
+    yrs = pd.to_numeric(df["year"], errors="coerce").astype(int)
+    rev = pd.Series([HS_REVISION.get(k, 2007) for k in zip(df["country_orig"], yrs)], index=df.index)
+    w = df.loc[rev == 2017].groupby("hs07_6d")["value_fob"].sum()
+    out = []
+    for r in (2007, 2012):
+        c = hs_correlation(r)
+        for old, s in c.groupby("old"):
+            t17 = sorted(set(s["h17"]))
+            if len(t17) == 1:
+                new, how = t17[0], "one HS 2017 code"
+            elif old in t17:
+                new, how = old, f"split into {len(t17)} HS 2017 codes, same code number kept"
+            else:
+                new = max(t17, key=lambda h: (w.get(h, 0.0), -int(h)))
+                how = f"split into {len(t17)} HS 2017 codes, the one with the largest exports in HS 2017"
+            out.append((r, old, new, how, " ".join(t17)))
+    m = pd.DataFrame(out, columns=["revision", "code", "hs17", "how", "hs17_all"])
+    s17 = set(hs_correlation(2007)["h17"])
+    m = pd.concat([m, pd.DataFrame({"revision": 2017, "code": sorted(s17), "hs17": sorted(s17), "how": "HS 2017 code", "hs17_all": sorted(s17)})])
+    return m
+
+
+def to_hs2017(df: pd.DataFrame) -> pd.DataFrame:
+    """Replace hs07_6d by its HS 2017 code (2026-11-03). Each row is read in the HS revision of its origin and year
+    (HS_REVISION). A code that does not exist in that revision is read in the first revision where it exists
+    (2017, 2012, 2007); this settles Uruguay. Codes that exist in no revision stay as they are. The reported code is
+    kept in hs_reported."""
+    m = hs2017_map(df)
+    look = {(r, c): h for r, c, h in zip(m["revision"], m["code"], m["hs17"])}
+    valid = {r: set(m.loc[m["revision"] == r, "code"]) for r in (2007, 2012, 2017)}
+    yrs = pd.to_numeric(df["year"], errors="coerce").astype(int)
+    keys = pd.DataFrame({"rev": [HS_REVISION.get(k, 2007) for k in zip(df["country_orig"], yrs)], "code": df["hs07_6d"].values})
+    u = keys.drop_duplicates()
+    res = {}
+    for r, c in zip(u["rev"], u["code"]):
+        for rr in (r, 2017, 2012, 2007):
+            if c in valid[rr]:
+                res[(r, c)] = look[(rr, c)]
+                break
+        else:
+            res[(r, c)] = c
+    df = df.copy()
+    df["hs_reported"] = df["hs07_6d"]
+    df["hs07_6d"] = [res[k] for k in zip(keys["rev"], keys["code"])]
+    return df
+
+
 def load_fdpy() -> pd.DataFrame:
-    """Firm x origin x dest x HS6 x year rows from src/15's cache (parquet copy made on first use)."""
+    """Firm x origin x dest x HS6 x year rows from src/15's cache (parquet copy made on first use). Shifted codes
+    (fix_shifted_codes) are corrected at load, and with WP_HS17=1 every code becomes HS 2017 (to_hs2017)."""
     if FDPY_PQ.exists():
-        return _in_window(pd.read_parquet(FDPY_PQ))
+        d = fix_shifted_codes(pd.read_parquet(FDPY_PQ))
+        return _in_window(to_hs2017(d) if HS17 else d)
     assert YEAR_WINDOW is None, "build the full fdpy parquet cache before using WP_YEARS"
     import pyreadstat
     assert FDPY_DTA.exists(), f"run src/15_wp_extract_fdpy.do first -> {FDPY_DTA}"
