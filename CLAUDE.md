@@ -211,6 +211,11 @@ Not on disk (to download): Fontagné–Guimbard–Orefice (2022) HS6 trade elast
   Stata writes `<dofile>.log` in the working directory, so a do-file must not open a log with that same name, and two
   batch runs of the same do-file need different folders. When the paper module runs as `__main__`, the exhibits module
   imports it again as a module: dump `X.P.FACTS` and `X.P.SHOWN`, not the `__main__` globals.
+- **Sun and Abraham on the number of MNEs is degenerate (found 2026-11-24).** In the v4 event studies the outcome N is
+  zero in every never treated cell and in every year before entry, and `eventstudyinteract` returns standard errors of
+  0.000 to 0.004 (TWFE and CS give 0.05) and pre-period coefficients of 0.01 with zero variance. It is not reported
+  (`wp_agro_v4_workbook.clean_event_results`, used by the workbook and the paper). CS pre-period coefficients of N, and
+  of any local exports in balanced cells, are zero by construction and show as "0 by construction".
 - **No ln(1 + x) and no asinh in any regression (Sebastián, 2026-11-23).** Logs are ln(X) on positive values; zeros go
   through PPML in levels or a 0/1 indicator (linear probability model). The v4 round had asinh and ln(1 + NL) outcomes
   in E2e and E6; they were replaced the same day.

@@ -325,7 +325,9 @@ EV_EST = [("twfe", "TWFE"), ("cs", "CS"), ("sa", "SA")]
 
 
 def event_results() -> pd.DataFrame:
-    return pd.concat([pd.read_stata(P.OUT4 / f"v4_event_{c}.dta") for c in ("A", "B")], ignore_index=True)
+    # Sun and Abraham on the number of MNEs has a degenerate variance and is not reported (wp_agro_v4_workbook.clean_event_results)
+    from wp_agro_v4_workbook import clean_event_results
+    return clean_event_results(pd.concat([pd.read_stata(P.OUT4 / f"v4_event_{c}.dta") for c in ("A", "B")], ignore_index=True))
 
 
 def ev_get(e, cellset, tag, y, est, term):

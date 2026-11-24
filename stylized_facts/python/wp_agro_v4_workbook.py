@@ -5,9 +5,10 @@ wp_agro_v4_workbook.py  --  docs/notes/WP_paperagro_v4_master_estimates.xlsx (sp
     WP_YEARS=2012-2018 WP_SCOPES=agro python wp_agro_v4_workbook.py
 
 One sheet per table (E1a, E1b, ... E7c), in the layout of the v3 workbook (outreg2 style): column numbers, a row with the
-fixed-effect code (FE1 to FE6) or the column label, one block per panel with coefficients, standard errors in
-parentheses, stars, test p values, observations, R2, within R2, singletons dropped and the row "Column in the note"
-(red: printed in the paper). Then "Long format" (one row per coefficient), "Classifications" (HS6 -> every product
+fixed effects of each column (O + D + P + Y ...) or the column label, one block per panel with coefficients, standard
+errors in parentheses, stars, test p values, observations, R2, within R2, singletons dropped, one Yes/No row per fixed
+effect, estimator, clusters, sample and the row "Column in the note" (red: printed in the paper, with the table numbers
+of the compiled Note_v4). Then "Long format" (one row per coefficient), "Classifications" (HS6 -> every product
 group of spec 0.3), "Samples" and "Notes".
 
 Reads output/wp_2012_2018/agro/v4/v4_regs_*.pkl, v4_desc_*.pkl (wp_agro_v4_est.py), v4_event_A.dta, v4_event_B.dta
@@ -75,6 +76,73 @@ TITLES = {
     "E7c": "Capital intensity x Rauch",
 }
 SHOWN: dict = {}
+
+# outreg2 layout: one Yes/No row per fixed effect, as in the v3 workbook
+FE_PARTS = {"FE1": ["O", "D", "P", "Y"], "FE2": ["OY", "DY", "P"], "FE3": ["ODP", "Y"], "FE4": ["ODP", "ODY"],
+            "FE5": ["ODP", "ODY", "OPY"], "FE6": ["ODP", "ODY", "OPY", "DPY"],
+            "origin x year + type of production": ["OY", "TYPE"], "oy + type": ["OY", "TYPE"],
+            "origin x year + HS chapter": ["OY", "HS2"], "oy + hs2": ["OY", "HS2"]}
+FE_NAME = {"O": "Origin FE", "D": "Destination FE", "P": "Product FE", "Y": "Year FE", "OY": "Origin x year FE",
+           "DY": "Destination x year FE", "ODP": "Origin x destination x product FE", "ODY": "Origin x destination x year FE",
+           "OPY": "Origin x product x year FE", "DPY": "Destination x product x year FE", "TYPE": "Type of production FE",
+           "HS2": "HS chapter FE"}
+FE_SHORT = {"FE1": "O + D + P + Y", "FE2": "OY + DY + P", "FE3": "ODP + Y", "FE4": "ODP + ODY", "FE5": "ODP + ODY + OPY",
+            "FE6": "ODP + ODY + OPY + DPY"}
+# within one origin the origin dimension of each fixed effect is constant (E2g, E4g)
+WITHIN = {"ODP": "DP", "ODY": "DY", "OPY": "PY", "OY": "Y"}
+FE_NAME_WITHIN = {"Y": "Year FE", "DP": "Destination x product FE", "DY": "Destination x year FE", "PY": "Product x year FE"}
+FE_SHORT_WITHIN = {"FE3": "DP + Y", "FE4": "DP + DY", "FE5": "DP + DY + PY"}
+WITHIN_SHEETS = ("E2g", "E4g")
+COL_LAB = {"lnKL": "ln capital per worker", "high_mean": "High capital intensity (aggregate ratio)",
+           "high_median": "High capital intensity (median)", "quintile": "Quintiles within stage"}
+STATUS_TXT = {"estat error 498": "Not estimated: too few cells in this country for Callaway and Sant'Anna",
+              "error 459": "Not estimated: no MNE in any cell of the placebo window",
+              "not reported": "Not reported: Sun and Abraham variance is degenerate for the number of MNEs"}
+
+
+def fe_parts(sheet: str, fe: str) -> list[str]:
+    parts = FE_PARTS.get(fe, [])
+    return [WITHIN.get(x, x) for x in parts] if sheet in WITHIN_SHEETS else parts
+
+
+def fe_name(sheet: str, part: str) -> str:
+    return (FE_NAME_WITHIN if sheet in WITHIN_SHEETS else FE_NAME).get(part, part)
+
+
+def fe_text(sheet: str, fe: str) -> str:
+    if fe in FE_PARTS:
+        return " + ".join(fe_name(sheet, x)[:-3] for x in fe_parts(sheet, fe))
+    return fe
+
+
+def where_in_paper(s: str) -> str:
+    """'Table base, Panel A, column (1)' -> 'Table 6, Panel A, column (1)', with the numbers of the compiled paper."""
+    aux = W.ROOT / "docs" / "overleaf_projects" / "WP_paperagro" / "Note_v4.aux"
+    if not s or not aux.exists():
+        return s
+    num = dict(re.findall(r"\\newlabel\{((?:tab|fig):[^}]*)\}\{\{([^}]*)\}", aux.read_text(encoding="utf-8", errors="ignore")))
+    names = {"Table A country (lnN)": "tab:a_country", "Table A country (D)": "tab:a_countryD", "Table A het country": "tab:a_hetcountry",
+             "Table A het local": "tab:a_hetlocal", "Table A het median": "tab:a_hetmed", "Table A het D": "tab:a_hetD",
+             "Table A location fd": "tab:a_locfd", "Table A location": "tab:a_loc", "Table A event_het": "tab:a_evhet",
+             "Table A event_chk": "tab:a_evchk", "Table A event checks": "tab:a_evchk", "Table A exporters": "tab:a_exporters",
+             "Table A continuous": "tab:a_cont", "Table A zeros": "tab:a_zeros", "Table A local": "tab:a_local", "Table A cross": "tab:a_cross",
+             "Table A type": "tab:a_type", "Table location": "tab:loc", "Table event": "tab:event", "Table base": "tab:base",
+             "Table het": "tab:het", "Table farm": "tab:farm", "Figure event": "fig:event"}
+    for k in sorted(names, key=len, reverse=True):
+        lab = names[k]
+        if lab in num:
+            s = s.replace(k, ("Figure " if lab.startswith("fig") else "Table ") + num[lab])
+    return s.replace("$\\ln$", "ln")
+
+
+def clean_event_results(e: pd.DataFrame) -> pd.DataFrame:
+    """Sun and Abraham on the number of MNEs: the outcome is zero in every control cell and in every year before entry, and the
+    variance estimate is degenerate (standard errors of 0.000 to 0.004 against 0.05 with TWFE and CS). Not reported."""
+    e = e.copy()
+    m = (e["est"] == "sa") & (e["outcome"] == "N")
+    e.loc[m, ["b", "se", "p"]] = np.nan
+    e.loc[m, "status"] = "not reported"
+    return e
 
 
 def stars(p):
@@ -161,14 +229,20 @@ def reg_block(sheet: str, regs: list[dict]):
     cols = list(dict.fromkeys(str(r["col"]) for r in rr))
     panels = list(dict.fromkeys(r["panel"] for r in rr))
     cell = {(r["panel"], str(r["col"])): r for r in rr}
-    rows = [[f"{sheet}. {TITLES.get(sheet, '')}"], [""] + [f"({i + 1})" for i in range(len(cols))], ["Column"] + cols]
+    if all(c in FE_PARTS for c in cols):
+        head = ["Fixed effects"] + [(FE_SHORT_WITHIN if sheet in WITHIN_SHEETS else FE_SHORT).get(c, c) for c in cols]
+    elif sheet == "E4g":
+        head = ["Exporting country"] + cols
+    else:
+        head = ["Specification"] + [COL_LAB.get(c, c) for c in cols]
+    rows = [[f"{sheet}. {TITLES.get(sheet, '')}"], [""] + [f"({i + 1})" for i in range(len(cols))], head]
     red, long = [], []
+    dep_lab = (lambda d: "first entry of an MNE (0/1)") if sheet == "E5d" else (lambda d: DEPS.get(d, d))
     for P in panels:
         start = len(rows)
         rows.append([P])
         line = [cell.get((P, c)) for c in cols]
-        rows.append(["Dependent variable"] + [DEPS.get(r["dep"], r["dep"]) if r else "" for r in line])
-        rows.append(["Fixed effects"] + [(r["fe"] if r else "") for r in line])
+        rows.append(["Dependent variable"] + [dep_lab(r["dep"]) if r else "" for r in line])
         for v in dict.fromkeys(v for r in line if r for v in r["regs"]):
             b, s = [], []
             for r in line:
@@ -186,10 +260,14 @@ def reg_block(sheet: str, regs: list[dict]):
                     + [f"{r['r2']:.3f}" if r and r["n"] and np.isfinite(r["r2"]) else "" for r in line])
         rows.append(["Within R-squared"] + [f"{r['r2w']:.3f}" if r and r["n"] and np.isfinite(r["r2w"]) else "" for r in line])
         rows.append(["Singletons dropped"] + [f"{r['singletons']:,}" if r and r["n"] else "" for r in line])
+        used = [p for p in FE_NAME if any(r and p in FE_PARTS.get(r["fe"], []) for r in line)]
+        for p in used:
+            pp = WITHIN.get(p, p) if sheet in WITHIN_SHEETS else p
+            rows.append([fe_name(sheet, pp)] + [("Yes" if p in FE_PARTS.get(r["fe"], []) else "No") if r else "" for r in line])
         rows.append(["Estimator"] + [r["est"] if r else "" for r in line])
         rows.append(["Clustered by"] + [{"od": "origin and destination pair", "country_dest": "destination", "hs": "product"}.get(r["cluster"], r["cluster"]) if r else "" for r in line])
         rows.append(["Sample"] + [r["sample"] if r else "" for r in line])
-        shown = [SHOWN.get(f"{sheet}|{P}|{c}", "") for c in cols]
+        shown = [where_in_paper(SHOWN.get(f"{sheet}|{P}|{c}", "")) for c in cols]
         rows.append(["Column in the note"] + [s or "Not shown" for s in shown])
         for j, s in enumerate(shown):
             if s:
@@ -200,17 +278,20 @@ def reg_block(sheet: str, regs: list[dict]):
             for v in r["regs"]:
                 if v in r["cells"]:
                     bb, ss, pp = r["cells"][v]
-                    long.append({"Table": sheet, "Panel": P, "Column": c, "Dependent variable": DEPS.get(r["dep"], r["dep"]), "Regressor": label(v),
+                    long.append({"Table": sheet, "Panel": P, "Column": c, "Dependent variable": dep_lab(r["dep"]), "Regressor": label(v),
                                  "Coefficient": bb, "Standard error": ss, "p value": pp, "Stars": stars(pp), "Observations": r["n"],
                                  "R-squared": r["r2"], "Within R-squared": r["r2w"], "Singletons dropped": r["singletons"],
-                                 "Fixed effects": r["fe"], "Clustered by": r["cluster"], "Sample": r["sample"], "Estimator": r["est"],
-                                 "Column in the note": SHOWN.get(f"{sheet}|{P}|{c}", "Not shown")})
+                                 "Fixed effects": fe_text(sheet, r["fe"]), "Clustered by": r["cluster"], "Sample": r["sample"], "Estimator": r["est"],
+                                 "Column in the note": where_in_paper(SHOWN.get(f"{sheet}|{P}|{c}", "")) or "Not shown"})
             for t, pv in r["tests"].items():
-                long.append({"Table": sheet, "Panel": P, "Column": c, "Dependent variable": DEPS.get(r["dep"], r["dep"]), "Regressor": f"Test: {t}",
-                             "p value": pv, "Observations": r["n"], "Fixed effects": r["fe"], "Clustered by": r["cluster"], "Sample": r["sample"],
-                             "Estimator": r["est"], "Column in the note": SHOWN.get(f"{sheet}|{P}|{c}", "Not shown")})
-    rows.append(["*** p<0.01, ** p<0.05, * p<0.1. Standard errors in parentheses. FE codes: "
-                 + "; ".join(f"{k} {v}" for k, v in FE_TXT.items()) + ". Red: printed in the paper."])
+                long.append({"Table": sheet, "Panel": P, "Column": c, "Dependent variable": dep_lab(r["dep"]), "Regressor": f"Test: {t}",
+                             "p value": pv, "Observations": r["n"], "Fixed effects": fe_text(sheet, r["fe"]), "Clustered by": r["cluster"],
+                             "Sample": r["sample"], "Estimator": r["est"],
+                             "Column in the note": where_in_paper(SHOWN.get(f"{sheet}|{P}|{c}", "")) or "Not shown"})
+    key = ("Within one origin the origin dimension of each fixed effect is constant: D destination, P product, Y year. "
+           if sheet in WITHIN_SHEETS else "O origin, D destination, P product, Y year. ")
+    rows.append(["Standard errors in parentheses. *** p<0.01, ** p<0.05, * p<0.1. " + (key if all(c in FE_PARTS for c in cols) else "")
+                 + "Red: printed in the paper."])
     return rows, red, long
 
 
@@ -241,7 +322,7 @@ def event_results() -> pd.DataFrame:
         f = OUT / f"v4_event_{P}.dta"
         if f.exists():
             out.append(pd.read_stata(f))
-    return pd.concat(out, ignore_index=True) if out else pd.DataFrame()
+    return clean_event_results(pd.concat(out, ignore_index=True)) if out else pd.DataFrame()
 
 
 def event_block(sheet, ev, cellset, tags, ests_main=("twfe", "cs", "sa")):
@@ -261,7 +342,12 @@ def event_block(sheet, ev, cellset, tags, ests_main=("twfe", "cs", "sa")):
             b, s_ = [], []
             for o, s in combos:
                 r = x[(x["outcome"] == o) & (x["est"] == s) & (x["term"] == t)]
-                if len(r) and np.isfinite(r["b"].iloc[0]):
+                if len(r) and np.isfinite(r["b"].iloc[0]) and not (r["se"].iloc[0] > 1e-9):
+                    # no variation by construction (number of MNEs before entry or at entry in some groups, any local exports in
+                    # cells with exports every year): the coefficient is exact and has no standard error
+                    v0 = r["b"].iloc[0]
+                    b.append("0 by construction" if abs(v0) < 5e-4 else f"{v0:.3f}, no variation"); s_.append("")
+                elif len(r) and np.isfinite(r["b"].iloc[0]):
                     b.append(f"{r['b'].iloc[0]:.3f}{stars(r['p'].iloc[0])}"); s_.append(f"({r['se'].iloc[0]:.3f})")
                 else:
                     b.append(""); s_.append("")
@@ -277,8 +363,14 @@ def event_block(sheet, ev, cellset, tags, ests_main=("twfe", "cs", "sa")):
                 v = r[fld].max() if len(r) else np.nan
                 vals.append(f"{int(v):,}" if np.isfinite(v) and v > 0 else "")
             rows.append([lab] + vals)
-        rows.append(["Status"] + [", ".join(sorted(set(x[(x["outcome"] == o) & (x["est"] == s)]["status"]) - {"ok"})) or "ok" for o, s in combos])
-        shown = [SHOWN.get(f"{sheet}|{tag}|{o}|{s}", "") for o, s in combos]
+        rows.append(["Cell FE"] + ["Yes" for o, s in combos])
+        rows.append(["Origin x year FE"] + ["No" if s == "cs" else "Yes" for o, s in combos])
+        if cellset == "B":
+            rows.append(["Destination x year FE"] + ["No" if s == "cs" else "Yes" for o, s in combos])
+        rows.append(["Control cells"] + [{"cs": "not yet treated", "sa": "never treated"}.get(s, "not yet and never treated") for o, s in combos])
+        rows.append(["Status"] + ["; ".join(STATUS_TXT.get(v, v) for v in sorted(set(x[(x["outcome"] == o) & (x["est"] == s)]["status"]) - {"ok"})) or "ok"
+                                  for o, s in combos])
+        shown = [where_in_paper(SHOWN.get(f"{sheet}|{tag}|{o}|{s}", "")) for o, s in combos]
         rows.append(["Column in the note"] + [s or "Not shown" for s in shown])
         for j, s in enumerate(shown):
             if s:
@@ -290,10 +382,13 @@ def event_block(sheet, ev, cellset, tags, ests_main=("twfe", "cs", "sa")):
                              "Coefficient": r["b"], "Standard error": r["se"], "p value": r["p"], "Stars": stars(r["p"]), "Observations": r["N"],
                              "Fixed effects": "cell + origin x year" + (" + destination x year" if cellset == "B" else ""),
                              "Clustered by": "origin x product" if cellset == "A" else "origin and destination pair", "Sample": TAGS.get(tag, tag),
-                             "Estimator": ESTS.get(r["est"], r["est"]), "Column in the note": SHOWN.get(f"{sheet}|{tag}|{r['outcome']}|{r['est']}", "Not shown")})
-    rows.append(["*** p<0.01, ** p<0.05, * p<0.1. Standard errors in parentheses. Base period: event time -1. TWFE and Sun and Abraham: cell FE and "
+                             "Estimator": ESTS.get(r["est"], r["est"]),
+                             "Column in the note": where_in_paper(SHOWN.get(f"{sheet}|{tag}|{r['outcome']}|{r['est']}", "")) or "Not shown"})
+    rows.append(["Standard errors in parentheses. *** p<0.01, ** p<0.05, * p<0.1. Base period: event time -1. TWFE and Sun and Abraham: cell FE and "
                  "origin x year FE (destination x year FE added for origin x destination x product cells), event time -4 binned with earlier years. "
-                 "Callaway and Sant'Anna: not yet treated controls, base period t0 - 1, event times before -4 not shown. Red: printed in the paper."])
+                 "Callaway and Sant'Anna: not yet treated controls, base period t0 - 1, event times before -4 not shown. Sun and Abraham is not "
+                 "reported for the number of MNEs: the outcome is zero in every control cell and in every year before entry, and its variance "
+                 "estimate is degenerate. Red: printed in the paper."])
     return rows, red, long
 
 
