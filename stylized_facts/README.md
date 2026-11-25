@@ -150,6 +150,24 @@ python/wp_agro_v4_paper.py          2026-11-23 exhibits of Note_v4.tex (tables/v
                                     group concentration), `regs` (wp_agro_v4_exhibits.py: baseline, capital intensity, heterogeneity,
                                     location, event studies, appendix tables), `flatten` (Note_v4.tex from docs/notes/Note_v4_source.tex).
                                     Order: v4_data, v4_est, Stata event and ppml do-files, v4_paper desc, regs, workbook, flatten.
+python/wp_agro_v5_data.py           2026-11-24 round v5 (especificaciones_estimaciones_v5_2026-11-24.md): classes_v5.parquet with the
+                                    source group of KL_p (22 farm types, 26 industries), the threshold ladder of E9a, terciles and
+                                    quartiles within stage, pooled thresholds (E9c), degree of processing (E10c).
+python/wp_agro_v5_data2.py          2026-11-24 PCI (Atlas HS92 headings, E10a), alternative US measures by group (E9d), country check
+                                    against FAOSTAT and USDA ERS (E9e). Downloads in data/raw/external/v5_downloads/ (not in git).
+python/wp_agro_v5_est.py (+ est2)   2026-11-24 E12.1 (location by stage), E9a, E9b, E9c, E9d, E9e, E10a, E10c, E10d (E10b waits for
+                                    Rauch's SITC file) -> output/wp_2012_2018/agro/v5/v5_regs_<step>.pkl.
+python/wp_agro_v5_events.py         2026-11-24 E11 panels ev5_A / ev5_B / ev5_Bentry: outcomes of the three steps (new and exiting
+                                    local exporters, survival, new destinations, information-spillover splits) and every treatment
+                                    definition (g_v4, g_nc, g_ps same condition with pseudo t0, g_bal, g_pre3, g_for, g_dom, g_s10,
+                                    g_s25, g_pers, g_be).
+stata/wp_agro_v5_event.do           2026-11-24 E11: blocks std (TWFE, CS not yet and never, SA, BJS, dCDH x samples), fe (EV1-EV5,
+                                    EV2-T, EV2-TF, stacked, FHS), treat, het, add (stacked, jwdid PPML, honestdid), spill, placebo.
+                                    Run: StataMP-64.exe /e do wp_agro_v5_event.do <A|B|E> <block>, each in its own folder.
+python/wp_agro_v5_match.py          2026-11-24 E11b (ix): stacked event study with CEM matched controls.
+python/wp_agro_v5_workbook.py       2026-11-24 docs/notes/WP_paperagro_v5_master_estimates.xlsx (v4 sheets + maps, E9-E12 tables, E11
+                                    sheets, figdata, D1-D4) and the figures in docs/notes/figures_v5. All labels in words come from
+                                    python/wp_agro_v5_labels.py (FE codes, samples, estimators, outcomes, cut-offs).
 python/wp_agro_refresh_overleaf.py  re-copies every exhibit the hand-edited WP_paperagro/main.tex uses from a wp output
                                      folder (default output/wp_2012_2018/agro), relabelled; never touches main.tex.
                                      Year window for any wp_* script: set WP_YEARS=2012-2018 (wp_common.YEAR_WINDOW;

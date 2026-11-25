@@ -216,6 +216,18 @@ Not on disk (to download): Fontagné–Guimbard–Orefice (2022) HS6 trade elast
   0.000 to 0.004 (TWFE and CS give 0.05) and pre-period coefficients of 0.01 with zero variance. It is not reported
   (`wp_agro_v4_workbook.clean_event_results`, used by the workbook and the paper). CS pre-period coefficients of N, and
   of any local exports in balanced cells, are zero by construction and show as "0 by construction".
+- **Event-study control group (found 2026-11-24, round v5).** In v4 treated cells needed two years with positive exports
+  before t0 while never treated cells only needed two years in 2012-2018. With the same condition for both (pseudo t0
+  drawn from the cohort distribution, `g_ps` in `wp_agro_v5_events.py`) or with CEM matched controls, the fall in the
+  probability of local exports after entry (-15 points in v4) disappears. Never compare event-study results across
+  treatment definitions without saying which one is used.
+- **Stata packages added 2026-11-24:** did_imputation, did_multiplegt_dyn, jwdid (needs hdfe), xtevent, event_plot,
+  honestdid (all SSC). `stackdev` is not on SSC: the stacked regression is built by hand in `wp_agro_v5_event.do`.
+  did_multiplegt_dyn's trends_nonparam() needs a numeric variable. Several Stata instances run in parallel without
+  problem (15 at once on 2026-11-24), each in its own working folder.
+- **Never edit a do-file while a Stata batch run is reading it (found 2026-11-25).** Stata reads the file line by line as it
+  runs, so an edit mid-run ends it with a parse error (r(198), r(199), r(612)) and an empty postfile; four v5 blocks were
+  lost this way after up to two hours. Run each job from its own copy of the do-file in its own folder.
 - **No ln(1 + x) and no asinh in any regression (Sebastián, 2026-11-23).** Logs are ln(X) on positive values; zeros go
   through PPML in levels or a 0/1 indicator (linear probability model). The v4 round had asinh and ln(1 + NL) outcomes
   in E2e and E6; they were replaced the same day.
