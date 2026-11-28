@@ -38,6 +38,15 @@ import wp_agro_v5_labels as L  # noqa: E402
 OUT5 = W.WP_OUT / "agro" / "v5"
 V5 = W.WP_INT / "v5"
 XLSX = W.ROOT / "docs" / "notes" / "WP_paperagro_v5_master_estimates.xlsx"
+FIGCACHE = W.WP_OUT / "agro" / "v5" / "v5_figure_tables.pkl"   # figure index and figure data of the last run with figures
+# hooks used by wp_agro_v6_workbook.py (round v6): extra sheets, primary-set table, extra rows and columns of All estimates
+HOOK_SHEETS = None      # callable(new, put_df, put_rows, text_sheet) -> list of dicts for All estimates
+PRIMARY = None          # (title, header, rows) shown at the top of Main results
+LONG_EXTRA_COLS: list = []
+FIG_EXTRA = None        # (figure data capital, figure data events, figure index) added by round v6
+READ_TITLE = "Multinationals and agricultural exports: all estimates, November 2026"
+READ_EXTRA: list = []   # extra (label, text) rows of Read me
+MAIN_TITLE = "Main results, in eight points (the numbers are in the sheets listed on the right)"
 FIG = W.ROOT / "docs" / "notes" / "figures_v5"
 OLD_FIG = [W.ROOT / "docs" / "notes" / "figures_E9", W.ROOT / "docs" / "notes" / "figures_E11"]
 TEX4 = W.ROOT / "docs" / "overleaf_projects" / "WP_paperagro" / "tables" / "v4"
@@ -184,6 +193,9 @@ def _readable_labels() -> None:
         m = re.match(r"^(lnN|D)_rauch_full_(con|lib)_(hom|ref|diff|na)$", v)
         if m:
             return f"{who[m.group(1)]} x " + {"hom": "homogeneous", "ref": "reference priced", "diff": "differentiated", "na": "not classified"}[m.group(3)]
+        m = re.match(r"^(lnN|D)_kr_(na|other)$", v)
+        if m:
+            return f"{who[m.group(1)]} x not classified (capital intensity or Rauch class)"
         m = re.match(r"^(lnN|D)_x_pci$", v)
         if m:
             return f"{who[m.group(1)]} x PCI"
@@ -236,10 +248,20 @@ def load_events() -> pd.DataFrame:
     why = {("bjs", "error 481"): "Not estimable: the fixed effects cannot be estimated on the cells without entry",
            ("T", "error 481"): "Not estimable: the fixed effects cannot be estimated on the cells without entry",
            ("T", "error 430"): "Not estimable: the estimation did not converge",
-           ("fhs", "error 198"): "Not estimable on destination cells (the command finds no usable observations)"}
+           ("fhs", "error 198"): "Not estimable: xtevent stopped with error 198 in every cell set (product, destination and new destination cells); v5 has no Freyaldenhoven et al. estimate"}
     for (es, stt), msg in why.items():
         e.loc[(e["est"] == es) & (e["status"] == stt), "status"] = msg
     e.loc[e["status"] == "estat error 498", "status"] = "Not estimable: too few cells in this group"
+    # correction V6-02 point 1 (2026-11-27): the OLS, PPML and stacked averages of event times 0 to 4 divided by five even when
+    # fewer post coefficients exist (rows by cohort and placebo). The average of the coefficients that exist is the stored value
+    # times 5 / k, and so is its standard error; the p value does not change.
+    post = e[e["est"].isin(["twfe", "ppml", "stk"]) & e["term"].isin(["Tp0", "Tp1", "Tp2", "Tp3", "Tp4"]) & np.isfinite(e["b"]) & (e["se"] > 1e-9)]
+    kk = post.groupby(k).size().rename("kpost")
+    e = e.merge(kk, left_on=k, right_index=True, how="left")
+    fix = e["est"].isin(["twfe", "ppml", "stk"]) & (e["term"] == "Post_avg") & (e["kpost"] < 5) & (e["kpost"] > 0)
+    e.loc[fix, "b"] = e.loc[fix, "b"] * 5 / e.loc[fix, "kpost"]
+    e.loc[fix, "se"] = e.loc[fix, "se"] * 5 / e.loc[fix, "kpost"]
+    e = e.drop(columns="kpost")
     s = (e["est"] == "sa") & (e["outcome"] == "N")
     e.loc[s, ["b", "se", "p"]] = np.nan
     e.loc[s, "status"] = "Not reported: the variance of Sun and Abraham is degenerate here (no MNE in any comparison cell or year before entry)"
@@ -985,8 +1007,28 @@ def main() -> None:
 
     # ---- front sheets (Read me is filled at the end, once the contents are known)
     ws_read = new("Read me")
-    text_sheet(new("Main results"), "Main results, in eight points (the numbers are in the sheets listed on the right)",
-               MAIN_RESULTS, widths=(5, 55, 110, 24), header=("", "Finding", "Numbers", "Sheets and figures"))
+    ws_main = new("Main results")
+    if PRIMARY is not None:
+        ptitle, phead, prows = PRIMARY
+        ws_main.append([ptitle]); ws_main["A1"].font = Font(bold=True, size=12); ws_main.append([])
+        ws_main.append(list(phead))
+        for j in range(1, len(phead) + 1):
+            ws_main.cell(row=ws_main.max_row, column=j).font = BOLD; ws_main.cell(row=ws_main.max_row, column=j).fill = HEAD
+        for r in prows:
+            ws_main.append(list(r))
+        ws_main.append([]); ws_main.append([MAIN_TITLE]); ws_main.cell(row=ws_main.max_row, column=1).font = Font(bold=True, size=12); ws_main.append([])
+        ws_main.append(["", "Finding", "Numbers", "Sheets and figures"])
+        for j in range(1, 5):
+            ws_main.cell(row=ws_main.max_row, column=j).font = BOLD; ws_main.cell(row=ws_main.max_row, column=j).fill = HEAD
+        for r in MAIN_RESULTS:
+            ws_main.append(list(r))
+        for j, w in enumerate((8, 55, 110, 24, 14, 14, 14, 50, 14)):
+            ws_main.column_dimensions[get_column_letter(j + 1)].width = w
+        for row in ws_main.iter_rows(min_row=3):
+            for c in row:
+                c.alignment = Alignment(wrap_text=True, vertical="top")
+    else:
+        text_sheet(ws_main, MAIN_TITLE, MAIN_RESULTS, widths=(5, 55, 110, 24), header=("", "Finding", "Numbers", "Sheets and figures"))
     text_sheet(new("Glossary"), "Glossary: every term and abbreviation used in the sheets and figures", GLOSSARY, widths=(42, 130))
 
     # ---- 1 where MNEs are
@@ -1081,6 +1123,10 @@ def main() -> None:
     put_df(new(NAME["E11 counts"], "Number of entered and comparison cells under each rule", "E11d"), "Number of cells in each event study", frames)
     # ---- figures
     fd9, fd11, index = [], [], []
+    if not figures and FIGCACHE.exists():
+        fd9, fd11, index = pickle.load(open(FIGCACHE, "rb"))
+    if FIG_EXTRA is not None:
+        fd9, fd11, index = fd9 + FIG_EXTRA[0], fd11 + FIG_EXTRA[1], index + FIG_EXTRA[2]
     if figures:
         for d in OLD_FIG + [FIG]:
             if d.exists():
@@ -1088,6 +1134,7 @@ def main() -> None:
         e9main = fig_e9(regs5, desc5, cls_meta, fd9, index, FIG / "2_capital_intensity")
         fig_main(ev5, e9main, fd11, index, FIG / "1_main_figures")
         fig_e11(ev5, fd11, index, FIG / "3_after_entry", names)
+        pickle.dump((fd9, fd11, index), open(FIGCACHE, "wb"))
     put_df(new(NAME["fig index"], "List of every figure, with its folder and what it shows", ""),
            "Figure index (folder docs/notes/figures_v5)", [("", pd.DataFrame(index))],
            "1_main_figures has the seven figures behind the main results; 2_capital_intensity and 3_after_entry have every variant.")
@@ -1099,6 +1146,8 @@ def main() -> None:
           "D3": "Parent countries of the multinationals, 2018 (Table 4 and Figure 1)", "D4": "Multinational groups, 2018 (Table 5 and Figure 2), and the numbers of Section 4.3"}
     for name, frames in d_sheets(op).items():
         put_df(new(NAME[name], dt[name], "E12.2"), dt[name], frames)
+    if HOOK_SHEETS is not None:
+        longs += HOOK_SHEETS(new, put_df, put_rows, text_sheet, wb)
     # ---- v4 sheets
     order = ["E1a", "E1b", "E1c", "E2a", "E2b", "E2c", "E2d", "E2e", "E2f", "E2g", "E3a", "E3b", "E3c", "E3d",
              "E4a", "E4b", "E4c", "E4d", "E4e", "E4f", "E4g", "E5a", "E5b", "E5c", "E5d", "E5e", "E7a", "E7b", "E7c"]
@@ -1121,7 +1170,7 @@ def main() -> None:
                       "Column in the note": "Not shown"})
     ws = new(NAME["Long format"], "Every estimate of every sheet in one table, for filtering", "")
     cols = ["Table", "Panel", "Column", "Column in the note", "Dependent variable", "Regressor", "Coefficient", "Standard error", "p value", "Stars",
-            "Observations", "R-squared", "Within R-squared", "Singletons dropped", "Fixed effects", "Clustered by", "Sample", "Estimator"]
+            "Observations", "R-squared", "Within R-squared", "Singletons dropped", "Fixed effects", "Clustered by", "Sample", "Estimator"] + LONG_EXTRA_COLS
     ws.append(cols)
     for j in range(1, len(cols) + 1):
         ws.cell(row=1, column=j).font = BOLD; ws.cell(row=1, column=j).fill = HEAD
@@ -1148,7 +1197,7 @@ def main() -> None:
     text_sheet(new(NAME["Notes"], "Data sources and details of the estimations", ""), "Technical notes", NOTES, widths=(36, 140))
     # ---- read me
     ws = ws_read
-    ws.append(["Multinationals and agricultural exports: all estimates, November 2026"]); ws["A1"].font = Font(bold=True, size=14)
+    ws.append([READ_TITLE]); ws["A1"].font = Font(bold=True, size=14)
     intro = [
         ("What this workbook answers", "1. In which agricultural products are multinationals present? 2. Is the link between multinationals and "
          "exports different in capital intensive products, or by other product traits? 3. What happens to local exporters after the first "
@@ -1163,6 +1212,7 @@ def main() -> None:
          "3_after_entry (every variant). Sheet 8.0 lists every figure and sheets 8.1 and 8.2 have the plotted numbers."),
         ("v4 sheets", "Sheets starting with v4 are the tables of the v4 draft, unchanged. Red numbers are printed in the draft."),
     ]
+    intro += READ_EXTRA
     for a, b in intro:
         ws.append([a, b])
     ws.append([]); ws.append(["Contents"]); ws.cell(row=ws.max_row, column=1).font = Font(bold=True, size=12)

@@ -168,6 +168,14 @@ python/wp_agro_v5_match.py          2026-11-24 E11b (ix): stacked event study wi
 python/wp_agro_v5_workbook.py       2026-11-24 docs/notes/WP_paperagro_v5_master_estimates.xlsx (v4 sheets + maps, E9-E12 tables, E11
                                     sheets, figdata, D1-D4) and the figures in docs/notes/figures_v5. All labels in words come from
                                     python/wp_agro_v5_labels.py (FE codes, samples, estimators, outcomes, cut-offs).
+python/wp_agro_v6_answers.py        2026-11-27 round v6 (especificaciones_estimaciones_v6_2026-11-25.md): answers to the 16 questions (V6-01).
+python/wp_agro_v6_data.py           2026-11-27 PCI6/PCI4/ubiquity from the OEC in HS 2017, PCI6_hs12, binary Rauch, hs_n1 (V6-03, V6-04).
+python/wp_agro_v6_events.py         2026-11-27 panels A/B/H, cohort-aligned stacks, placebo stacks, universe table, new-exporter flags.
+stata/wp_agro_v6_event.do           2026-11-27 aligned stacked event studies: blocks main, cohort, placebo, chk, fe, het, hetplc, bridge.
+python/wp_agro_v6_est.py            2026-11-27 regressions V6-05 to V6-09 (two-way clusters, permutation p) and P2 of the bridge.
+python/wp_agro_v6_workbook.py       2026-11-27 docs/notes/WP_paperagro_v6_master_estimates.xlsx (v5 workbook + corrections + 10.1-12.7)
+python/wp_agro_delivery.py           2026-11-28 builds docs/notes/entrega_v6_2026-11-28/ (LEEME, workbook, record, figures, code of v4-v6 in run order) and its zip.
+                                    and docs/notes/figures_v6. Record: docs/notes/RESULTS_v6_2026-11-27.md.
 python/wp_agro_refresh_overleaf.py  re-copies every exhibit the hand-edited WP_paperagro/main.tex uses from a wp output
                                      folder (default output/wp_2012_2018/agro), relabelled; never touches main.tex.
                                      Year window for any wp_* script: set WP_YEARS=2012-2018 (wp_common.YEAR_WINDOW;

@@ -228,6 +228,15 @@ Not on disk (to download): Fontagné–Guimbard–Orefice (2022) HS6 trade elast
 - **Never edit a do-file while a Stata batch run is reading it (found 2026-11-25).** Stata reads the file line by line as it
   runs, so an edit mid-run ends it with a parse error (r(198), r(199), r(612)) and an empty postfile; four v5 blocks were
   lost this way after up to two hours. Run each job from its own copy of the do-file in its own folder.
+- **Stata traps of round v6 (2026-11-27).** `foreach c in $CL hs4n` splits a two-way cluster list ("od op") into two one-way
+  clusters: quote it. `if _rc == 0 & \`s' > 0` is evaluated even when the local is empty and stops the do-file: test _rc
+  first. Event dummies whose outcome is constant by construction (anyXL two years before entry under R(g); N and D before
+  entry) make the cluster covariance singular and reghdfe returns no standard errors at all: drop those terms. `egen ...,
+  label` fails on a second cut if the value label exists: `cap label drop` first. A file written by `postfile` is unreadable
+  until `postclose`: a do-file that stops early leaves it empty.
+- **The v5 event-study control rule was not aligned by cohort (found 2026-11-27).** g_ps evaluated the prior-exports rule at a
+  drawn pseudo-year but compared each control with every cohort. Round v6 uses cohort-aligned stacks (A.7 of the v6 plan).
+  In 2017 half of the new local exporters at entry fall in HS codes without a one-to-one HS 2012 correspondence (hs_n1).
 - **No ln(1 + x) and no asinh in any regression (Sebastián, 2026-11-23).** Logs are ln(X) on positive values; zeros go
   through PPML in levels or a 0/1 indicator (linear probability model). The v4 round had asinh and ln(1 + NL) outcomes
   in E2e and E6; they were replaced the same day.

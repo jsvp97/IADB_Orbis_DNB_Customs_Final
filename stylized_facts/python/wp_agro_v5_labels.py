@@ -194,7 +194,8 @@ def cut_words(cut: str) -> str:
     if m:
         return f"high and low {ALT.get(m.group(1), m.group(1))} (split at the median of exports)"
     cut = cut.replace("farm type or industry", "farm type (farm stage) or industry (processing stage)")
-    cut = cut.replace("terciles", "capital intensity terciles").replace("quartiles", "capital intensity quartiles")
+    cut = re.sub(r"(?<!PCI )terciles", "capital intensity terciles", cut)
+    cut = re.sub(r"(?<!PCI )quartiles", "capital intensity quartiles", cut)
     cut = cut.replace("capital capital", "capital")
     return text(cut)
 

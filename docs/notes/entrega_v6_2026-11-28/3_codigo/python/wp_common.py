@@ -1,0 +1,899 @@
+"""
+wp_common.py
+============
+
+Shared layer for the WORKING-PAPER extensions of the stylized facts (Volpe's agenda,
+September 2026; see ../../docs/WORKPLAN_working_paper.md). It sits ON TOP of Ignacio's
+`_common.py`: same palette, same matplotlib defaults, same LaTeX/figure helpers -- only
+the paths and a few new helpers are added here. Ignacio's scripts are untouched.
+
+Everything downstream reads ONE cache built by `src/15_wp_extract_fdpy.do`
+(firm x origin x destination x HS6 x year, with both match flags, parent country, group
+id, HQ flag and destination-presence flags) -- never the 20 GB base.
+
+Conventions
+-----------
+CONVENTION = "sf"  (default) : the stylized-facts document's convention (Ignacio,
+                    post-2026-05-23): matched = _merge_DNB_Orbis==3 (`m_dnb`);
+                    dom = matched & parent == origin; ext = matched - dom (unknown-parent
+                    matched firms count as FOREIGN); Ecuador excluded.
+CONVENTION = "src" : src/05-14 convention: matched = _merge_final_review==3 (`m_fr`);
+                    ext requires a known parent != origin; ten origins.
+Every script calls `mne_flags(df)` so the switch is one constant.
+
+Outputs go to  output/wp/<scope>/{Graphs,Tables,Regressions}/  where scope is
+"all" (all goods), "agro" (HS 01-24), "mining", "manufacturing", or "sectors" (the
+four-sector comparison). No Overleaf mirror (set OVERLEAF_WP to a folder if wanted).
+"""
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+import logging
+import re
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+logging.getLogger("fontTools").setLevel(logging.WARNING)   # eps export is very chatty otherwise
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+try:  # Windows consoles default to cp1252; labels carry sigma etc.
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:  # noqa: BLE001
+    pass
+sys.path.insert(0, str(HERE.parents[1] / "config"))
+
+from _common import (  # noqa: E402  -- Ignacio's helpers, unchanged
+    C_MNE_EXT, C_MNE_DOM, C_MNE_TOT, ensure_dir, save_figure, stars,
+    write_regression_table,
+)
+from paths import (  # noqa: E402  -- config/paths.py
+    ROOT, RAW, INT, OUTPUT, F_PRODCHAR, F_LALL, F_IPC1, F_RHCI, F_GRAVITY, F_INCOME,
+    F_HS2SITC, F_HS2NAICS, F_HSDESC, EXCLUDED_ORIGINS_SF,
+)
+
+# ---------------------------------------------------------------------
+# Switches
+# ---------------------------------------------------------------------
+CONVENTION = "sf"            # "sf" (document) or "src" (scripts 05-14) -- see module docstring
+MINING_INCLUDES_HS71 = True  # put HS 71 (precious metals/stones: gold, silver) with mining & fuels
+OVERLEAF_WP: Path | None = None
+
+# ---------------------------------------------------------------------
+# Paths
+# ---------------------------------------------------------------------
+WP_INT   = INT / "wp"
+FDPY_DTA = WP_INT / "fdpy_base.dta"          # written by src/15_wp_extract_fdpy.do
+FDPY_PQ  = WP_INT / "fdpy_base.parquet"      # pandas cache of the same
+CUBE_PQ  = WP_INT / "odpy_parent_cube.parquet"
+CLASS_PQ = WP_INT / "hs6_classifications.parquet"
+# Year window (2026-10-02, agriculture paper): WP_YEARS="2012-2018" restricts every exhibit to those years (the window in
+# which all nine origins are observed) and writes to output/wp_2012_2018/ so the all-years outputs stay untouched.
+# The cached cube / firm-level parquet are read in full and filtered; nothing is cached under a window.
+import os as _os
+_YW = _os.environ.get("WP_YEARS", "").strip()
+YEAR_WINDOW = tuple(int(x) for x in _YW.split("-")) if _YW else None
+WP_OUT   = OUTPUT / ("wp" if YEAR_WINDOW is None else f"wp_{YEAR_WINDOW[0]}_{YEAR_WINDOW[1]}")
+F_FGO    = RAW / "ProTEE_0_1.csv"                              # CEPII, Fontagne-Guimbard-Orefice (2022), HS6 rev. 2007
+F_BEC    = RAW / "UNSD_HS-SITC-BEC_Correlations_2022.xlsx"     # UNSD: HS92..HS22 x BEC4/BEC5 x SITC1-4
+for _d in (WP_INT, WP_OUT):
+    ensure_dir(_d)
+# HS 2017 codes (2026-11-03, agriculture note): WP_HS17=1 converts every product code of the base to HS 2017 at load
+# (to_hs2017) and keeps its own cube, so the outputs made on the codes as reported stay untouched.
+HS17 = _os.environ.get("WP_HS17", "").strip() == "1"
+if HS17:
+    CUBE_PQ = WP_INT / "odpy_parent_cube_hs17.parquet"
+UNSD = RAW / "unsd"                                            # UNSD correspondence tables, downloaded 2026-11-03
+
+
+def outdirs(scope: str) -> tuple[Path, Path, Path]:
+    """(Graphs, Tables, Regressions) folders for a scope; created on demand."""
+    base = WP_OUT / scope
+    g, t, r = base / "Graphs", base / "Tables", base / "Regressions"
+    for d in (g, t, r):
+        ensure_dir(d)
+    return g, t, r
+
+
+def legend_below(fig) -> None:
+    """2026-10-01 (agro paper): every legend goes under the figure, centred, in as few rows as fit the figure's
+    width. Axes legends and figure legends are merged into one figure legend (labels deduplicated) and placed just
+    below the lowest tick labels / axis title. Set fig._keep_legend = True to leave a figure's legend alone."""
+    if getattr(fig, "_keep_legend", False):
+        return
+    legs = [a.get_legend() for a in fig.axes if a.get_legend() is not None] + list(fig.legends)
+    if not legs:
+        return
+    H, L = [], []
+    for lg in legs:
+        for h, t in zip(lg.legend_handles, lg.get_texts()):
+            if t.get_text() and t.get_text() not in L:
+                H.append(h); L.append(t.get_text())
+    fs = legs[0].get_texts()[0].get_fontsize() if legs[0].get_texts() else 9
+    for lg in legs:
+        lg.remove()
+    fig.canvas.draw()
+    r = fig.canvas.get_renderer()
+    inv = fig.transFigure.inverted()
+    y0 = min(inv.transform(a.get_tightbbox(r))[0][1] for a in fig.axes if a.get_visible())
+    avail = fig.get_size_inches()[0] * fig.dpi
+    n = len(L)
+    for nc in range(n, 0, -1):
+        rows = -(-n // nc); nc = -(-n // rows)             # balanced rows
+        lg = fig.legend(H, L, loc="upper center", bbox_to_anchor=(0.5, y0 - 0.01), bbox_transform=fig.transFigure,
+                        ncol=nc, frameon=False, fontsize=fs)
+        fig.canvas.draw()
+        if lg.get_window_extent(r).width <= avail or nc == 1:
+            return
+        lg.remove()
+
+
+def savefig(fig, name: str, gdir: Path) -> None:
+    legend_below(fig)
+    save_figure(fig, name, gdir, OVERLEAF_WP)
+
+
+def _balance_braces(line: str) -> str:
+    """A footnote line written as `{\\footnotesize ...}} \\\\` carries one closing brace too
+    many (a literal-string slip in some table writers); drop it when the line is unbalanced."""
+    line = re.sub(r"(?<!\\)%", r"\\%", line)     # a bare % inside a fragment is never a comment
+    body = re.sub(r"\\[{}]", "", line)          # ignore escaped braces
+    stripped = line.rstrip()
+    if body.count("}") > body.count("{") and stripped.endswith("}} \\\\"):
+        return stripped[:-4] + " \\\\"
+    return line
+
+
+def write_tex(lines: list[str], path: Path) -> None:
+    ensure_dir(path.parent)
+    path.write_text("\n".join(_balance_braces(l) for l in lines) + "\n", encoding="utf-8")
+
+
+def tex_escape(s: str) -> str:
+    s = str(s)
+    if s.startswith("$") or "\\" in s:   # already TeX
+        return s
+    return (str(s).replace("\\", r"\textbackslash{}").replace("&", r"\&").replace("%", r"\%")
+            .replace("$", r"\$").replace("#", r"\#").replace("_", r"\_"))
+
+
+# ---------------------------------------------------------------------
+# Palette for parent countries (foreign MNE bar split by home country)
+#   foreign total keeps Ignacio's navy; parents get distinct, print-safe hues;
+#   domestic stays light gray; unknown parent is hatched.
+# ---------------------------------------------------------------------
+# Ten shades of the document's navy for the parent countries (rank 1 = darkest), a gray-blue for
+# "Other foreign MNEs", the document's light gray for domestic MNEs.
+BLUE_SHADES = ["#1f3864", "#2a4a7f", "#365c99", "#446fb1", "#5682c4", "#6d95d1", "#86a8dc", "#a0bbe5", "#b9cdec", "#d2def3"]
+C_OTHER_FOREIGN = "#9fb0c8"
+C_UNKNOWN = "#cfd6e4"
+PARENT_COLORS = {"Other": C_OTHER_FOREIGN, "Unknown": C_UNKNOWN, "Domestic": C_MNE_DOM, "Local": "#e8e8e8"}
+
+
+def parent_color(code: str, i: int = 0) -> str:
+    """Colour for the i-th parent group in a stacked split (i = rank among the shown parents)."""
+    return PARENT_COLORS.get(code, BLUE_SHADES[min(i, len(BLUE_SHADES) - 1)])
+
+
+def text_color(code: str, i: int = 0) -> str:
+    return "white" if code not in PARENT_COLORS and i < 6 else "black"
+
+
+# ---------------------------------------------------------------------
+# Regions (destination and parent). Same lists as Ignacio's sf_explore_dest.py,
+# extended so that every code in the data gets a region.
+# ---------------------------------------------------------------------
+NA_CODES = {"USA", "CAN"}
+OC_CODES = {"AUS", "NZL", "PNG", "FJI"}
+LAC_CODES = {"ARG", "BHS", "BRB", "BLZ", "BOL", "BRA", "CHL", "COL", "CRI", "DOM", "ECU", "SLV",
+             "GTM", "GUY", "HTI", "HND", "JAM", "MEX", "NIC", "PAN", "PRY", "PER", "SUR", "TTO",
+             "URY", "VEN", "CUB", "ABW", "ANT", "CUW", "ATG", "DMA", "GRD", "KNA", "LCA", "VCT",
+             "BMU", "CYM", "VGB", "TCA", "PRI", "SXM", "BES", "MSR", "AIA", "GLP", "MTQ", "GUF"}
+EU_CODES = {"AUT", "BEL", "BGR", "CYP", "CZE", "DNK", "EST", "FIN", "FRA", "DEU", "GRC", "HUN",
+            "IRL", "ITA", "LVA", "LTU", "LUX", "MLT", "NLD", "POL", "PRT", "ROU", "SVK", "SVN",
+            "ESP", "SWE", "GBR", "CHE", "NOR", "ISL", "LIE", "MCO", "AND", "SMR", "GIB", "JEY",
+            "GGY", "IMN", "FRO", "ALB", "BIH", "HRV", "MKD", "MNE", "SRB", "XKX", "MDA", "BLR",
+            "UKR", "RUS", "TUR", "GEO", "ARM", "AZE"}
+ASIA_CODES = {"CHN", "HKG", "MAC", "TWN", "JPN", "KOR", "PRK", "MNG", "IND", "PAK", "BGD", "LKA",
+              "NPL", "BTN", "MDV", "AFG", "IDN", "MYS", "PHL", "SGP", "THA", "VNM", "KHM", "LAO",
+              "MMR", "BRN", "TLS", "KAZ", "KGZ", "TJK", "TKM", "UZB", "ARE", "SAU", "ISR", "IRN",
+              "IRQ", "JOR", "KWT", "LBN", "OMN", "QAT", "SYR", "YEM", "BHR", "PSE"}
+AFRICA_CODES = {"DZA", "AGO", "BEN", "BWA", "BFA", "BDI", "CMR", "CPV", "CAF", "TCD", "COM", "COD",
+                "COG", "CIV", "DJI", "EGY", "GNQ", "ERI", "ETH", "GAB", "GMB", "GHA", "GIN", "GNB",
+                "KEN", "LSO", "LBR", "LBY", "MDG", "MWI", "MLI", "MRT", "MUS", "MAR", "MOZ", "NAM",
+                "NER", "NGA", "RWA", "STP", "SEN", "SYC", "SLE", "SOM", "ZAF", "SSD", "SDN", "SWZ",
+                "TZA", "TGO", "TUN", "UGA", "ZMB", "ZWE", "ESH", "REU", "MYT", "SHN"}
+REGION_ORDER = ["Latin America", "North America", "Europe", "Asia", "Africa", "Oceania", "Rest of World"]
+
+
+def classify_region(code) -> str:
+    code = "" if code is None or (isinstance(code, float) and np.isnan(code)) else str(code)
+    if code in LAC_CODES:    return "Latin America"
+    if code in NA_CODES:     return "North America"
+    if code in EU_CODES:     return "Europe"
+    if code in ASIA_CODES:   return "Asia"
+    if code in AFRICA_CODES: return "Africa"
+    if code in OC_CODES:     return "Oceania"
+    return "Rest of World"
+
+
+# ---------------------------------------------------------------------
+# Sectors (HS 2007 chapters)
+# ---------------------------------------------------------------------
+SECTOR_ORDER = ["Agriculture", "Mining & fuels", "Manufacturing", "Rest"]
+SCOPE_OF_SECTOR = {"Agriculture": "agro", "Mining & fuels": "mining", "Manufacturing": "manufacturing", "Rest": "rest"}
+SECTOR_OF_SCOPE = {v: k for k, v in SCOPE_OF_SECTOR.items()}
+SCOPES_SECTORS = ["agro", "manufacturing", "mining", "rest"]
+SCOPES_ALL = ["all"] + SCOPES_SECTORS
+if _os.environ.get("WP_SCOPES", "").strip():   # e.g. WP_SCOPES=agro: run the scope loops for these scopes only
+    SCOPES_ALL = [x.strip() for x in _os.environ["WP_SCOPES"].split(",") if x.strip()]
+SCOPE_LABEL = {"all": "All goods", "agro": "Agriculture (HS 01--24)", "mining": "Mining \\& fuels (HS 25--27, 71)",
+               "manufacturing": "Manufacturing (HS 28--97 excl. 71)", "rest": "Rest (HS 98--99 and unclassified codes; services are not in customs data)"}
+AGRO_SECTION_LABEL = {1: "I Live animals & products (01-05)", 2: "II Vegetable products (06-14)",
+                      3: "III Fats & oils (15)", 4: "IV Food, beverages, tobacco (16-24)"}
+
+
+def hs2_of(hs6: pd.Series) -> pd.Series:
+    return pd.to_numeric(hs6.astype(str).str.zfill(6).str[:2], errors="coerce")
+
+
+def sector4(hs2: pd.Series) -> pd.Series:
+    """Agriculture 01-24; Mining & fuels 25-27 (+71 if MINING_INCLUDES_HS71); Manufacturing = rest.
+    Services are NOT in customs merchandise data (documented in the WORKPLAN)."""
+    hs2 = pd.to_numeric(hs2, errors="coerce")
+    s = pd.Series("Rest", index=hs2.index, dtype="object")   # HS 98-99, chapter 00 and unclassifiable codes
+    s[hs2.between(28, 97)] = "Manufacturing"
+    s[hs2.between(1, 24)] = "Agriculture"
+    mining = hs2.between(25, 27)
+    if MINING_INCLUDES_HS71:
+        mining = mining | (hs2 == 71)
+    s[mining] = "Mining & fuels"
+    return s
+
+
+def agro_section(hs2: pd.Series) -> pd.Series:
+    s = pd.Series(np.nan, index=hs2.index, dtype="float")
+    s[hs2.between(1, 5)] = 1; s[hs2.between(6, 14)] = 2; s[hs2 == 15] = 3; s[hs2.between(16, 24)] = 4
+    return s
+
+
+def hs_section(hs2: pd.Series) -> pd.Series:
+    bins = [(1, 5), (6, 14), (15, 15), (16, 24), (25, 27), (28, 38), (39, 40), (41, 43), (44, 46), (47, 49),
+            (50, 63), (64, 67), (68, 70), (71, 71), (72, 83), (84, 85), (86, 89), (90, 92), (93, 93),
+            (94, 96), (97, 97)]
+    s = pd.Series(np.nan, index=hs2.index, dtype="float")
+    for i, (a, b) in enumerate(bins, 1):
+        s[hs2.between(a, b)] = i
+    return s
+
+
+def scope_filter(df: pd.DataFrame, scope: str) -> pd.DataFrame:
+    """Row filter by scope on a frame that carries `hs2`."""
+    if scope == "all":
+        return df
+    sec = sector4(df["hs2"])
+    return df[sec == SECTOR_OF_SCOPE[scope]]
+
+
+# ---------------------------------------------------------------------
+# BEC Rev.4 -> end use (SNA basic classes). Standard mapping used by UN/OECD:
+#   capital       41, 521
+#   intermediate  111, 121, 21, 22, 31, 322, 42, 53
+#   consumption   112, 122, 522, 61, 62, 63
+#   mixed / n.e.s. 321 (motor spirit), 51 (passenger cars), 7
+# ---------------------------------------------------------------------
+BEC4_ENDUSE = {
+    "111": "Intermediate", "121": "Intermediate", "21": "Intermediate", "22": "Intermediate",
+    "31": "Intermediate", "322": "Intermediate", "42": "Intermediate", "53": "Intermediate",
+    "112": "Consumption", "122": "Consumption", "522": "Consumption", "61": "Consumption",
+    "62": "Consumption", "63": "Consumption",
+    "41": "Capital", "521": "Capital",
+    # revision 7 (Volpe): three end-use classes only -- motor spirit and goods n.e.s. (in the data: HS 27 fuels)
+    # go with the industrial supplies, passenger cars with consumption
+    "321": "Intermediate", "51": "Consumption", "7": "Intermediate",
+}
+BEC4_LABEL = {
+    "111": "Food & bev., primary, for industry", "112": "Food & bev., primary, for households",
+    "121": "Food & bev., processed, for industry", "122": "Food & bev., processed, for households",
+    "21": "Industrial supplies, primary", "22": "Industrial supplies, processed",
+    "31": "Fuels, primary", "321": "Motor spirit", "322": "Fuels, other processed",
+    "41": "Capital goods", "42": "Parts of capital goods", "51": "Passenger cars",
+    "521": "Transport equipment, industrial", "522": "Transport equipment, non-industrial",
+    "53": "Parts of transport equipment", "61": "Consumer goods, durable",
+    "62": "Consumer goods, semi-durable", "63": "Consumer goods, non-durable", "7": "Goods n.e.s.",
+}
+ENDUSE_ORDER = ["Intermediate", "Consumption", "Capital"]
+
+# Agro INPUTS (Volpe: "insumos agro") -- hand-made HS 2007 flag, cross-checked against BEC end use
+AGRO_INPUT_HS2 = {31}                                         # fertilizers
+AGRO_INPUT_HS4 = {"3808",                                      # pesticides, herbicides, fungicides
+                  "1209", "1005", "1006", "1007",              # seeds for sowing (1005-1007 only the seed lines; refined below)
+                  "2301", "2302", "2303", "2304", "2305", "2306", "2308", "2309",   # animal feed
+                  "8432", "8433", "8434", "8436", "8437", "8701",                    # agricultural machinery, tractors
+                  "0102", "0103", "0104", "0105", "0106", "0511",                    # live animals, semen/embryos
+                  "3101", "3102", "3103", "3104", "3105"}
+SEED_HS6 = {"100510", "100610", "100710", "120810", "120910", "120921", "120922", "120923",
+            "120924", "120925", "120926", "120929", "120930", "120991", "120999", "070110", "071310",
+            "071320", "071331", "071332", "071333", "071339", "071340", "071350", "071390"}
+
+
+def agro_input_flag(hs6: pd.Series) -> pd.Series:
+    h = hs6.astype(str).str.zfill(6)
+    f = h.str[:2].isin({f"{c:02d}" for c in AGRO_INPUT_HS2}) | h.str[:4].isin(AGRO_INPUT_HS4) | h.isin(SEED_HS6)
+    # exclude the food uses of maize/rice/soy: only the "seed" lines count (10051x, 10061x, 10071x, 1201 all)
+    food_not_seed = h.str[:4].isin({"1005", "1006", "1007"}) & ~h.isin({"100510", "100610", "100710"})
+    return (f & ~food_not_seed).astype("int8")
+
+
+# ---------------------------------------------------------------------
+# HS6 classification table (built once, cached)
+# ---------------------------------------------------------------------
+def build_classifications(force: bool = False) -> pd.DataFrame:
+    """hs07_6d -> descriptions, HS2/section, sector, agro section, Lall, IPC, product
+    characteristics (PCI, sigma BW, upstreamness, ladder, Rauch), FGO elasticity, RHCI,
+    BEC4 + end use, SITC3, NAICS, agro-input flag."""
+    import pyreadstat
+    if CLASS_PQ.exists() and not force:
+        return pd.read_parquet(CLASS_PQ)
+    print(">>> building HS6 classification table")
+
+    def dta(p, cols=None):
+        d, _ = pyreadstat.read_dta(str(p), usecols=cols, encoding="latin1")
+        return d
+
+    # descriptions (WITS H3->H2 table) -- also gives HS2002 code
+    desc = pd.read_csv(F_HSDESC, dtype=str, encoding="latin1")
+    desc.columns = ["hs07_6d", "hs6_desc", "hs02_6d", "hs02_desc"]
+    desc["hs07_6d"] = desc["hs07_6d"].str.zfill(6)
+    desc = desc.drop_duplicates("hs07_6d")[["hs07_6d", "hs6_desc"]]
+
+    # product characteristics (Ignacio's F_PRODCHAR: pci sigma upstreamness ladder + Rauch)
+    pc = dta(F_PRODCHAR, ["hs07_6d", "pci", "sigma", "upstreamness", "ladder", "con_34", "lib_diff",
+                          "lib_ref_price", "lib_org_exch", "hs2007productdescription"])
+    pc["hs07_6d"] = pc["hs07_6d"].astype(str).str.zfill(6)
+    pc = pc.rename(columns={"pci": "complexity", "sigma": "sigma_bw", "ladder": "quality_ladder",
+                            "hs2007productdescription": "hs6_desc_pc"})
+    # Rauch (1999), conservative classification at SITC 3/4 digits mapped to HS6 (con_34 in the product file)
+    pc["rauch"] = pc["con_34"].map({"n": "Differentiated", "r": "Reference-priced", "w": "Homogeneous (exchange)"}) if "con_34" in pc.columns else None
+    pc["rauch_unused"] = np.select([pc["lib_diff"] == 1, pc["lib_ref_price"] == 1, pc["lib_org_exch"] == 1],
+                            ["Differentiated", "Reference-priced", "Homogeneous (exchange)"], default=None)
+    pc = pc.drop_duplicates("hs07_6d")
+
+    lall = dta(F_LALL, ["hs07_6d", "hs6_description", "sitc3_3digit", "lall2000_category"])
+    lall["hs07_6d"] = lall["hs07_6d"].astype(str).str.zfill(6)
+    lall = lall.drop_duplicates("hs07_6d").rename(columns={"hs6_description": "hs6_desc_lall"})
+    ipc = dta(F_IPC1, ["hs07_6d", "ipc1"]); ipc["hs07_6d"] = ipc["hs07_6d"].astype(str).str.zfill(6)
+    ipc = ipc.drop_duplicates("hs07_6d")
+    rhci = dta(F_RHCI, ["hs07_6d", "rhci"]); rhci["hs07_6d"] = rhci["hs07_6d"].astype(str).str.zfill(6)
+    rhci = rhci.drop_duplicates("hs07_6d")
+
+    # FGO (2022) -- sigma is the import-demand elasticity (negative); more negative = more substitutable.
+    fgo = pd.read_csv(F_FGO, dtype={"HS6": str})
+    fgo["hs07_6d"] = fgo["HS6"].str.zfill(6)
+    fgo = fgo.rename(columns={"sigma": "sigma_fgo", "zero": "fgo_flag_zero", "positive": "fgo_flag_positive"})
+    fgo["sigma_fgo_abs"] = -fgo["sigma_fgo"]           # substitutability, positive scale
+    fgo = fgo[["hs07_6d", "sigma_fgo", "sigma_fgo_abs", "fgo_flag_zero", "fgo_flag_positive"]]
+
+    # BEC4 / BEC5 / SITC3 from the UNSD table (HS07 column). One HS07 may map to several rows
+    # (HS22 splits); take the modal BEC4 per HS07 (ties -> first).
+    bec = pd.read_excel(F_BEC, dtype=str)
+    bec = bec.rename(columns={"HS07": "hs07_6d"})[["hs07_6d", "BEC4", "BEC5", "SITC3"]].dropna(subset=["hs07_6d"])
+    bec["hs07_6d"] = bec["hs07_6d"].str.zfill(6)
+    bec["BEC4"] = bec["BEC4"].str.strip()
+    modal = (bec.groupby(["hs07_6d", "BEC4"]).size().reset_index(name="n")
+                .sort_values(["hs07_6d", "n"], ascending=[True, False]).drop_duplicates("hs07_6d"))
+    bec["SITC3"] = bec["SITC3"].astype(str).str.strip()
+    sitc = bec.drop_duplicates("hs07_6d")[["hs07_6d", "SITC3", "BEC5"]]
+    bec4 = modal[["hs07_6d", "BEC4"]].merge(sitc, on="hs07_6d", how="left").rename(columns={"BEC4": "bec4", "SITC3": "sitc3_unsd", "BEC5": "bec5"})
+    bec4["bec_enduse"] = bec4["bec4"].map(BEC4_ENDUSE)          # unmapped BEC codes stay NaN (none in the data)
+    bec4["bec4_label"] = bec4["bec4"].map(BEC4_LABEL).fillna(bec4["bec4"])
+
+    # SITC Rev.3 from the WITS text concordance (codes are 3-5 digits with leading zeros preserved;
+    # the .dta twin lost the zeros, so the CSV is the source)
+    sitc_own = pd.read_csv(RAW / "JobID-53_Concordance_H3_to_S3.CSV", dtype=str, encoding="latin1")
+    sitc_own.columns = ["hs07_6d", "hs6_desc_sitc", "sitc3", "sitc3_desc"]
+    sitc_own["hs07_6d"] = sitc_own["hs07_6d"].str.zfill(6)
+    sitc_own = sitc_own.drop_duplicates("hs07_6d")
+    sitc_own["sitc3"] = sitc_own["sitc3"].astype(str).str.strip()
+    sitc_own["sitc1"] = sitc_own["sitc3"].str[:1]
+    sitc_own["sitc2"] = sitc_own["sitc3"].str[:2]
+    sitc_own["sitc3_3d"] = sitc_own["sitc3"].str[:3]
+
+    naics = dta(F_HS2NAICS); naics.columns = [c.lower() for c in naics.columns]
+    naics["hs07_6d"] = naics["hs6"].astype(str).str.zfill(6)
+    naics["naics"] = naics["naics"].astype(str).str.strip()
+    naics = naics.drop_duplicates("hs07_6d")[["hs07_6d", "naics"]]
+    naics["naics3"] = naics["naics"].str[:3]
+
+    base = pd.DataFrame({"hs07_6d": sorted(set(desc["hs07_6d"]) | set(pc["hs07_6d"]) | set(lall["hs07_6d"]))})
+    for t in (desc, pc, lall, ipc, rhci, fgo, bec4, sitc_own, naics):
+        base = base.merge(t, on="hs07_6d", how="left")
+    base["hs6_desc"] = base["hs6_desc"].fillna(base["hs6_desc_lall"]).fillna(base["hs6_desc_pc"]).fillna(base["hs6_desc_sitc"])
+    # codes that appear in the customs data but are not HS 2007 lines (later revisions)
+    EXTRA_DESC = {"080390": "Bananas, fresh or dried (excl. plantains) [HS2012 code]", "080310": "Plantains, fresh or dried [HS2012 code]",
+                  "271012": "Light petroleum oils and preparations [HS2012 code]", "271020": "Petroleum oils containing biodiesel [HS2012 code]",
+                  "440729": "Tropical wood, sawn [HS2012 code]", "030389": "Frozen fish n.e.s. [HS2012 code]"}
+    for k, v in EXTRA_DESC.items():
+        if k not in set(base["hs07_6d"]):
+            base = pd.concat([base, pd.DataFrame({"hs07_6d": [k]})], ignore_index=True)
+        base.loc[base["hs07_6d"] == k, "hs6_desc"] = base.loc[base["hs07_6d"] == k, "hs6_desc"].fillna(v)
+    base = base.drop(columns=["hs6_desc_lall", "hs6_desc_pc", "hs6_desc_sitc"])
+    base["hs2"] = hs2_of(base["hs07_6d"])
+    base["hs4"] = base["hs07_6d"].str[:4]
+    base["hs_section"] = hs_section(base["hs2"])
+    base["sector4"] = sector4(base["hs2"])
+    base["agro_section"] = agro_section(base["hs2"])
+    base["agro_input"] = agro_input_flag(base["hs07_6d"])
+    base.to_parquet(CLASS_PQ, index=False)
+    print(f"    {len(base):,} HS6 rows -> {CLASS_PQ.name}; "
+          f"FGO coverage {base['sigma_fgo'].notna().mean():.0%}, BEC {base['bec4'].notna().mean():.0%}, "
+          f"PCI {base['complexity'].notna().mean():.0%}")
+    return base
+
+
+# ---------------------------------------------------------------------
+# The FDPY cache and the parent cube
+# ---------------------------------------------------------------------
+FDPY_COLS = ["country_orig", "Tax_ID", "country_dest", "hs07_6d", "year", "value_fob", "m_dnb", "m_fr",
+             "iso3_parent", "ID_Orbis_DNB", "parent_key", "exporter_is_hq", "has_aff_in_dest",
+             "has_aff_in_neighbor", "naics_aff_2"]
+
+
+def _in_window(df: pd.DataFrame) -> pd.DataFrame:
+    """Rows inside YEAR_WINDOW (all rows when no window is set)."""
+    if YEAR_WINDOW is None:
+        return df
+    y = pd.to_numeric(df["year"], errors="coerce")
+    return df[y.between(*YEAR_WINDOW)].reset_index(drop=True)
+
+
+SHIFTED_CODES = (("URY", (2016, 2017, 2018)),)   # origin and years whose HS chapters 01-09 lost the leading zero
+
+
+def fix_shifted_codes(df: pd.DataFrame) -> pd.DataFrame:
+    """2026-11-03. In the base, every Uruguay export of HS chapters 01-09 in 2016-2018 has its code read from a
+    10-digit number that lost the leading zero, so the six characters are digits 2-7 of the true code
+    (0202.30 frozen boneless beef appears as "202300", 0402.21 milk powder as "402210", in chapter 40). Uruguay has
+    no code starting with 0 in those years and 2,100-2,800 such rows in every other year. The true code is
+    "0" + the first five characters. A code is corrected when its shifted heading exists (HS 2007 headings and
+    headings seen elsewhere in the base) and either its literal heading does not exist, or the shifted code has
+    more Uruguayan exports than the literal code in the other years (this settles the few codes valid both ways,
+    such as 0901 coffee against 9011 microscopes)."""
+    yrs = pd.to_numeric(df["year"], errors="coerce")
+    for o, years in SHIFTED_CODES:
+        bad = (df["country_orig"] == o) & yrs.isin(years) & ~df["hs07_6d"].str.startswith("0")
+        if not bad.any():
+            continue
+        l = pd.read_stata(RAW / "lall2000_hs2007.dta", columns=["hs07_6d"])
+        heads = set(l["hs07_6d"].astype(str).str.zfill(6).str[:4])
+        clean = ~((df["country_orig"] == o) & yrs.isin(years))
+        heads |= set(df.loc[clean, "hs07_6d"].str[:4].unique())
+        other = df[(df["country_orig"] == o) & ~yrs.isin(years)].groupby("hs07_6d")["value_fob"].sum()
+        codes = df.loc[bad, "hs07_6d"].unique()
+        fix = {}
+        for c in codes:
+            s = "0" + c[:5]
+            if s[:4] not in heads:
+                continue
+            if c[:4] not in heads or other.get(s, 0.0) > other.get(c, 0.0):
+                fix[c] = s
+        df.loc[bad, "hs07_6d"] = df.loc[bad, "hs07_6d"].map(lambda c: fix.get(c, c))
+    return df
+
+
+# HS revision in which each origin reports its codes, by year (2026-11-03). Found from the codes themselves: an
+# origin-year is HS 2012 when it has codes that exist in HS 2012 and HS 2017 but not in HS 2007, and HS 2017 when it has
+# codes that exist only in HS 2017. Every other origin-year reports HS 2007. Uruguay mixes HS 2007 and HS 2012 codes
+# from 2016 on, which to_hs2017 settles code by code.
+HS_REVISION = {**{(o, y): 2012 for o in ("CHL", "COL", "CRI", "SLV") for y in range(2006, 2017)},
+               **{(o, y): 2017 for o in ("CHL", "COL", "CRI", "SLV", "ECU") for y in (2017, 2018, 2019, 2020, 2021, 2022)},
+               **{("URY", y): 2012 for y in range(2016, 2023)}}
+
+
+def hs_correlation(rev: int) -> pd.DataFrame:
+    """UNSD correlation table HS 2017 x HS `rev` (columns h17, old, rel)."""
+    x = pd.read_excel(UNSD / f"HS2017toHS{rev}ConversionAndCorrelationTables.xlsx", sheet_name=None, dtype=str)
+    c = x[[s for s in x if s.startswith("Correlation")][0]].dropna(axis=1, how="all")
+    c = c.iloc[1:, [0, -2, -1]]
+    c.columns = ["h17", "old", "rel"]
+    return c.dropna(subset=["h17", "old"])
+
+
+def hs2017_map(df: pd.DataFrame) -> pd.DataFrame:
+    """One row per (revision, reported code) -> HS 2017 code, from the UNSD correlation tables HS 2017 x HS 2007 and
+    HS 2017 x HS 2012. A code that UNSD links to one HS 2017 code takes it. A code that UNSD links to several HS 2017
+    codes (it was split) takes the same code number when it is among them, else the one with the largest exports of
+    the origins that report in HS 2017. Codes in HS 2017 already are kept."""
+    yrs = pd.to_numeric(df["year"], errors="coerce").astype(int)
+    rev = pd.Series([HS_REVISION.get(k, 2007) for k in zip(df["country_orig"], yrs)], index=df.index)
+    w = df.loc[rev == 2017].groupby("hs07_6d")["value_fob"].sum()
+    out = []
+    for r in (2007, 2012):
+        c = hs_correlation(r)
+        for old, s in c.groupby("old"):
+            t17 = sorted(set(s["h17"]))
+            if len(t17) == 1:
+                new, how = t17[0], "one HS 2017 code"
+            elif old in t17:
+                new, how = old, f"split into {len(t17)} HS 2017 codes, same code number kept"
+            else:
+                new = max(t17, key=lambda h: (w.get(h, 0.0), -int(h)))
+                how = f"split into {len(t17)} HS 2017 codes, the one with the largest exports in HS 2017"
+            out.append((r, old, new, how, " ".join(t17)))
+    m = pd.DataFrame(out, columns=["revision", "code", "hs17", "how", "hs17_all"])
+    s17 = set(hs_correlation(2007)["h17"])
+    m = pd.concat([m, pd.DataFrame({"revision": 2017, "code": sorted(s17), "hs17": sorted(s17), "how": "HS 2017 code", "hs17_all": sorted(s17)})])
+    return m
+
+
+def to_hs2017(df: pd.DataFrame) -> pd.DataFrame:
+    """Replace hs07_6d by its HS 2017 code (2026-11-03). Each row is read in the HS revision of its origin and year
+    (HS_REVISION). A code that does not exist in that revision is read in the first revision where it exists
+    (2017, 2012, 2007); this settles Uruguay. Codes that exist in no revision stay as they are. The reported code is
+    kept in hs_reported."""
+    m = hs2017_map(df)
+    look = {(r, c): h for r, c, h in zip(m["revision"], m["code"], m["hs17"])}
+    valid = {r: set(m.loc[m["revision"] == r, "code"]) for r in (2007, 2012, 2017)}
+    yrs = pd.to_numeric(df["year"], errors="coerce").astype(int)
+    keys = pd.DataFrame({"rev": [HS_REVISION.get(k, 2007) for k in zip(df["country_orig"], yrs)], "code": df["hs07_6d"].values})
+    u = keys.drop_duplicates()
+    res = {}
+    for r, c in zip(u["rev"], u["code"]):
+        for rr in (r, 2017, 2012, 2007):
+            if c in valid[rr]:
+                res[(r, c)] = look[(rr, c)]
+                break
+        else:
+            res[(r, c)] = c
+    df = df.copy()
+    df["hs_reported"] = df["hs07_6d"]
+    df["hs07_6d"] = [res[k] for k in zip(keys["rev"], keys["code"])]
+    return df
+
+
+def load_fdpy() -> pd.DataFrame:
+    """Firm x origin x dest x HS6 x year rows from src/15's cache (parquet copy made on first use). Shifted codes
+    (fix_shifted_codes) are corrected at load, and with WP_HS17=1 every code becomes HS 2017 (to_hs2017)."""
+    if FDPY_PQ.exists():
+        d = fix_shifted_codes(pd.read_parquet(FDPY_PQ))
+        return _in_window(to_hs2017(d) if HS17 else d)
+    assert YEAR_WINDOW is None, "build the full fdpy parquet cache before using WP_YEARS"
+    import pyreadstat
+    assert FDPY_DTA.exists(), f"run src/15_wp_extract_fdpy.do first -> {FDPY_DTA}"
+    print(f">>> reading {FDPY_DTA} (first time; parquet cache written)")
+    df, _ = pyreadstat.read_dta(str(FDPY_DTA), encoding="latin1")
+    for c in ("m_dnb", "m_fr", "exporter_is_hq", "has_aff_in_dest", "has_aff_in_neighbor"):
+        df[c] = pd.to_numeric(df[c], errors="coerce").fillna(0).astype("int8")
+    df["year"] = pd.to_numeric(df["year"], errors="coerce").astype("Int64")
+    df["value_fob"] = pd.to_numeric(df["value_fob"], errors="coerce").fillna(0.0).astype(float)
+    for c in ("country_orig", "country_dest", "iso3_parent", "hs07_6d", "Tax_ID", "ID_Orbis_DNB", "parent_key"):
+        df[c] = df[c].astype("string").str.strip().fillna("")
+    df["hs07_6d"] = df["hs07_6d"].str.zfill(6)
+    df.to_parquet(FDPY_PQ, index=False)
+    return df
+
+
+def matched_flag(df: pd.DataFrame) -> pd.Series:
+    return df["m_dnb"] if CONVENTION == "sf" else df["m_fr"]
+
+
+def excluded_origins() -> tuple:
+    return EXCLUDED_ORIGINS_SF if CONVENTION == "sf" else tuple()
+
+
+def owner_type(df: pd.DataFrame) -> pd.Series:
+    """local | dom | ext | ext_unknown  (ext_unknown = matched, no parent country recorded).
+    Under CONVENTION='sf', ext_unknown is FOREIGN (ext = total - dom); under 'src' it is
+    neither foreign nor domestic. `mne_flags` applies that rule."""
+    m = matched_flag(df).astype(bool)
+    par = df["iso3_parent"].astype("string").fillna("")
+    out = pd.Series("local", index=df.index, dtype="object")
+    out[m & (par == df["country_orig"])] = "dom"
+    out[m & (par != df["country_orig"]) & (par != "")] = "ext"
+    out[m & (par == "")] = "ext_unknown"
+    return out
+
+
+def build_cube(force: bool = False) -> pd.DataFrame:
+    """origin x dest x HS6 x year x iso3_parent x m_dnb x m_fr  ->  value, n_firms, and the
+    HQ / presence sub-sums. Both conventions can be recomposed from it."""
+    if CUBE_PQ.exists() and not force:
+        return _in_window(pd.read_parquet(CUBE_PQ))
+    assert YEAR_WINDOW is None, "build the full cube before using WP_YEARS"
+    df = load_fdpy()
+    print(f">>> building parent cube from {len(df):,} FDPY rows")
+    df = df[df["value_fob"] > 0]
+    keys = ["country_orig", "country_dest", "hs07_6d", "year", "iso3_parent", "m_dnb", "m_fr"]
+    df = df.assign(
+        v_hq=df["value_fob"] * df["exporter_is_hq"],
+        v_affpres=df["value_fob"] * df["has_aff_in_dest"],
+        v_hqdest=df["value_fob"] * ((df["iso3_parent"] != "") & (df["iso3_parent"] == df["country_dest"])).astype(int),
+        firm=df["country_orig"] + "|" + df["Tax_ID"],
+    )
+    # group key: the parent's Orbis/D&B id when known, else the parent name, else the firm itself
+    grp = df["ID_Orbis_DNB"].where(df["ID_Orbis_DNB"] != "", df["parent_key"])
+    df["group"] = grp.where(grp != "", df["firm"])
+    g = df.groupby(keys, as_index=False, dropna=False).agg(
+        value=("value_fob", "sum"), n_firms=("firm", "nunique"), n_groups=("group", "nunique"),
+        v_hq=("v_hq", "sum"), n_hq=("exporter_is_hq", "sum"),
+        v_affpres=("v_affpres", "sum"), n_affpres=("has_aff_in_dest", "sum"),
+        v_hqdest=("v_hqdest", "sum"))
+    g["n_hqdest"] = np.where((g["iso3_parent"] != "") & (g["iso3_parent"] == g["country_dest"]), g["n_firms"], 0)
+    g["hs2"] = hs2_of(g["hs07_6d"])
+    g.to_parquet(CUBE_PQ, index=False)
+    print(f"    cube: {len(g):,} rows -> {CUBE_PQ.name}")
+    return g
+
+
+def mne_flags(cube: pd.DataFrame) -> pd.DataFrame:
+    """Add owner_type, val_total/val_dom/val_ext, parent_grp columns to a cube slice, apply the
+    convention's origin exclusion. Works on any frame with the cube keys."""
+    d = cube[~cube["country_orig"].isin(excluded_origins())].copy()
+    d["owner_type"] = owner_type(d)
+    m = matched_flag(d).astype(bool)
+    d["val_total"] = d["value"] * m
+    d["val_dom"] = d["value"] * (d["owner_type"] == "dom")
+    if CONVENTION == "sf":
+        d["val_ext"] = d["val_total"] - d["val_dom"]                    # unknown parent counts as foreign
+    else:
+        d["val_ext"] = d["value"] * (d["owner_type"] == "ext")
+    d["val_ext_known"] = d["value"] * (d["owner_type"] == "ext")
+    d["val_ext_unknown"] = d["value"] * (d["owner_type"] == "ext_unknown")
+    # annual averages (revision 7): each origin's value divided by the number of years it is observed, so that a
+    # sum over rows is the region's average annual flow. Shares keep using the pooled `value` columns.
+    ny = d.groupby("country_orig")["year"].transform("nunique").astype(float)
+    for c in ("value", "val_total", "val_ext", "val_dom"):
+        d[f"{c}_yr"] = d[c] / ny
+    return d
+
+
+YEARS_BY_ORIGIN = {"ARG": "2011--2019", "CHL": "2009--2022", "COL": "2010--2021", "CRI": "2010--2019", "DOM": "2012--2019",
+                   "PER": "2010--2019", "PRY": "2012--2020", "SLV": "2006--2018", "URY": "2010--2019"}
+VAL_HDR = r"\$bn/yr"      # column header for annual-average values
+VAL_NOTE = ("Dollar values are annual averages: each origin's pooled value divided by the number of years it is observed "
+            "(ARG 2011--2019, CHL 2009--2022, COL 2010--2021, CRI 2010--2019, DOM 2012--2019, PER 2010--2019, PRY 2012--2020, "
+            "SLV 2006--2018, URY 2010--2019); shares are computed on the pooled values.")
+
+# OECD members (38) -- used to split the foreign bar into OECD- and non-OECD-parent multinationals (revision 7)
+OECD_CODES = {"AUS", "AUT", "BEL", "CAN", "CHL", "COL", "CRI", "CZE", "DNK", "EST", "FIN", "FRA", "DEU", "GRC", "HUN", "ISL",
+              "IRL", "ISR", "ITA", "JPN", "KOR", "LVA", "LTU", "LUX", "MEX", "NLD", "NZL", "NOR", "POL", "PRT", "SVK", "SVN",
+              "ESP", "SWE", "CHE", "TUR", "GBR", "USA"}
+
+# Tax havens and conduit jurisdictions (revision 7). Dependencies are consolidated into their sovereign; the
+# stand-alone havens are pooled into one group when parents are consolidated.
+HAVEN_SOVEREIGN = {**{c: "GBR" for c in ("AIA", "BMU", "VGB", "CYM", "GIB", "GGY", "IMN", "JEY", "MSR", "TCA", "FLK", "SHN")},
+                   **{c: "NLD" for c in ("ABW", "CUW", "SXM", "BES", "ANT")}, **{c: "USA" for c in ("PRI", "VIR", "GUM", "ASM")},
+                   **{c: "CHN" for c in ("HKG", "MAC")}, **{c: "FRA" for c in ("MCO",)}}
+HAVEN_STANDALONE = {"LIE", "CHE", "LUX", "PAN", "BHS", "BRB", "BLZ", "CYP", "MLT", "MUS", "SYC", "MHL", "LBR", "VUT", "WSM",
+                    "AND", "SMR", "ARE", "SGP", "IRL"}
+HAVEN_GROUP_LABEL = "Tax havens & conduits"
+
+
+PARENT_RULE_NOTE = ("Foreign MNEs whose parent country is not recorded (7.5\\% of foreign-MNE export value) are allocated to "
+                    "parent countries in proportion to the recorded parents of the same group, so every share by parent "
+                    "country refers to all foreign MNEs and adds up with the domestic and local shares.")
+
+
+def parent_scale(d: pd.DataFrame, den: pd.Series, g: pd.Series, index) -> pd.Series:
+    """Revision 9 -- THE one rule for matched firms with no recorded parent country: within each group of the
+    denominator, their value is allocated to parent countries in proportion to the recorded parents, i.e. every
+    parent-country quantity computed on recorded parents is scaled by (all foreign value / recorded-parent foreign
+    value) of the same group. Ignacio's Figure 4 (shares among recorded parents) is the special case where the
+    group is the whole sample, so its 23.3 % for the USA is preserved."""
+    ot = d["owner_type"]
+    known = d.loc[den & (ot == "ext"), "value"].groupby(g[den & (ot == "ext")]).sum().reindex(index)
+    fall = d.loc[den & ot.isin(["ext", "ext_unknown"]), "value"].groupby(g[den & ot.isin(["ext", "ext_unknown"])]).sum().reindex(index)
+    return (fall / known).replace([np.inf, -np.inf], np.nan).fillna(1.0)
+
+
+def flow_shares(d: pd.DataFrame, by, numerators: dict, denominator=None, order=None, scale: set | None = None) -> pd.DataFrame:
+    """THE single share engine (revision 8). For every group of `by` (a column name, a Series aligned with d, or
+    None for one row 'All'): the pooled export value of each numerator mask as a percent of the pooled value of the
+    denominator mask (default: everything in the group), plus the denominator's annual-average value in USD bn
+    ('total_bn'). Numerators named in `scale` are parent-country quantities (masks inside the recorded-parent
+    foreign MNEs) and are scaled by `parent_scale` so that they refer to all foreign MNEs (revision 9). Every share
+    in every US / parent / destination exhibit is computed here, so two exhibits that describe the same quantity
+    cannot disagree; a different denominator is always a different column."""
+    den = pd.Series(True, index=d.index) if denominator is None else denominator.reindex(d.index).fillna(False).astype(bool)
+    g = pd.Series("All", index=d.index) if by is None else (d[by] if isinstance(by, str) else pd.Series(by, index=d.index))
+    base = d.loc[den, "value"].groupby(g[den]).sum()
+    out = pd.DataFrame(index=base.index)
+    sc = parent_scale(d, den, g, base.index) if scale else None
+    for name, mask in numerators.items():
+        m = mask.reindex(d.index).fillna(False).astype(bool) & den
+        out[name] = 100 * d.loc[m, "value"].groupby(g[m]).sum().reindex(base.index).fillna(0.0) / base
+        if scale and name in scale:
+            out[name] = out[name] * sc
+    out["total_bn"] = d.loc[den, "value_yr"].groupby(g[den]).sum().reindex(base.index) / 1e9
+    if order is not None:
+        out = out.reindex([o for o in order if o in out.index])
+    return out
+
+
+def consolidate_parent(code: pd.Series) -> pd.Series:
+    """Parent country with dependencies folded into their sovereign and stand-alone havens pooled."""
+    out = code.map(HAVEN_SOVEREIGN).fillna(code)
+    return out.where(~out.isin(HAVEN_STANDALONE), HAVEN_GROUP_LABEL)
+
+
+TOP_K_FIG = 10  # parents shown individually in every figure/table that splits the foreign bar by home country (2026-09-08, rev. 3)
+
+
+def top_parents(d: pd.DataFrame, k: int = TOP_K_FIG, force: tuple = ()) -> list[str]:
+    """Top-k parent countries by KNOWN-parent foreign-MNE value (plus forced codes if present)."""
+    v = d[d["owner_type"] == "ext"].groupby("iso3_parent")["value"].sum().sort_values(ascending=False)
+    top = list(v.index[:k])
+    for c in force:
+        if c in v.index and c not in top:
+            top.append(c)
+    return top
+
+
+def parent_group(d: pd.DataFrame, top: list[str], unknown_to_other: bool = True) -> pd.Series:
+    """Label for the stacked-bar split: parent code (if in top), Other (every other foreign MNE,
+    including matched firms with no recorded parent unless unknown_to_other=False), Domestic,
+    or Local (unmatched)."""
+    out = pd.Series("Local", index=d.index, dtype="object")
+    out[d["owner_type"] == "dom"] = "Domestic"
+    out[d["owner_type"] == "ext_unknown"] = "Other" if unknown_to_other else "Unknown"
+    ext = d["owner_type"] == "ext"
+    out[ext] = np.where(d.loc[ext, "iso3_parent"].isin(top), d.loc[ext, "iso3_parent"], "Other")
+    return out
+
+
+PARENT_GROUPS_NOTE = (f"The foreign-MNE bar is split into the {TOP_K_FIG} largest parent countries by foreign-MNE export "
+                      "value in the scope and `Other foreign' (all remaining parents, including matched firms with no "
+                      "recorded parent country); domestic MNEs have a parent in the exporting country.")
+
+
+# ---------------------------------------------------------------------
+# Generic LaTeX matrix writer (two-way tables, heat-map companions)
+# ---------------------------------------------------------------------
+def write_matrix_tex(mat: pd.DataFrame, path: Path, *, fmt: str = "{:.1f}", corner: str = "",
+                     row_total: pd.Series | None = None, col_total: pd.Series | None = None,
+                     note: str | None = None, caption_cols: str | None = None) -> None:
+    cols = list(mat.columns)
+    ncol = len(cols) + (1 if row_total is not None else 0)
+    lines = [rf"\begin{{tabular}}{{l{'r' * ncol}}}", r"\toprule"]
+    if caption_cols:
+        lines.append(rf" & \multicolumn{{{len(cols)}}}{{c}}{{{caption_cols}}}" + (" & " if row_total is not None else "") + r" \\")
+    hdr = [tex_escape(corner)] + [tex_escape(c) for c in cols] + (["Total"] if row_total is not None else [])
+    lines += [" & ".join(hdr) + r" \\", r"\midrule"]
+    def _f(c):
+        return fmt[c] if isinstance(fmt, dict) else fmt
+
+    for idx, row in mat.iterrows():
+        cells = ["--" if pd.isna(v) else _f(c).format(v) for c, v in zip(cols, row.values)]
+        if row_total is not None:
+            cells.append(_f(cols[0]).format(row_total.loc[idx]))
+        lines.append(tex_escape(idx) + " & " + " & ".join(cells) + r" \\")
+    if col_total is not None:
+        lines.append(r"\midrule")
+        cells = [_f(c).format(col_total.loc[c]) for c in cols] + ([_f(cols[0]).format(col_total.sum() if row_total is None else row_total.sum())] if row_total is not None else [])
+        lines.append("Total & " + " & ".join(cells) + r" \\")
+    lines.append(r"\bottomrule")
+    if note:
+        lines.append(rf"\multicolumn{{{ncol + 1}}}{{p{{0.95\textwidth}}}}{{\footnotesize {note}}} \\")
+    lines.append(r"\end{tabular}")
+    write_tex(lines, path)
+
+
+def heatmap(mat: pd.DataFrame, fname: str, gdir: Path, *, cbar_label: str, fmt: str = "{:.0f}",
+            cmap: str = "Blues", vmin: float | None = None, vmax: float | None = None,
+            xlabel: str = "", ylabel: str = "", annotate_thresh: float | None = None) -> None:
+    """Same construction as Ignacio's sf_explore_dest_by_origin.heatmap (imshow + annotations)."""
+    import textwrap
+    ncol, nrow = mat.shape[1], mat.shape[0]
+    fig, ax = plt.subplots(figsize=(max(5.5, 0.5 * ncol + 2.6), max(3.6, 0.36 * nrow + 1.9)))
+    afs = 8 if ncol <= 12 else 7   # annotation font
+    vals = mat.values.astype(float)
+    vmin = np.nanmin(vals) if vmin is None else vmin
+    vmax = np.nanmax(vals) if vmax is None else vmax
+    im = ax.imshow(vals, aspect="auto", cmap=cmap, vmin=vmin, vmax=vmax)
+    ax.set_xticks(range(ncol)); ax.set_xticklabels([textwrap.fill(str(c), 22) if len(str(c)) > 22 else str(c) for c in mat.columns], rotation=45, ha="right", fontsize=9)
+    ax.set_yticks(range(nrow)); ax.set_yticklabels([textwrap.fill(str(c), 34) if len(str(c)) > 34 else str(c) for c in mat.index], fontsize=9)
+    for i in range(mat.shape[0]):
+        for j in range(mat.shape[1]):
+            v = vals[i, j]
+            if np.isnan(v):
+                ax.text(j, i, "—", ha="center", va="center", fontsize=afs, color="gray"); continue
+            if annotate_thresh is not None and v < annotate_thresh:
+                continue
+            color = "white" if v > vmin + 0.6 * (vmax - vmin) else "black"
+            ax.text(j, i, fmt.format(v), ha="center", va="center", fontsize=afs, color=color)
+    cbar = plt.colorbar(im, ax=ax, fraction=0.03, pad=0.02)
+    cbar.set_label(cbar_label, fontsize=9)
+    if xlabel: ax.set_xlabel(xlabel)
+    if ylabel: ax.set_ylabel(ylabel)
+    savefig(fig, fname, gdir)
+
+
+# ---------------------------------------------------------------------
+# Gravity / income helpers
+# ---------------------------------------------------------------------
+def load_gravity(cols=("iso3_o", "iso3_d", "year", "dist", "contig", "comlang_off", "fta_wto",
+                       "gdp_o", "gdpcap_o", "pop_o", "gdp_d", "gdpcap_d", "pop_d")) -> pd.DataFrame:
+    import pyreadstat
+    g, _ = pyreadstat.read_dta(str(F_GRAVITY), usecols=list(cols))
+    if "year" in g.columns:
+        g["year"] = pd.to_numeric(g["year"], errors="coerce").astype("Int64")
+    return g
+
+
+def load_income_groups() -> pd.DataFrame:
+    import pyreadstat
+    d, _ = pyreadstat.read_dta(str(F_INCOME))
+    return d.rename(columns={"iso3": "country_dest", "income_group": "income_group_dest"})
+
+
+def fmt_bn(v: float) -> str:
+    return f"{v / 1e9:,.1f}"
+
+
+_DESC_CACHE = None
+
+
+def hs6_desc_fallback(codes: pd.Series) -> pd.Series:
+    """Descriptions for codes that are not HS 2007 lines: national/special customs lines (00, 98, 99)
+    and later-revision HS codes, mapped to their HS 2007 counterpart with the UNSD HS2022->HS2007
+    conversion table (data/raw/UNSD_HS2022toHS2007_Conversion.xlsx); last resort = the heading."""
+    global _DESC_CACHE
+    if _DESC_CACHE is None:
+        cls = pd.read_parquet(CLASS_PQ, columns=["hs07_6d", "hs6_desc"]).dropna().drop_duplicates("hs07_6d").set_index("hs07_6d")["hs6_desc"]
+        conv = pd.read_excel(Path(F_HSDESC).parent / "UNSD_HS2022toHS2007_Conversion.xlsx", sheet_name=0, dtype=str)
+        conv.columns = ["h22", "h07"]
+        conv = conv.dropna().drop_duplicates("h22").set_index("h22")["h07"].str.zfill(6)
+        _DESC_CACHE = (cls, conv)
+    cls, conv = _DESC_CACHE
+
+    def one(c):
+        c = str(c)
+        if c in cls.index:
+            return cls[c]
+        if c[:2] in ("00", "98", "99"):
+            return "National / special customs line (no HS description)"
+        h = conv.get(c)
+        if h is not None and h in cls.index:
+            return f"{cls[h]} [later HS revision; HS 2007 line {h}]"
+        same4 = cls[cls.index.str[:4] == c[:4]]
+        if len(same4):
+            return f"Heading {c[:4]} (later HS revision): {same4.iloc[0]}"
+        return f"HS {c} (no description available)"
+    return codes.map(one)
+
+
+__all__ = [n for n in dir() if not n.startswith("_")]
+
+
+# ---------------------------------------------------------------------
+# HS sections (21) and the fast pyfixest call used by every regression script
+# ---------------------------------------------------------------------
+HS_SECTIONS = [(1, 5, "I Live animals; animal products"), (6, 14, "II Vegetable products"), (15, 15, "III Fats and oils"),
+               (16, 24, "IV Prepared foodstuffs, beverages, tobacco"), (25, 27, "V Mineral products"), (28, 38, "VI Chemicals"),
+               (39, 40, "VII Plastics and rubber"), (41, 43, "VIII Hides, skins, leather"), (44, 46, "IX Wood and articles"),
+               (47, 49, "X Pulp, paper"), (50, 63, "XI Textiles and apparel"), (64, 67, "XII Footwear, headgear"),
+               (68, 70, "XIII Stone, ceramics, glass"), (71, 71, "XIV Precious metals and stones"), (72, 83, "XV Base metals"),
+               (84, 85, "XVI Machinery and electrical equipment"), (86, 89, "XVII Transport equipment"),
+               (90, 92, "XVIII Optical, precision instruments"), (93, 93, "XIX Arms"), (94, 96, "XX Miscellaneous manufactures"),
+               (97, 97, "XXI Works of art"), (98, 99, "Special / unclassified (98-99)")]
+
+
+def hs_section_label(hs2: pd.Series) -> pd.Series:
+    h = pd.to_numeric(hs2, errors="coerce")
+    out = pd.Series("Unclassified", index=hs2.index, dtype="object")
+    for lo, hi, lab in HS_SECTIONS:
+        out[h.between(lo, hi)] = lab
+    return out
+
+
+HS_SECTION_ORDER = [lab for _, _, lab in HS_SECTIONS] + ["Unclassified"]
+
+
+def feols(fml: str, data: pd.DataFrame, **kw):
+    """pyfixest.feols with the Rust demeaner (identical estimates, ~50x faster on high-dimensional FE)."""
+    import pyfixest as pf
+    kw.setdefault("demeaner_backend", "rust")
+    return pf.feols(fml, data=data, **kw)

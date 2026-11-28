@@ -102,3 +102,6 @@ docs/overleaf_projects/**/*.out
 docs/overleaf_projects/**/*.spl
 docs/overleaf_projects/**/*.toc
 docs/overleaf_projects/WP_paperagro/Note_v*.pdf
+
+# Zips of deliveries and figure folders (2026-11-28): rebuilt from the tracked files, shared by hand
+docs/notes/*.zip
